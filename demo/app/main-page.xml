@@ -2,5 +2,6 @@
   xmlns:ui="nativescript-mdc">
   <StackLayout class="p-20">
     <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
+    <ui:Card></ui:Card>
   </StackLayout>
 </Page>
