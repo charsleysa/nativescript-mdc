@@ -1,7 +1,7 @@
 {
     "name": "nativescript-mdc",
-    "version": "1.0.0",
-    "description": "Your awesome NativeScript plugin.",
+    "version": "0.0.1",
+    "description": "NativeScript Material Design Components.",
     "main": "mdc",
     "typings": "index.d.ts",
     "nativescript": {
@@ -35,8 +35,8 @@
         "iOS"
     ],
     "author": {
-        "name": "Your Name",
-        "email": "youremail@yourdomain.com"
+        "name": "Stefan Charsley",
+        "email": "charsleysa@gmail.com"
     },
     "bugs": {
         "url": "https://github.com/charsleysa/nativescript-mdc/issues"
