@@ -13,8 +13,6 @@ import {
     strokeWidthProperty
 } from './card-common';
 
-declare var com: any;
-
 export class Card extends CardCommon {
     private _androidViewId: number;
 
@@ -23,7 +21,7 @@ export class Card extends CardCommon {
     }
 
     public createNativeView() {
-        return new (com.google.android.material.card as any).MaterialCardView(this._context);
+        return new (android.support.v7.widget as any).CardView(this._context);
     }
 
     public initNativeView() {

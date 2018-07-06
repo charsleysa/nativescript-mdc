@@ -3,7 +3,7 @@ import { ContentView, Property } from 'tns-core-modules/ui/content-view';
 export { backgroundColorProperty, backgroundInternalProperty } from 'tns-core-modules/ui/core/view';
 
 /**
- * Contains the CardView class, which represents a card view component.
+ * Contains the CardCommon class, which represents a card view component.
  */
 export class CardCommon extends ContentView {
     /**

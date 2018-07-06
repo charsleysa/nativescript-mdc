@@ -26,7 +26,7 @@ export class Card extends CardCommon {
     }
 
     [backgroundColorProperty.setNative](value: Color) {
-        this.nativeView.setBackgroundColor(value !== undefined ? value.ios : new Color('#FFFFFF').ios);
+        this.nativeView.backgroundColor = value !== undefined ? value.ios : new Color('#FFFFFF').ios;
     }
 
     [backgroundColorProperty.getDefault]() {
@@ -34,7 +34,7 @@ export class Card extends CardCommon {
     }
 
     [backgroundInternalProperty.setNative](value) {
-        this.nativeView.setBackgroundColor(new Color(value.color !== undefined ? value.color + '' : '#FFFFFF').ios);
+        this.nativeView.backgroundColor = new Color(value.color !== undefined ? value.color + '' : '#FFFFFF').ios;
     }
 
     [backgroundInternalProperty.getDefault]() {

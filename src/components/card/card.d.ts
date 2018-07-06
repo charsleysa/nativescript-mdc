@@ -1,9 +1,9 @@
 import { ContentView } from 'tns-core-modules/ui/content-view';
 
 /**
- * Contains the CardView class, which represents a card view component.
+ * Contains the Card class, which represents a card view component.
  */
-export class CardCommon extends ContentView {
+export class Card extends ContentView {
     /**
      * Gets or set the elevation of the card view.
      */
