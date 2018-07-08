@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/tns-platform-declarations/ios.d.ts" />
-
 import { Color } from 'tns-core-modules/color';
 import { screen } from 'tns-core-modules/platform';
 import {

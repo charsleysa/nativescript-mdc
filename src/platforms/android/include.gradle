@@ -21,5 +21,6 @@ dependencies {
     if(project.hasProperty("supportVersion")) {
        supportVer = supportVersion
     }
+    implementation "com.android.support:design:$supportVer"
     implementation "com.android.support:cardview-v7:$supportVer"
 }

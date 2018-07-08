@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/tns-platform-declarations/android.d.ts" />
-
 import * as application from 'tns-core-modules/application';
 import { Color } from 'tns-core-modules/color';
 import {
@@ -13,6 +11,8 @@ import {
     strokeWidthProperty
 } from './card-common';
 
+const CardView = (android.support.v7.widget as any).CardView;
+
 export class Card extends CardCommon {
     private _androidViewId: number;
 
@@ -21,7 +21,7 @@ export class Card extends CardCommon {
     }
 
     public createNativeView() {
-        return new (android.support.v7.widget as any).CardView(this._context);
+        return new CardView(this._context);
     }
 
     public initNativeView() {
