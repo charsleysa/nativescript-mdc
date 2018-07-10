@@ -26,6 +26,11 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
     public selectedTabIndex: number = 0;
 
     /**
+     * Get or set the style of visibilty for the title of the tabs.
+     */
+    public titleVisibility: 'selected' | 'always' | 'never' = 'selected';
+
+    /**
      * Get or set the color of the icon and title of the selected tab.
      */
     public activeColor: string = 'blue';
@@ -41,11 +46,6 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
     public backgroundColor: string = 'white';
 
     /**
-     * Get or set the keyLineColor of the bottomNavigation only for iOS
-     */
-    public keyLineColor: string = '#eeeeee';
-
-    /**
      * Method allowing to manually select a tab
      */
     public selectTab(index: number): void {
@@ -54,17 +54,15 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
         }
     }
 
-    public onTabSelected(index: number): boolean {
+    public onTabSelected(index: number) {
         let eventData: OnTabSelectedEventData = {
             eventName: 'tabSelected',
             object: this,
             oldIndex: this.selectedTabIndex || 0,
             newIndex: index
         };
-        if (this.tabs[index].selectable) { this.selectedTabIndex = index; }
+        this.selectedTabIndex = index;
         this.notify(eventData);
-
-        return this.tabs[index].selectable;
     }
 
     _addChildFromBuilder(name: string, value: any): void {
@@ -84,6 +82,11 @@ export const tabsProperty = new Property<BottomNavigationBase, BottomNavigationT
     equalityComparer: (a: any[], b: any[]) => !a && !b && a.length === b.length
 });
 tabsProperty.register(BottomNavigationBase);
+
+export const titleVisibilityProperty = new Property<BottomNavigationBase, string>({
+    name: 'titleVisibility'
+});
+titleVisibilityProperty.register(BottomNavigationBase);
 
 export const activeColorProperty = new Property<BottomNavigationBase, string>({
     name: 'activeColor'
@@ -124,24 +127,12 @@ export const backgroundColorCssProperty = new CssProperty<Style, Color>({
 });
 backgroundColorCssProperty.register(Style);
 
-export const keyLineColorProperty = new Property<BottomNavigationBase, string>({
-    name: 'keyLineColor'
-});
-keyLineColorProperty.register(BottomNavigationBase);
-
-export const keyLineColorCssProperty = new CssProperty<Style, Color>({
-    name: 'tabKeyLineColor',
-    cssName: 'tab-keyline-color',
-    equalityComparer: Color.equals,
-    valueConverter: v => new Color(v)
-});
-keyLineColorCssProperty.register(Style);
-
 export class BottomNavigationTabBase {
 
-    constructor(title: string, icon: string, selectable?: boolean, parent?: WeakRef<BottomNavigationBase>) {
+    constructor(title: string, icon: string, selectedIcon?: string, selectable?: boolean, parent?: WeakRef<BottomNavigationBase>) {
         this._title = title;
         this._icon = icon;
+        if (selectedIcon) { this._selectedIcon = selectedIcon; }
         if (selectable) { this._selectable = selectable; }
         if (parent) { this._parent = parent; }
     }
@@ -167,6 +158,18 @@ export class BottomNavigationTabBase {
     set icon(value: string) {
         if (this._icon !== value) {
             this._icon = value;
+        }
+    }
+
+    private _selectedIcon: string;
+
+    get selectedIcon(): string {
+        return this._selectedIcon;
+    }
+
+    set selectedIcon(value: string) {
+        if (this._selectedIcon !== value) {
+            this._selectedIcon = value;
         }
     }
 

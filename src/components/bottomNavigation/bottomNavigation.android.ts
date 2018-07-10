@@ -8,15 +8,15 @@ import {
     inactiveColorCssProperty,
     inactiveColorProperty,
     tabsProperty,
-    keyLineColorProperty,
-    keyLineColorCssProperty,
+    titleVisibilityProperty
 } from './bottomNavigation-common';
 import { Color } from 'tns-core-modules/color';
 import { fromResource } from 'tns-core-modules/image-source';
+import { ad } from 'tns-core-modules/utils/utils';
 
 const BitmapDrawable = android.graphics.drawable.BitmapDrawable;
 const BottomNavigationView = (android.support as any).design.widget.BottomNavigationView;
-let AHBottomNavigationItem = com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+const BottomNavigationMenuView = (android.support as any).design.internal.BottomNavigationMenuView;
 
 export class BottomNavigation extends BottomNavigationBase {
 
@@ -28,40 +28,104 @@ export class BottomNavigation extends BottomNavigationBase {
         this.nativeView = new BottomNavigationView(this._context);
         let owner = new WeakRef(this);
 
-        this.nativeView.setOnTabSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener(
-            {
-                get owner(): BottomNavigation {
-                    return owner.get();
-                },
-                onNavigationItemSelected: function (item: android.view.MenuItem): boolean {
-                    if (this.owner) {
-                        return this.owner.onTabSelected(item);
+        this.nativeView.setOnTabSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
+            get owner(): BottomNavigation {
+                return owner.get();
+            },
+            onNavigationItemSelected: function (item: android.view.MenuItem): boolean {
+                if (this.owner) {
+                    let bar: BottomNavigation = this.owner.get();
+                    const index = item.getItemId();
+                    const selectable = bar.tabs[index].selectable;
+                    if (selectable) {
+                        bar.onTabSelected(index);
+                        return true;
+                    } else {
+                        return false;
                     }
-
-                    return true;
                 }
+
+                return true;
             }
-        ));
+        }));
 
         return this.nativeView;
     }
 
     initNativeView(): void {
-        this.nativeView.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
-        this.nativeView.setAccentColor(new Color(this.activeColor).android);
-        this.nativeView.setInactiveColor(new Color(this.inactiveColor).android);
-        this.nativeView.setColored(false);
-        this.nativeView.setDefaultBackgroundColor(new Color(this.backgroundColor).android);
+        this.enableItemShiftMode(false);
+        this.setTabColors(new Color(this.activeColor), new Color(this.inactiveColor));
+        this.nativeView.setBackgroundColor(new Color(this.backgroundColor).android);
     }
 
     createTabs(tabs: BottomNavigationTab[]) {
         if (!this.tabs) { this.tabs = tabs; }
-        for (let tab of tabs) {
-            let icon = new BitmapDrawable(fromResource(tab.icon).android);
-            let item = new AHBottomNavigationItem(tab.title, icon, new Color('white').android);
-            this.nativeView.addItem(item);
+        const menu: android.view.Menu = this.nativeView.getMenu();
+        menu.clear();
+        for (const tabIndex in tabs) {
+            const tab = tabs[tabIndex];
+            const tabBarItem = menu.add(android.view.Menu.NONE, Number(tabIndex), android.view.Menu.NONE, tab.title);
+
+            const iconDrawable = new android.graphics.drawable.StateListDrawable();
+            if (tab.selectedIcon != null) {
+                const iconSelectedDrawable = new BitmapDrawable(fromResource(tab.selectedIcon).android);
+                iconDrawable.addState([ad.resources.getId('state_checked')], iconSelectedDrawable);
+            }
+            const iconDefaultDrawable = new BitmapDrawable(fromResource(tab.icon).android);
+            iconDrawable.addState([], iconDefaultDrawable);
+
+            tabBarItem.setIcon(iconDrawable);
         }
-        this.nativeView.setCurrentItem(this.selectedTabIndex);
+        this.nativeView.setSelectedItemId(this.selectedTabIndex);
+    }
+
+    private setTabColors(activeColor: Color, inactiveColor: Color) {
+        const colorStateList = new android.content.res.ColorStateList(
+            [ [ad.resources.getId('state_checked')], [] ],
+            [ activeColor.android, inactiveColor.android ]
+        );
+        this.nativeView.setItemIconTintList(colorStateList);
+        this.nativeView.setItemTextColor(colorStateList);
+    }
+
+    private enableItemShiftMode(enable: boolean) {
+        const menuView = this.getField(BottomNavigationView.class, this.nativeView, 'mMenuView');
+        this.setField(menuView.getClass(), menuView, 'mShiftingMode', false);
+        const menuItems = this.getField(menuView.getClass(), menuView, 'mButtons');
+        for (const item of menuItems) {
+            this.setField(item.getClass(), item, 'mShiftingMode', enable);
+        }
+        menuView.updateMenuView();
+    }
+
+    private getField(
+        targetClass: java.lang.Class<any>,
+        instance: java.lang.Object,
+        fieldName: string
+    ): any {
+        try {
+            const field = targetClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(instance);
+        } catch (e) {
+            console.log(e);
+        }
+        return null;
+    }
+
+    private setField(
+        targetClass: java.lang.Class<any>,
+        instance: java.lang.Object,
+        fieldName: string,
+        value: any
+    ) {
+        try {
+            const field = targetClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(instance, value);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     [tabsProperty.getDefault](): BottomNavigationTab[] {
@@ -72,36 +136,48 @@ export class BottomNavigation extends BottomNavigationBase {
         this.createTabs(value);
     }
 
+    [titleVisibilityProperty.getDefault](): string {
+        return 'selected';
+    }
+
+    [titleVisibilityProperty.setNative](value: string) {
+        switch (value) {
+            case 'never':
+                // TODO
+                this.enableItemShiftMode(false);
+                break;
+            case 'always':
+                this.enableItemShiftMode(false);
+                break;
+            case 'selected':
+            default:
+                this.enableItemShiftMode(true);
+                break;
+        }
+    }
+
     [activeColorProperty.setNative](activeColor: string) {
-        this.nativeView.setAccentColor(new Color(activeColor).android);
+        this.setTabColors(new Color(activeColor), new Color(this.inactiveColor));
     }
 
     [activeColorCssProperty.setNative](activeColor: Color) {
-        this.nativeView.setAccentColor(activeColor.android);
+        this.setTabColors(activeColor, new Color(this.inactiveColor));
     }
 
     [inactiveColorProperty.setNative](inactiveColor: string) {
-        this.nativeView.setInactiveColor(new Color(inactiveColor).android);
+        this.setTabColors(new Color(this.activeColor), new Color(inactiveColor));
     }
 
     [inactiveColorCssProperty.setNative](inactiveColor: Color) {
-        this.nativeView.setInactiveColor(inactiveColor.android);
+        this.setTabColors(new Color(this.activeColor), inactiveColor);
     }
 
     [backgroundColorProperty.setNative](backgroundColor: string) {
-        this.nativeView.setDefaultBackgroundColor(new Color(backgroundColor).android);
+        this.nativeView.setBackgroundColor(new Color(backgroundColor).android);
     }
 
     [backgroundColorCssProperty.setNative](backgroundColor: Color) {
-        this.nativeView.setDefaultBackgroundColor(backgroundColor.android);
-    }
-
-    [keyLineColorProperty.setNative](keyLineColor: string) {
-        // This inly works with ios
-    }
-
-    [keyLineColorCssProperty.setNative](keyLineColor: Color) {
-        // This inly works with ios
+        this.nativeView.setBackgroundColor(backgroundColor.android);
     }
 
     protected selectTabNative(index: number): void {
@@ -111,7 +187,7 @@ export class BottomNavigation extends BottomNavigationBase {
 }
 
 export class BottomNavigationTab extends BottomNavigationTabBase {
-    constructor(title: string, icon: string, selectable?: boolean, parent?: WeakRef<BottomNavigationBase>) {
-        super(title, icon, selectable, parent);
+    constructor(title: string, icon: string, selectedIcon?: string, selectable?: boolean, parent?: WeakRef<BottomNavigationBase>) {
+        super(title, icon, selectedIcon, selectable, parent);
     }
 }
