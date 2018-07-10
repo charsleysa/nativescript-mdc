@@ -26,15 +26,15 @@ export class BottomNavigation extends BottomNavigationBase {
 
     createNativeView(): Object {
         this.nativeView = new BottomNavigationView(this._context);
-        let owner = new WeakRef(this);
+        const owner = new WeakRef(this);
 
-        this.nativeView.setOnTabSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
+        this.nativeView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
             get owner(): BottomNavigation {
                 return owner.get();
             },
             onNavigationItemSelected: function (item: android.view.MenuItem): boolean {
                 if (this.owner) {
-                    let bar: BottomNavigation = this.owner.get();
+                    const bar: BottomNavigation = this.owner;
                     const index = item.getItemId();
                     const selectable = bar.tabs[index].selectable;
                     if (selectable) {
@@ -69,10 +69,12 @@ export class BottomNavigation extends BottomNavigationBase {
             const iconDrawable = new android.graphics.drawable.StateListDrawable();
             if (tab.selectedIcon != null) {
                 const iconSelectedDrawable = new BitmapDrawable(fromResource(tab.selectedIcon).android);
-                iconDrawable.addState([ad.resources.getId('state_checked')], iconSelectedDrawable);
+                const state = Array.create('int', 1);
+                state[0] = this.getResourceId('android:attr/state_checked');
+                iconDrawable.addState(state, iconSelectedDrawable);
             }
             const iconDefaultDrawable = new BitmapDrawable(fromResource(tab.icon).android);
-            iconDrawable.addState([], iconDefaultDrawable);
+            iconDrawable.addState(Array.create('int', 0), iconDefaultDrawable);
 
             tabBarItem.setIcon(iconDrawable);
         }
@@ -80,22 +82,34 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     private setTabColors(activeColor: Color, inactiveColor: Color) {
-        const colorStateList = new android.content.res.ColorStateList(
-            [ [ad.resources.getId('state_checked')], [] ],
-            [ activeColor.android, inactiveColor.android ]
-        );
+        const state = Array.create('int', 1);
+        state[0] = this.getResourceId('android:attr/state_checked');
+        const states = java.lang.reflect.Array.newInstance(state.getClass(), 2);
+        states[0] = state;
+        states[1] = Array.create('int', 0);
+        const colors = Array.create('int', 2);
+        colors[0] = activeColor.android;
+        colors[1] = inactiveColor.android;
+        const colorStateList = new android.content.res.ColorStateList(states, colors);
         this.nativeView.setItemIconTintList(colorStateList);
         this.nativeView.setItemTextColor(colorStateList);
     }
 
     private enableItemShiftMode(enable: boolean) {
         const menuView = this.getField(BottomNavigationView.class, this.nativeView, 'mMenuView');
-        this.setField(menuView.getClass(), menuView, 'mShiftingMode', false);
+        this.setField(menuView.getClass(), menuView, 'mShiftingMode', java.lang.Boolean.valueOf(false));
         const menuItems = this.getField(menuView.getClass(), menuView, 'mButtons');
-        for (const item of menuItems) {
-            this.setField(item.getClass(), item, 'mShiftingMode', enable);
+        if (menuItems != null) {
+            for (const item of menuItems) {
+                this.setField(item.getClass(), item, 'mShiftingMode', java.lang.Boolean.valueOf(enable));
+            }
+            menuView.updateMenuView();
         }
-        menuView.updateMenuView();
+    }
+
+    private getResourceId(name: string): number {
+        const resources: android.content.res.Resources = ad.getApplication().getResources();
+        return resources.getIdentifier(name, null, null);
     }
 
     private getField(

@@ -24,7 +24,7 @@ declare const
 
 export declare class MDCBottomNavigationBarDelegate { }
 
-export class BottomNavigationDelegate extends NSObject {
+class BottomNavigationDelegate extends NSObject {
 
     public static ObjCProtocols = [MDCBottomNavigationBarDelegate];
     private _owner: WeakRef<BottomNavigation>;
