@@ -16,7 +16,6 @@ import { ad } from 'tns-core-modules/utils/utils';
 
 const BitmapDrawable = android.graphics.drawable.BitmapDrawable;
 const BottomNavigationView = (android.support as any).design.widget.BottomNavigationView;
-const BottomNavigationMenuView = (android.support as any).design.internal.BottomNavigationMenuView;
 
 export class BottomNavigation extends BottomNavigationBase {
 
@@ -78,6 +77,21 @@ export class BottomNavigation extends BottomNavigationBase {
 
             tabBarItem.setIcon(iconDrawable);
         }
+        // --- Reset shift
+        switch (this.titleVisibility) {
+            case 'never':
+                // TODO
+                this.enableItemShiftMode(false);
+                break;
+            case 'always':
+                this.enableItemShiftMode(false);
+                break;
+            case 'selected':
+            default:
+                this.enableItemShiftMode(true);
+                break;
+        }
+        // ----
         this.nativeView.setSelectedItemId(this.selectedTabIndex);
     }
 

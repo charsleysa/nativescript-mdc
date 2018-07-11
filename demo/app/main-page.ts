@@ -8,3 +8,13 @@ export function pageLoaded(args: observable.EventData) {
     let page = <pages.Page>args.object;
     page.bindingContext = new HelloWorldModel();
 }
+
+export function loaded(args) {
+    let bar = args.object;
+    bar.on('tabSelected', (args) => {
+        if (args.newIndex === 1) {
+            alert('This item has selectable: false, and should be used to perform actions');
+        }
+        console.log('tab selected ' + args.newIndex);
+    });
+}

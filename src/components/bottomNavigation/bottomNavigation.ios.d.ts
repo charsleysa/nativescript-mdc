@@ -8,6 +8,7 @@ export declare class BottomNavigation extends BottomNavigationBase {
     initNativeView(): void;
     disposeNativeView(): void;
     onLoaded(): void;
+    layoutNativeView(left: number, top: number, right: number, bottom: number): void;
     createTabs(tabs: BottomNavigationTab[]): void;
     protected selectTabNative(index: number): void;
 }

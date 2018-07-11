@@ -14,6 +14,7 @@ import { Color } from 'tns-core-modules/color/color';
 import { fromResource } from 'tns-core-modules/image-source/image-source';
 import { screen } from 'tns-core-modules/platform/platform';
 import { ios } from 'tns-core-modules/application/application';
+import { View, layout } from 'tns-core-modules/ui/core/view/view';
 
 declare const MDCBottomNavigationBar: any;
 type MDCBottomNavigationBar = any;
@@ -64,13 +65,6 @@ export class BottomNavigation extends BottomNavigationBase {
     createNativeView() {
         this._delegate = BottomNavigationDelegate.initWithOwner(new WeakRef(this));
         this.nativeView = MDCBottomNavigationBar.alloc().init();
-        let bottomSafeArea = 0;
-        if (ios.window.safeAreaInsets) {
-            bottomSafeArea = ios.window.safeAreaInsets.bottom;
-        }
-        const bottomBarHeight = 56 + bottomSafeArea;
-        this.nativeView.frame = CGRectMake(0, screen.mainScreen.heightDIPs - bottomBarHeight, screen.mainScreen.widthDIPs, bottomBarHeight);
-
         return this.nativeView;
     }
 
@@ -89,6 +83,28 @@ export class BottomNavigation extends BottomNavigationBase {
     onLoaded() {
         this.nativeView.delegate = this._delegate;
         super.onLoaded();
+    }
+
+    public layoutNativeView(left: number, top: number, right: number, bottom: number): void {
+        if (!this.nativeViewProtected) {
+            return;
+        }
+
+        let bottomSafeArea = 0;
+        if (ios.window.safeAreaInsets) {
+            bottomSafeArea = ios.window.safeAreaInsets.bottom;
+        }
+
+        const nativeView = this.nativeViewProtected;
+        const frame = CGRectMake(
+            layout.toDeviceIndependentPixels(left),
+            layout.toDeviceIndependentPixels(top),
+            layout.toDeviceIndependentPixels(right - left),
+            layout.toDeviceIndependentPixels(bottom - top) + bottomSafeArea
+        );
+
+        // Method not defined in .d.ts file but it's there
+        (this as any)._setNativeViewFrame(nativeView, frame);
     }
 
     createTabs(tabs: BottomNavigationTab[]) {

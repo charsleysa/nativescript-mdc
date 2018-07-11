@@ -6,10 +6,11 @@
         <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
       </mdc:Card>
     </StackLayout>
-      <mdc:BottomNavigation class="bottom-nav" loaded="{{ loaded }}" row="1">
+      <mdc:BottomNavigation class="bottom-nav" loaded="loaded" row="1">
           <mdc:BottomNavigationTab title="First" icon="ic_home" />
           <mdc:BottomNavigationTab title="Second" icon="ic_view_list" selectable="false" />
           <mdc:BottomNavigationTab title="Third" icon="ic_menu" />
+          <mdc:BottomNavigationTab title="Forth" icon="ic_view_list" selectedIcon="ic_menu" />
       </mdc:BottomNavigation>
   </GridLayout>
 </Page>
