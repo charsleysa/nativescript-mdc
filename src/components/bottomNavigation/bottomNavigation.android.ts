@@ -10,8 +10,8 @@ import {
     tabsProperty,
     titleVisibilityProperty
 } from './bottomNavigation-common';
-import { Color } from 'tns-core-modules/color';
-import { fromResource } from 'tns-core-modules/image-source';
+import { Color } from 'tns-core-modules/color/color';
+import { fromResource } from 'tns-core-modules/image-source/image-source';
 import { ad } from 'tns-core-modules/utils/utils';
 
 const BitmapDrawable = android.graphics.drawable.BitmapDrawable;

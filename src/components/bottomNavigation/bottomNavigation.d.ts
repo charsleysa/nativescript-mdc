@@ -1,5 +1,5 @@
-import { EventData } from 'tns-core-modules/data/observable';
-import { AddChildFromBuilder, View } from 'tns-core-modules/ui/core/view';
+import { EventData } from 'tns-core-modules/data/observable/observable';
+import { AddChildFromBuilder, View } from 'tns-core-modules/ui/core/view/view';
 
 export declare interface OnTabSelectedEventData extends EventData {
     oldIndex: number;

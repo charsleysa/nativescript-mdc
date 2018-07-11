@@ -1,5 +1,5 @@
-import * as application from 'tns-core-modules/application';
-import { Color } from 'tns-core-modules/color';
+import * as application from 'tns-core-modules/application/application';
+import { Color } from 'tns-core-modules/color/color';
 import {
     CardCommon,
     backgroundColorProperty,

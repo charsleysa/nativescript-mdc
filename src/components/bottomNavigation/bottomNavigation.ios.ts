@@ -10,10 +10,10 @@ import {
     tabsProperty,
     titleVisibilityProperty
 } from './bottomNavigation-common';
-import { Color } from 'tns-core-modules/color';
-import { fromResource } from 'tns-core-modules/image-source';
-import { screen } from 'tns-core-modules/platform';
-import { ios } from 'tns-core-modules/application';
+import { Color } from 'tns-core-modules/color/color';
+import { fromResource } from 'tns-core-modules/image-source/image-source';
+import { screen } from 'tns-core-modules/platform/platform';
+import { ios } from 'tns-core-modules/application/application';
 
 declare const MDCBottomNavigationBar: any;
 type MDCBottomNavigationBar = any;

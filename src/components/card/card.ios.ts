@@ -1,5 +1,5 @@
-import { Color } from 'tns-core-modules/color';
-import { screen } from 'tns-core-modules/platform';
+import { Color } from 'tns-core-modules/color/color';
+import { screen } from 'tns-core-modules/platform/platform';
 import {
     CardCommon,
     backgroundColorProperty,
