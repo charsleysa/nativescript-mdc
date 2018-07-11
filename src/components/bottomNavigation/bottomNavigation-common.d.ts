@@ -1,8 +1,8 @@
-import { AddChildFromBuilder, View } from 'tns-core-modules/ui/core/view';
-import { CssProperty, Property } from 'tns-core-modules/ui/core/properties';
-import { EventData } from 'tns-core-modules/data/observable';
-import { Style } from 'tns-core-modules/ui/styling/style';
-import { Color } from 'tns-core-modules/color';
+import { AddChildFromBuilder, View } from 'tns-core-modules/ui/core/view/view';
+import { CssProperty, Property } from 'tns-core-modules/ui/core/properties/properties';
+import { EventData } from 'tns-core-modules/data/observable/observable';
+import { Style } from 'tns-core-modules/ui/styling/style/style';
+import { Color } from 'tns-core-modules/color/color';
 export interface OnTabSelectedEventData extends EventData {
     oldIndex: number;
     newIndex: number;
