@@ -1,1 +1,10 @@
 ﻿@import '~nativescript-theme-core/css/core.light.css';
+
+.card {
+    margin: 30;
+    background-color: pink;
+}
+
+.text {
+    margin: 30;
+}

@@ -1,5 +1,6 @@
 import * as application from 'tns-core-modules/application/application';
 import { Color } from 'tns-core-modules/color/color';
+import { layout } from 'tns-core-modules/utils/utils';
 import {
     CardCommon,
     backgroundColorProperty,
@@ -52,11 +53,11 @@ export class Card extends CardCommon {
     }
 
     [elevationProperty.setNative](value: number) {
-        this.nativeView.setCardElevation(value);
+        this.nativeView.setCardElevation(layout.toDevicePixels(value));
     }
 
     [radiusProperty.setNative](value: number) {
-        this.nativeView.setRadius(value);
+        this.nativeView.setRadius(layout.toDevicePixels(value));
     }
 
     [rippleProperty.setNative](value: boolean) {
@@ -82,10 +83,10 @@ export class Card extends CardCommon {
     }
 
     [strokeColorProperty.setNative](value: Color) {
-        this.nativeView.setStrokeColor(value !== undefined ? value.android : new Color('#FFFFFF').android);
+        // this.nativeView.setStrokeColor(value !== undefined ? value.android : new Color('#FFFFFF').android);
     }
 
     [strokeWidthProperty.setNative](value: number) {
-        this.nativeView.setStrokeWidth(value);
+        // this.nativeView.setStrokeWidth(value);
     }
 }

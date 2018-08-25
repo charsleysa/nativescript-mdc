@@ -1,9 +1,9 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" class="page"
   xmlns:mdc="nativescript-mdc">
   <GridLayout columns="*" rows="*, auto">
-    <StackLayout class="p-20" row="0">
-      <mdc:Card backgroundColor="red" elevation="10" radius="5" ripple="true">
-        <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
+    <StackLayout row="0">
+      <mdc:Card class="card" elevation="5" radius="15" ripple="true">
+        <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
       </mdc:Card>
     </StackLayout>
       <mdc:BottomNavigation class="bottom-nav" loaded="loaded" row="1">
