@@ -209,7 +209,7 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     protected selectTabNative(index: number): void {
-        this.nativeView.setCurrentItem(index);
+        this.nativeView.setSelectedItemId(index);
     }
 
 }
