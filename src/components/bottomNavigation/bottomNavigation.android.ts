@@ -16,6 +16,7 @@ import { ad } from 'tns-core-modules/utils/utils';
 
 const BitmapDrawable = android.graphics.drawable.BitmapDrawable;
 const BottomNavigationView = (android.support as any).design.widget.BottomNavigationView;
+const MenuBuilder = (android.support.v7.view as any).menu.MenuBuilder;
 
 export class BottomNavigation extends BottomNavigationBase {
 
@@ -92,7 +93,12 @@ export class BottomNavigation extends BottomNavigationBase {
                 break;
         }
         // ----
+        // Disable the bottom navigation callback when setting the item (match iOS behavior)
+        const menuBuilder = menu as any; /** MenuBuilder */
+        const cb = this.getField(MenuBuilder.class, menuBuilder, 'mCallback');
+        menuBuilder.setCallback(null);
         this.nativeView.setSelectedItemId(this.selectedTabIndex);
+        menuBuilder.setCallback(cb);
     }
 
     private setTabColors(activeColor: Color, inactiveColor: Color) {
