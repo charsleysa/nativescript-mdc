@@ -10,15 +10,15 @@
 
 android {
   project.ext {
-    compileSdk = "27"
-    targetSdk = "27"
-    supportVersion = "27.1.1"
+    compileSdk = "28"
+    targetSdk = "28"
+    supportVersion = "28.0.0"
   }
-  defaultConfig {  
+  defaultConfig {
     generatedDensities = []
-    applicationId = "org.nativescript.demo"  
-  }  
-  aaptOptions {  
-    additionalParameters "--no-version-vectors"  
-  }  
-} 
+    applicationId = "org.nativescript.demo"
+  }
+  aaptOptions {
+    additionalParameters "--no-version-vectors"
+  }
+}

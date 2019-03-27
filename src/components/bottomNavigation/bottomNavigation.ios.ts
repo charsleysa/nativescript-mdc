@@ -1,3 +1,11 @@
+import { Color } from 'tns-core-modules/color/color';
+import { fromResource } from 'tns-core-modules/image-source/image-source';
+import { screen } from 'tns-core-modules/platform/platform';
+import { ios } from 'tns-core-modules/application/application';
+import { View, layout } from 'tns-core-modules/ui/core/view/view';
+
+import { themer } from '../core/material';
+
 import {
     activeColorCssProperty,
     activeColorProperty,
@@ -10,18 +18,6 @@ import {
     tabsProperty,
     titleVisibilityProperty
 } from './bottomNavigation-common';
-import { Color } from 'tns-core-modules/color/color';
-import { fromResource } from 'tns-core-modules/image-source/image-source';
-import { screen } from 'tns-core-modules/platform/platform';
-import { ios } from 'tns-core-modules/application/application';
-import { View, layout } from 'tns-core-modules/ui/core/view/view';
-
-declare const MDCBottomNavigationBar: any;
-type MDCBottomNavigationBar = any;
-declare const
-    MDCBottomNavigationBarTitleVisibilitySelected: any,
-    MDCBottomNavigationBarTitleVisibilityAlways: any,
-    MDCBottomNavigationBarTitleVisibilityNever: any;
 
 export declare class MDCBottomNavigationBarDelegate { }
 
@@ -55,25 +51,29 @@ class BottomNavigationDelegate extends NSObject {
 }
 
 export class BottomNavigation extends BottomNavigationBase {
+    nativeViewProtected: MDCBottomNavigationBar;
 
     private _delegate: BottomNavigationDelegate;
 
     get ios(): any {
-        return this.nativeView;
+        return this.nativeViewProtected;
     }
 
     createNativeView() {
         this._delegate = BottomNavigationDelegate.initWithOwner(new WeakRef(this));
-        this.nativeView = MDCBottomNavigationBar.alloc().init();
-        return this.nativeView;
+        const view = MDCBottomNavigationBar.alloc().init();
+        const colorScheme = themer.getAppColorScheme();
+        if (colorScheme) {
+            MDCBottomNavigationBarColorThemer.applySemanticColorSchemeToBottomNavigation(colorScheme, view);
+        }
+        return view;
     }
 
     initNativeView(): void {
-        this.nativeView.selectedItemTintColor = new Color(this.activeColor).ios;
-        this.nativeView.selectedItemTitleColor = new Color(this.activeColor).ios;
-        this.nativeView.unselectedItemTintColor = new Color(this.inactiveColor).ios;
-        this.nativeView.unselectedItemTitleColor = new Color(this.inactiveColor).ios;
-        this.nativeView.barTintColor = new Color(this.backgroundColor).ios;
+        this.nativeViewProtected.selectedItemTintColor = new Color(this.activeColor).ios;
+        this.nativeViewProtected.selectedItemTitleColor = new Color(this.activeColor).ios;
+        this.nativeViewProtected.unselectedItemTintColor = new Color(this.inactiveColor).ios;
+        this.nativeViewProtected.barTintColor = new Color(this.backgroundColor).ios;
     }
 
     disposeNativeView() {
@@ -81,7 +81,7 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     onLoaded() {
-        this.nativeView.delegate = this._delegate;
+        this.nativeViewProtected.delegate = this._delegate;
         super.onLoaded();
     }
 
@@ -119,8 +119,8 @@ export class BottomNavigation extends BottomNavigationBase {
             }
             bottomNavigationTabs.push(tabBarItem);
         }
-        this.nativeView.items = bottomNavigationTabs;
-        this.nativeView.selectedItem = bottomNavigationTabs[this.selectedTabIndex];
+        this.nativeViewProtected.items = bottomNavigationTabs as unknown as NSArray<UITabBarItem>;
+        this.nativeViewProtected.selectedItem = bottomNavigationTabs[this.selectedTabIndex];
     }
 
     [tabsProperty.getDefault](): BottomNavigationTab[] {
@@ -138,48 +138,46 @@ export class BottomNavigation extends BottomNavigationBase {
     [titleVisibilityProperty.setNative](value: string) {
         switch (value) {
             case 'never':
-                this.nativeView.titleVisibility = MDCBottomNavigationBarTitleVisibilityNever;
+                this.nativeViewProtected.titleVisibility = MDCBottomNavigationBarTitleVisibility.Never;
                 break;
             case 'always':
-                this.nativeView.titleVisibility = MDCBottomNavigationBarTitleVisibilityAlways;
+                this.nativeViewProtected.titleVisibility = MDCBottomNavigationBarTitleVisibility.Always;
                 break;
             case 'selected':
             default:
-                this.nativeView.titleVisibility = MDCBottomNavigationBarTitleVisibilitySelected;
+                this.nativeViewProtected.titleVisibility = MDCBottomNavigationBarTitleVisibility.Selected;
                 break;
         }
     }
 
     [activeColorProperty.setNative](activeColor: string) {
-        this.nativeView.selectedItemTintColor = new Color(activeColor).ios;
-        this.nativeView.selectedItemTitleColor = new Color(activeColor).ios;
+        this.nativeViewProtected.selectedItemTintColor = new Color(activeColor).ios;
+        this.nativeViewProtected.selectedItemTitleColor = new Color(activeColor).ios;
     }
 
     [activeColorCssProperty.setNative](activeColor: Color) {
-        this.nativeView.selectedItemTintColor = activeColor.ios;
-        this.nativeView.selectedItemTitleColor = activeColor.ios;
+        this.nativeViewProtected.selectedItemTintColor = activeColor.ios;
+        this.nativeViewProtected.selectedItemTitleColor = activeColor.ios;
     }
 
     [inactiveColorProperty.setNative](inactiveColor: string) {
-        this.nativeView.unselectedItemTintColor = new Color(inactiveColor).ios;
-        this.nativeView.unselectedItemTitleColor = new Color(inactiveColor).ios;
+        this.nativeViewProtected.unselectedItemTintColor = new Color(inactiveColor).ios;
     }
 
     [inactiveColorCssProperty.setNative](inactiveColor: Color) {
-        this.nativeView.unselectedItemTintColor = inactiveColor.ios;
-        this.nativeView.unselectedItemTitleColor = inactiveColor.ios;
+        this.nativeViewProtected.unselectedItemTintColor = inactiveColor.ios;
     }
 
     [backgroundColorProperty.setNative](backgroundColor: string) {
-        this.nativeView.barTintColor = new Color(backgroundColor).ios;
+        this.nativeViewProtected.barTintColor = new Color(backgroundColor).ios;
     }
 
     [backgroundColorCssProperty.setNative](backgroundColor: Color) {
-        this.nativeView.barTintColor = backgroundColor.ios;
+        this.nativeViewProtected.barTintColor = backgroundColor.ios;
     }
 
     protected selectTabNative(index: number): void {
-        this.nativeView.selectedItem = this.nativeView.items[index];
+        this.nativeViewProtected.selectedItem = this.nativeViewProtected.items[index];
     }
 }
 

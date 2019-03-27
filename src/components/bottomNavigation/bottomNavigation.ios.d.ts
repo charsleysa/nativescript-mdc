@@ -2,9 +2,10 @@ import { BottomNavigationBase, BottomNavigationTabBase } from './bottomNavigatio
 export declare class MDCBottomNavigationBarDelegate {
 }
 export declare class BottomNavigation extends BottomNavigationBase {
+    nativeViewProtected: MDCBottomNavigationBar;
     private _delegate;
     readonly ios: any;
-    createNativeView(): any;
+    createNativeView(): MDCBottomNavigationBar;
     initNativeView(): void;
     disposeNativeView(): void;
     onLoaded(): void;

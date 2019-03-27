@@ -1,3 +1,7 @@
+import { Color } from 'tns-core-modules/color/color';
+import { fromResource } from 'tns-core-modules/image-source/image-source';
+import { ad } from 'tns-core-modules/utils/utils';
+
 import {
     activeColorCssProperty,
     activeColorProperty,
@@ -10,31 +14,43 @@ import {
     tabsProperty,
     titleVisibilityProperty
 } from './bottomNavigation-common';
-import { Color } from 'tns-core-modules/color/color';
-import { fromResource } from 'tns-core-modules/image-source/image-source';
-import { ad } from 'tns-core-modules/utils/utils';
 
-const BitmapDrawable = android.graphics.drawable.BitmapDrawable;
-const BottomNavigationView = (android.support as any).design.widget.BottomNavigationView;
-const MenuBuilder = (android.support.v7.view as any).menu.MenuBuilder;
+import BitmapDrawable = android.graphics.drawable.BitmapDrawable;
+import BottomNavigationView = android.support.design.widget.BottomNavigationView;
+import MenuBuilder = android.support.v7.view.menu.MenuBuilder;
+
+enum LabelVisibilityMode {
+    /**
+     * Label behaves as "labeled" when there are 3 items or less, or "selected" when there are 4 items
+     * or more.
+     */
+    LABEL_VISIBILITY_AUTO = -1,
+
+    /** Label is shown on the selected navigation item. */
+    LABEL_VISIBILITY_SELECTED = 0,
+
+    /** Label is shown on all navigation items. */
+    LABEL_VISIBILITY_LABELED = 1,
+
+    /** Label is not shown on any navigation items. */
+    LABEL_VISIBILITY_UNLABELED = 2
+}
 
 export class BottomNavigation extends BottomNavigationBase {
+    nativeViewProtected: BottomNavigationView;
 
     get android(): any {
-        return this.nativeView;
+        return this.nativeViewProtected;
     }
 
     createNativeView(): Object {
-        this.nativeView = new BottomNavigationView(this._context);
+        const view = new BottomNavigationView(this._context);
         const owner = new WeakRef(this);
 
-        this.nativeView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
-            get owner(): BottomNavigation {
-                return owner.get();
-            },
+        view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
             onNavigationItemSelected: function (item: android.view.MenuItem): boolean {
                 if (this.owner) {
-                    const bar: BottomNavigation = this.owner;
+                    const bar: BottomNavigation = owner.get();
                     const index = item.getItemId();
                     const selectable = bar.tabs[index].selectable;
                     if (selectable) {
@@ -49,22 +65,22 @@ export class BottomNavigation extends BottomNavigationBase {
             }
         }));
 
-        return this.nativeView;
+        return view;
     }
 
     initNativeView(): void {
-        this.enableItemShiftMode(false);
         this.setTabColors(new Color(this.activeColor), new Color(this.inactiveColor));
-        this.nativeView.setBackgroundColor(new Color(this.backgroundColor).android);
+        this.nativeViewProtected.setBackgroundColor(new Color(this.backgroundColor).android);
     }
 
     createTabs(tabs: BottomNavigationTab[]) {
         if (!this.tabs) { this.tabs = tabs; }
-        const menu: android.view.Menu = this.nativeView.getMenu();
+        const menu: android.view.Menu = this.nativeViewProtected.getMenu();
         menu.clear();
         for (const tabIndex in tabs) {
             const tab = tabs[tabIndex];
             const tabBarItem = menu.add(android.view.Menu.NONE, Number(tabIndex), android.view.Menu.NONE, tab.title);
+            tabBarItem.setEnabled(tab.selectable);
 
             const iconDrawable = new android.graphics.drawable.StateListDrawable();
             if (tab.selectedIcon != null) {
@@ -78,26 +94,11 @@ export class BottomNavigation extends BottomNavigationBase {
 
             tabBarItem.setIcon(iconDrawable);
         }
-        // --- Reset shift
-        switch (this.titleVisibility) {
-            case 'never':
-                // TODO
-                this.enableItemShiftMode(false);
-                break;
-            case 'always':
-                this.enableItemShiftMode(false);
-                break;
-            case 'selected':
-            default:
-                this.enableItemShiftMode(true);
-                break;
-        }
-        // ----
         // Disable the bottom navigation callback when setting the item (match iOS behavior)
         const menuBuilder = menu as any; /** MenuBuilder */
         const cb = this.getField(MenuBuilder.class, menuBuilder, 'mCallback');
         menuBuilder.setCallback(null);
-        this.nativeView.setSelectedItemId(this.selectedTabIndex);
+        this.nativeViewProtected.setSelectedItemId(this.selectedTabIndex);
         menuBuilder.setCallback(cb);
     }
 
@@ -111,20 +112,8 @@ export class BottomNavigation extends BottomNavigationBase {
         colors[0] = activeColor.android;
         colors[1] = inactiveColor.android;
         const colorStateList = new android.content.res.ColorStateList(states, colors);
-        this.nativeView.setItemIconTintList(colorStateList);
-        this.nativeView.setItemTextColor(colorStateList);
-    }
-
-    private enableItemShiftMode(enable: boolean) {
-        const menuView = this.getField(BottomNavigationView.class, this.nativeView, 'mMenuView');
-        this.setField(menuView.getClass(), menuView, 'mShiftingMode', java.lang.Boolean.valueOf(false));
-        const menuItems = this.getField(menuView.getClass(), menuView, 'mButtons');
-        if (menuItems != null) {
-            for (const item of menuItems) {
-                this.setField(item.getClass(), item, 'mShiftingMode', java.lang.Boolean.valueOf(enable));
-            }
-            menuView.updateMenuView();
-        }
+        this.nativeViewProtected.setItemIconTintList(colorStateList);
+        this.nativeViewProtected.setItemTextColor(colorStateList);
     }
 
     private getResourceId(name: string): number {
@@ -171,21 +160,28 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     [titleVisibilityProperty.getDefault](): string {
-        return 'selected';
+        switch ((this.nativeViewProtected as any).getLabelVisibilityMode()) {
+            case LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED:
+                return 'never';
+            case LabelVisibilityMode.LABEL_VISIBILITY_LABELED:
+                return 'always';
+            case LabelVisibilityMode.LABEL_VISIBILITY_SELECTED:
+            default:
+                return 'selected';
+        }
     }
 
     [titleVisibilityProperty.setNative](value: string) {
         switch (value) {
             case 'never':
-                // TODO
-                this.enableItemShiftMode(false);
+                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
                 break;
             case 'always':
-                this.enableItemShiftMode(false);
+                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
                 break;
             case 'selected':
             default:
-                this.enableItemShiftMode(true);
+                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_SELECTED);
                 break;
         }
     }
@@ -207,15 +203,15 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     [backgroundColorProperty.setNative](backgroundColor: string) {
-        this.nativeView.setBackgroundColor(new Color(backgroundColor).android);
+        this.nativeViewProtected.setBackgroundColor(new Color(backgroundColor).android);
     }
 
     [backgroundColorCssProperty.setNative](backgroundColor: Color) {
-        this.nativeView.setBackgroundColor(backgroundColor.android);
+        this.nativeViewProtected.setBackgroundColor(backgroundColor.android);
     }
 
     protected selectTabNative(index: number): void {
-        this.nativeView.setSelectedItemId(index);
+        this.nativeViewProtected.setSelectedItemId(index);
     }
 
 }

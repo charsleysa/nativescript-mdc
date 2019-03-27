@@ -1,1 +1,2 @@
-export * from './module';
+export declare class NativeScriptMDCBottomNavigationModule {
+}

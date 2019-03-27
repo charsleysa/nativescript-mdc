@@ -1,2 +1,34 @@
+pod 'MaterialComponents/schemes/Color'
+
+pod 'MaterialComponents/ActivityIndicator'
+pod 'MaterialComponents/ActivityIndicator+ColorThemer'
+
+pod 'MaterialComponents/BottomSheet'
+
 pod 'MaterialComponents/BottomNavigation'
+pod 'MaterialComponents/BottomNavigation+ColorThemer'
+
+pod 'MaterialComponents/Buttons'
+pod 'MaterialComponents/Buttons+ButtonThemer'
+
 pod 'MaterialComponents/Cards'
+pod 'MaterialComponents/Cards+ColorThemer'
+
+pod 'MaterialComponents/Dialogs'
+pod 'MaterialComponents/Dialogs+DialogThemer'
+pod 'MaterialComponents/Dialogs+TypographyThemer'
+
+pod 'MaterialComponents/Ink'
+pod 'MaterialComponents/Ink+ColorThemer'
+
+pod 'MaterialComponents/ProgressView'
+pod 'MaterialComponents/ProgressView+ColorThemer'
+
+pod 'MaterialComponents/Slider'
+pod 'MaterialComponents/Slider+ColorThemer'
+
+pod 'MaterialComponents/Snackbar'
+pod 'MaterialComponents/Snackbar+ColorThemer'
+
+pod 'MaterialComponents/TextFields'
+pod 'MaterialComponents/TextFields+ColorThemer'

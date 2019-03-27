@@ -3,7 +3,7 @@ import { BottomNavigation, BottomNavigationTab } from '../bottomNavigation';
 import { isBlank } from 'nativescript-angular/lang-facade';
 
 @Directive({
-    selector: 'BottomNavigation'
+    selector: 'MDCBottomNavigation'
 })
 export class BottomNavigationDirective implements AfterViewInit {
 
@@ -110,7 +110,7 @@ export class BottomNavigationDirective implements AfterViewInit {
 }
 
 @Directive({
-    selector: 'BottomNavigationTab'
+    selector: 'MDCBottomNavigationTab'
 })
 export class BottomNavigationTabDirective {
 

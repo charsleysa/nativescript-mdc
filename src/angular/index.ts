@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 
 import { NativeScriptMDCBottomNavigationModule } from '../components/bottomNavigation/angular';
-import { NativeScriptMDCCardModule } from '../components/card/angular';
+import { NativeScriptMDCCardViewModule } from '../components/cardView/angular';
 
 @NgModule({
     imports: [
         NativeScriptMDCBottomNavigationModule,
-        NativeScriptMDCCardModule
+        NativeScriptMDCCardViewModule
     ],
     exports: [
         NativeScriptMDCBottomNavigationModule,
-        NativeScriptMDCCardModule
+        NativeScriptMDCCardViewModule
     ]
 })
 export class NativescriptMDCModule { }

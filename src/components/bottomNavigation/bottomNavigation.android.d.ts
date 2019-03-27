@@ -4,11 +4,11 @@ export declare class BottomNavigation extends BottomNavigationBase {
     createNativeView(): Object;
     initNativeView(): void;
     createTabs(tabs: BottomNavigationTab[]): void;
-    private setTabColors(activeColor, inactiveColor);
-    private enableItemShiftMode(enable);
-    private getResourceId(name);
-    private getField(targetClass, instance, fieldName);
-    private setField(targetClass, instance, fieldName, value);
+    private setTabColors;
+    private enableItemShiftMode;
+    private getResourceId;
+    private getField;
+    private setField;
     protected selectTabNative(index: number): void;
 }
 export declare class BottomNavigationTab extends BottomNavigationTabBase {
