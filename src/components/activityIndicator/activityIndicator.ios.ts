@@ -1,9 +1,8 @@
-import { colorProperty } from 'tns-core-modules/ui/styling/style-properties';
-import { Color } from 'tns-core-modules/color/color';
+import { colorProperty, Color } from 'tns-core-modules/ui/core/view';
 import { screen } from 'tns-core-modules/platform/platform';
 
-import { ActivityIndicatorBase } from './activityIndicator-common';
 import { themer } from '../core/material';
+import { ActivityIndicatorBase, busyProperty } from './activityIndicator-common';
 
 declare module 'tns-core-modules/ui/core/view' {
     interface View {
@@ -17,7 +16,7 @@ export class ActivityIndicator extends ActivityIndicatorBase {
     get ios(): MDCActivityIndicator {
         return this.nativeViewProtected;
     }
-    public createNativeView() {
+    createNativeView() {
         const view = MDCActivityIndicator.new();
         const colorScheme = this.colorThemer || themer.getAppColorScheme();
         if (colorScheme) {
@@ -33,60 +32,22 @@ export class ActivityIndicator extends ActivityIndicatorBase {
         return this.colorThemer;
     }
 
-    _onSizeChanged(): void {
-        if (this.autoSize) {
-            this.updateStrokeRadius(this.getMeasuredWidth(), this.getMeasuredHeight());
+    [busyProperty.getDefault](): boolean {
+        if ((<any>this.nativeViewProtected).isAnimating) {
+            return (<any>this.nativeViewProtected).isAnimating();
         }
-        super._onSizeChanged();
+        else {
+            return this.nativeViewProtected.animating;
+        }
     }
-
-    private updateStrokeRadius(width: number, height: number) {
-        // radius is maxed to 72
-        const min = Math.min(Math.min(width, height), 144);
-        const strokeWidth = min / 25;
-        const scale = screen.mainScreen.scale;
-
-        const radius = min / 2 - strokeWidth / 2;
-        this.nativeViewProtected.strokeWidth = strokeWidth;
-        this.nativeViewProtected.radius = radius / scale;
+    [busyProperty.setNative](value: boolean) {
+        let nativeView = this.nativeViewProtected;
+        if (value) {
+            nativeView.startAnimating();
+        } else {
+            nativeView.stopAnimating();
+        }
     }
-
-    // public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
-
-    //     let nativeView = this.nativeViewProtected;
-    //     if (nativeView) {
-    //         const width = layout.getMeasureSpecSize(widthMeasureSpec);
-    //         const widthMode = layout.getMeasureSpecMode(widthMeasureSpec);
-    //         const height = layout.getMeasureSpecSize(heightMeasureSpec);
-    //         const heightMode = layout.getMeasureSpecMode(heightMeasureSpec);
-
-    //         const horizontalPadding = this.effectivePaddingLeft + this.effectiveBorderLeftWidth + this.effectivePaddingRight + this.effectiveBorderRightWidth;
-    //         let verticalPadding = this.effectivePaddingTop + this.effectiveBorderTopWidth + this.effectivePaddingBottom + this.effectiveBorderBottomWidth;
-
-    //         const desiredSize = layout.measureNativeView(
-    //             nativeView,
-    //             width - horizontalPadding, widthMode,
-    //             height - verticalPadding, heightMode);
-
-    //         desiredSize.width = desiredSize.width + horizontalPadding;
-    //         desiredSize.height = desiredSize.height + verticalPadding;
-
-    //         const measureWidth = Math.max(desiredSize.width, this.effectiveMinWidth);
-    //         const measureHeight = Math.max(desiredSize.height, this.effectiveMinHeight);
-
-    //         const widthAndState = View.resolveSizeAndState(measureWidth, width, widthMode, 0);
-    //         const heightAndState = View.resolveSizeAndState(measureHeight, height, heightMode, 0);
-
-    //         this.setMeasuredDimension(widthAndState, heightAndState);
-    //     }
-    // }
-
-    // public startAnimating() {
-    //     this.nativeView.startAnimating();
-    // }
-    // public stopAnimating() {
-    //     this.nativeView.stopAnimating();
-    // }
 
     [colorProperty.getDefault](): UIColor {
         return null;

@@ -1,11 +1,12 @@
 import { BottomNavigationBase, BottomNavigationTabBase } from './bottomNavigation-common';
+import BottomNavigationView = android.support.design.widget.BottomNavigationView;
 export declare class BottomNavigation extends BottomNavigationBase {
+    nativeViewProtected: BottomNavigationView;
     readonly android: any;
     createNativeView(): Object;
     initNativeView(): void;
     createTabs(tabs: BottomNavigationTab[]): void;
     private setTabColors;
-    private enableItemShiftMode;
     private getResourceId;
     private getField;
     private setField;

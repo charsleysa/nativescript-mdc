@@ -1,6 +1,7 @@
-import { ActivityIndicator as NSActivityIndicator } from 'tns-core-modules/ui/activity-indicator';
-export declare abstract class ActivityIndicatorBase extends NSActivityIndicator {
+import { Property, View } from 'tns-core-modules/ui/core/view';
+export declare abstract class ActivityIndicatorBase extends View {
+    busy: boolean;
     startAnimating(): void;
     stopAnimating(): void;
-    onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void;
 }
+export declare const busyProperty: Property<ActivityIndicatorBase, boolean>;

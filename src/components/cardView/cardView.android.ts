@@ -243,7 +243,7 @@ export class CardView extends CardViewBase {
         const elevation = android.support.v4.view.ViewCompat.getElevation(view);
         const translationZ = android.support.v4.view.ViewCompat.getTranslationZ(view);
         const elevationSelected = elevation * 2; // for now to be the same as iOS
-        const translationSelectedZ = translationZ + 6;
+        const translationSelectedZ = translationZ * 2;
         const animationDuration = 100;
         const listAnimator = new android.animation.StateListAnimator();
         let animators = new java.util.ArrayList<android.animation.Animator>();
@@ -380,6 +380,10 @@ export class CardView extends CardViewBase {
 
     [elevationProperty.setNative](value: number) {
         android.support.v4.view.ViewCompat.setElevation(this.nativeViewProtected, value);
+        // Refresh state list animator if elevation changes
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            this.createStateListAnimator(this.nativeViewProtected);
+        }
     }
 
     [elevationProperty.getDefault](): number {
