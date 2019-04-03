@@ -66,7 +66,7 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
     }
 
     _addChildFromBuilder(name: string, value: any): void {
-        if (name === 'BottomNavigationTab') {
+        if (name === 'BottomNavigationTab' || name === 'MDCBottomNavigationTab') {
             if (!this.tabs) {
                 this.tabs = <BottomNavigationTabBase[]>[];
             }
