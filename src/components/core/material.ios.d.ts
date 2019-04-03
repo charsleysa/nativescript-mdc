@@ -15,7 +15,6 @@ export declare class Themer {
     setButtonTypography(args: TypographyOptions): void;
 }
 export declare const themer: Themer;
-export declare function install(): void;
 export declare function getRippleColor(color: string | Color): UIColor;
 export declare function overrideViewBase(): void;
-export declare function installMixins(): void;
+export declare function install(): void;

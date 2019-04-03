@@ -1,4 +1,4 @@
-import { TextFieldBase } from './textField.common';
+import { TextFieldBase } from './textField-common';
 export declare class TextField extends TextFieldBase {
     editText: android.support.design.widget.TextInputEditText;
     layoutView: android.support.design.widget.TextInputLayout;

@@ -17,7 +17,6 @@ export class Themer {
 export var themer: Themer;
 
 export function install();
-export function installMixins();
 export function applyMixins(derivedCtor: any, baseCtors: any[]);
 export function getRippleColor(color: string | Color): any;
 

@@ -34,10 +34,10 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         this._createImageSourceFromSrc(value);
     }
     public show() {
-        this.nativeView.show();
+        this.nativeViewProtected.show();
     }
     public hide() {
-        this.nativeView.hide();
+        this.nativeViewProtected.hide();
     }
 
     [elevationProperty.setNative](value: number) {

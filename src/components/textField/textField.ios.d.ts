@@ -1,5 +1,5 @@
 import { Style } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
-import { TextFieldBase } from './textField.common';
+import { TextFieldBase } from './textField-common';
 declare module 'tns-core-modules/ui/text-field/text-field' {
     interface TextField {
         _updateAttributedPlaceholder(): any;

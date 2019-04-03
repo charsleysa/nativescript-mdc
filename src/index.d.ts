@@ -13,3 +13,4 @@ export * from './components/ripple/ripple';
 export * from './components/slider/slider';
 export * from './components/snackBar/snackBar';
 export * from './components/textField/textField';
+export declare function install(): void;

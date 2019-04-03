@@ -11,6 +11,4 @@ export declare class ActivityIndicator extends ActivityIndicatorBase {
     createNativeView(): MDCActivityIndicator;
     colorThemer: MDCSemanticColorScheme;
     getColorThemer(): MDCSemanticColorScheme;
-    _onSizeChanged(): void;
-    private updateStrokeRadius;
 }

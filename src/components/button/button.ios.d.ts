@@ -1,7 +1,7 @@
 import { ButtonBase } from './button-common';
 export declare class Button extends ButtonBase {
     nativeViewProtected: MDCButton;
-    _ios: MDCButton;
+    readonly ios: MDCButton;
     applyShapeScheme(): void;
     createNativeView(): MDCButton;
     shapeScheme: MDCShapeScheme;

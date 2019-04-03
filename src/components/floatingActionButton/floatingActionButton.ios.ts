@@ -7,6 +7,10 @@ import { FloatingActionButtonBase, imageSourceProperty, srcProperty } from './fl
 export class FloatingActionButton extends FloatingActionButtonBase {
     nativeViewProtected: MDCFloatingButton;
 
+    get ios(): MDCFloatingButton {
+        return this.nativeViewProtected;
+    }
+
     public _setNativeImage(nativeImage: UIImage) {
         // this.nativeViewProtected.setImageForState(nativeImage ? nativeImage.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : nativeImage, UIControlState.Normal);
         this.nativeViewProtected.setImageForState(nativeImage, UIControlState.Normal);

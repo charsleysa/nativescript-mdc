@@ -18,7 +18,11 @@ function getButtonScheme() {
 
 export class Button extends ButtonBase {
     nativeViewProtected: MDCButton;
-    _ios: MDCButton;
+
+    get ios(): MDCButton {
+        return this.nativeViewProtected;
+    }
+
     applyShapeScheme() {
         MDCButtonShapeThemer.applyShapeSchemeToButton(this.shapeScheme, this.nativeViewProtected);
     }

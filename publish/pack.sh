@@ -29,6 +29,7 @@ pack() {
     echo 'Building /src...'
     cd "$TO_SOURCE_DIR"
     node_modules/.bin/tsc
+    node --max-old-space-size=8192 ./node_modules/.bin/ngc
     cd ..
 
     echo 'Creating package...'

@@ -7,51 +7,45 @@ export declare class SnackBar {
      * @param {number} - The max lines for the text of the snackbar. * Android Only *
      * @param {boolean} - Set RTL for the textview of the snackbar. * Android Only *
      */
-    simple(
-      snackText: string,
-      textColor?: string,
-      backgroundColor?: string,
-      maxLines?: number,
-      isRTL?: boolean
-    ): Promise<any>;
-  
+    simple(snackText: string, textColor?: string, backgroundColor?: string, maxLines?: number, isRTL?: boolean): Promise<any>;
+
     /**
      * Show a SnackBar with Action
      */
     action(options: SnackBarOptions): Promise<any>;
-  
+
     /**
      * Manually Dismiss an active SnackBar.
      */
     dismiss(): Promise<any>;
-  }
-  
-  export interface SnackBarOptions {
+}
+
+export interface SnackBarOptions {
     /**
      * The action button text of the snackbar.
      */
     actionText: string;
-  
+
     /**
      * The text of the snackbar.
      */
     snackText: string;
-  
+
     /**
      * Delay to hide the snackbar.
      */
     hideDelay: number;
-  
+
     /**
      * Action Text Color of the snackbar.
      */
     actionTextColor?: string;
-  
+
     /**
      * Text Color of the snackbar.
      */
     textColor?: string;
-  
+
     /**
      * Background Color of the snackbar.
      */
@@ -61,18 +55,18 @@ export declare class SnackBar {
      * Set the maxLines if you are displaying a long string of text and it will wrap.
      */
     maxLines?: number;
-  
+
     /**
      * *Android Only*
      * Use RTL for textview of snackbar.
      */
     isRTL?: boolean;
-  }
-  
-  export enum DismissReasons {
+}
+
+export enum DismissReasons {
     SWIPE = 'Swipe',
     ACTION = 'Action',
     TIMEOUT = 'Timeout',
     MANUAL = 'Manual',
     CONSECUTIVE = 'Consecutive'
-  }
+}

@@ -9,4 +9,4 @@ declare module 'tns-core-modules/ui/core/view' {
     }
 }
 
-declare function install();
+export function install();

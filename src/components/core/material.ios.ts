@@ -57,14 +57,6 @@ export class Themer {
 
 export const themer = new Themer();
 
-export function install() {
-    try {
-        require('nativescript-material-bottomsheet').install();
-    } catch (e) {
-        console.log('error installing bottomsheet', e);
-    }
-}
-
 export function getRippleColor(color: string | Color): UIColor {
     if (color) {
         const temp = typeof color === 'string' ? new Color(color) : color;
@@ -204,6 +196,6 @@ export function overrideViewBase() {
     applyMixins(NSView, [ViewWithElevationAndRipple]);
 }
 
-export function installMixins() {
+export function install() {
     overrideViewBase();
 }

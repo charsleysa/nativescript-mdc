@@ -22,7 +22,7 @@ export class Button extends ButtonBase {
     public isLoading: boolean;
 
     get android(): android.support.design.button.MaterialButton {
-        return this.nativeView;
+        return this.nativeViewProtected;
     }
 
     public createNativeView() {

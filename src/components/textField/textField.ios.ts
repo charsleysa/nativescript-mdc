@@ -1,7 +1,7 @@
 import { Color, placeholderColorProperty, Style } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
 
 import { themer } from '../core/material';
-import { errorColorProperty, errorProperty, floatingProperty, helperProperty, maxLengthProperty, TextFieldBase } from './textField.common';
+import { errorColorProperty, errorProperty, floatingProperty, helperProperty, maxLengthProperty, TextFieldBase } from './textField-common';
 
 let colorScheme: MDCSemanticColorScheme;
 function getColorScheme() {

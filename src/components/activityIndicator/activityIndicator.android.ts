@@ -5,6 +5,10 @@ import { ActivityIndicatorBase, busyProperty } from './activityIndicator-common'
 export class ActivityIndicator extends ActivityIndicatorBase {
     nativeViewProtected: android.widget.ProgressBar;
 
+    get android(): android.widget.ProgressBar {
+        return this.nativeViewProtected;
+    }
+
     public createNativeView() {
         const progressBar =  new android.widget.ProgressBar(this._context);
         progressBar.setVisibility(android.view.View.INVISIBLE);

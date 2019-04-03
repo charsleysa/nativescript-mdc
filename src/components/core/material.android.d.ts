@@ -9,11 +9,10 @@ export declare class Themer {
     setPrimaryColorVariant(value: string): void;
 }
 export declare const themer: Themer;
-export declare function install(): void;
 export declare function getRippleColor(color: string | Color): number;
 export declare function createStateListAnimator(view: ViewBase, nativeView: android.view.View): void;
 export declare function getAttrColor(context: android.content.Context, name: string): number;
 export declare function createRippleDrawable(view: android.view.View, rippleColor: number, radius?: number): globalAndroid.graphics.drawable.StateListDrawable | globalAndroid.graphics.drawable.RippleDrawable;
-export declare function installMixins(): void;
+export declare function install(): void;
 export declare function isPostLollipop(): boolean;
 export declare function isPostLollipopMR1(): boolean;
