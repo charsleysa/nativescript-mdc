@@ -1,6 +1,6 @@
 {
     "name": "nativescript-mdc",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "NativeScript Material Design Components.",
     "main": "index",
     "typings": "index.d.ts",
