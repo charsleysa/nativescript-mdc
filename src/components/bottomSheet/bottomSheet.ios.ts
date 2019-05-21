@@ -1,6 +1,6 @@
 import { fromObject } from 'tns-core-modules/data/observable/observable';
 import { ios, traceCategories, traceError, traceMessageType, traceWrite, View, ViewBase } from 'tns-core-modules/ui/core/view';
-import { ios as iosUtils, layout } from 'tns-core-modules/utils/utils';
+import { layout } from 'tns-core-modules/utils/utils';
 
 import { BottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
 import { applyMixins } from '../core/material';
@@ -207,7 +207,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         } else {
             bottomSheet.view.backgroundColor = this.style.backgroundColor.ios;
         }
-        const transitionCoordinator = iosUtils.getter(bottomSheet, bottomSheet.transitionCoordinator);
+        const transitionCoordinator = bottomSheet.transitionCoordinator;
         if (transitionCoordinator) {
             UIViewControllerTransitionCoordinator.prototype.animateAlongsideTransitionCompletion.call(transitionCoordinator, null, () => {
                 (this.bindingContext = fromObject(options.context)), this._raiseShownBottomSheetEvent();

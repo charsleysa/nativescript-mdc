@@ -4,4 +4,4 @@ import { registerElement } from 'nativescript-angular/element-registry';
 @NgModule()
 export class NativeScriptMDCActivityIndicatorModule {}
 
-registerElement('MDCActivityIndicator', () => require('../activityindicator').ActivityIndicator);
+registerElement('MDCActivityIndicator', () => require('../activityIndicator').ActivityIndicator);

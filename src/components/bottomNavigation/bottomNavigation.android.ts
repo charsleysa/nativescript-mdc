@@ -49,7 +49,7 @@ export class BottomNavigation extends BottomNavigationBase {
 
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener({
             onNavigationItemSelected: function (item: android.view.MenuItem): boolean {
-                if (this.owner) {
+                if (owner) {
                     const bar: BottomNavigation = owner.get();
                     const index = item.getItemId();
                     const selectable = bar.tabs[index].selectable;
