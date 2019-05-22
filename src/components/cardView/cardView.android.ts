@@ -6,206 +6,12 @@ import { backgroundColorProperty, backgroundInternalProperty } from 'tns-core-mo
 import { elevationProperty, rippleColorProperty } from '../core/cssproperties';
 import { CardViewBase, borderColorProperty, borderRadiusProperty, borderWidthProperty, interactableProperty } from './cardView-common';
 
-let MDCCardView: typeof android.support.design.card.MaterialCardView;
-let BACKGROUND_DEFAULT_STATE_1: number[];
-let BACKGROUND_DEFAULT_STATE_2: number[];
-let BACKGROUND_SELECTED_STATE: number[];
-let BACKGROUND_CHECKED_STATE: number[];
-let BACKGROUND_FOCUSED_STATE: number[];
-let BACKGROUND_DISABLED_STATE: number[];
-
-function initMDCCardView() {
-    if (!MDCCardView) {
-        // if (android.os.Build.VERSION.SDK_INT >= 23) {
-        MDCCardView = android.support.design.card.MaterialCardView;
-        // } else {
-        //     initializePreLollipopCardView()
-        //     MDCCardView = PreLollipopCardView as any
-        // }
-        BACKGROUND_DEFAULT_STATE_1 = [android.R.attr.state_window_focused, android.R.attr.state_enabled];
-        BACKGROUND_DEFAULT_STATE_2 = [android.R.attr.state_enabled];
-        BACKGROUND_SELECTED_STATE = [android.R.attr.state_window_focused, android.R.attr.state_enabled, android.R.attr.state_pressed];
-
-        BACKGROUND_CHECKED_STATE = [android.R.attr.state_window_focused, android.R.attr.state_enabled, android.R.attr.state_checked];
-        BACKGROUND_FOCUSED_STATE = [android.R.attr.state_focused, android.R.attr.state_window_focused, android.R.attr.state_enabled];
-        BACKGROUND_DISABLED_STATE = [-android.R.attr.state_enabled];
-    }
-}
-
-interface PreLollipopCardView extends android.support.design.card.MaterialCardView {
-    // tslint:disable-next-line:no-misused-new
-    new (context): PreLollipopCardView;
-}
-let PreLollipopCardView: PreLollipopCardView;
-
-function initializePreLollipopCardView() {
-    if (PreLollipopCardView) {
-        return;
-    }
-    class PreLollipopCardViewImpl extends android.support.design.card.MaterialCardView {
-        constructor(context) {
-            super(context);
-            return global.__native(this);
-        }
-        private mForeground;
-
-        private mSelfBounds = new android.graphics.Rect();
-
-        private mOverlayBounds = new android.graphics.Rect();
-
-        private mForegroundGravity = android.view.Gravity.FILL;
-
-        protected mForegroundInPadding = true;
-
-        mForegroundBoundsChanged = false;
-
-        /**
-         * Describes how the foreground is positioned.
-         *
-         * @return foreground gravity.
-         * @see #setForegroundGravity(int)
-         */
-        getForegroundGravity() {
-            return this.mForegroundGravity;
-        }
-
-        /**
-         * Describes how the foreground is positioned. Defaults to START and TOP.
-         *
-         * @param foregroundGravity See {@link android.view.Gravity}
-         * @see #getForegroundGravity()
-         */
-        setForegroundGravity(foregroundGravity) {
-            if (this.mForegroundGravity !== foregroundGravity) {
-                if ((foregroundGravity & android.view.Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK) === 0) {
-                    foregroundGravity |= android.view.Gravity.START;
-                }
-
-                if ((foregroundGravity & android.view.Gravity.VERTICAL_GRAVITY_MASK) === 0) {
-                    foregroundGravity |= android.view.Gravity.TOP;
-                }
-
-                this.mForegroundGravity = foregroundGravity;
-
-                if (this.mForegroundGravity === android.view.Gravity.FILL && this.mForeground != null) {
-                    const padding = new android.graphics.Rect();
-                    this.mForeground.getPadding(padding);
-                }
-
-                this.requestLayout();
-            }
-        }
-
-        verifyDrawable(who) {
-            return super.verifyDrawable(who) || who === this.mForeground;
-        }
-
-        jumpDrawablesToCurrentState() {
-            super.jumpDrawablesToCurrentState();
-            if (this.mForeground != null) {
-                this.mForeground.jumpToCurrentState();
-            }
-        }
-
-        drawableStateChanged() {
-            super.drawableStateChanged();
-            if (this.mForeground != null && this.mForeground.isStateful()) {
-                this.mForeground.setState(this.getDrawableState());
-            }
-        }
-
-        /**
-         * Supply a Drawable that is to be rendered on top of all of the child
-         * views in the frame layout.  Any padding in the Drawable will be taken
-         * into account by ensuring that the children are inset to be placed
-         * inside of the padding area.
-         *
-         * @param drawable The Drawable to be drawn on top of the children.
-         */
-        setForeground(drawable) {
-            if (this.mForeground !== drawable) {
-                if (this.mForeground != null) {
-                    this.mForeground.setCallback(null);
-                    this.unscheduleDrawable(this.mForeground);
-                }
-
-                this.mForeground = drawable;
-
-                if (drawable != null) {
-                    this.setWillNotDraw(false);
-                    drawable.setCallback(this);
-                    if (drawable.isStateful()) {
-                        drawable.setState(this.getDrawableState());
-                    }
-                    if (this.mForegroundGravity === android.view.Gravity.FILL) {
-                        const padding = new android.graphics.Rect();
-                        drawable.getPadding(padding);
-                    }
-                } else {
-                    this.setWillNotDraw(true);
-                }
-                this.requestLayout();
-                this.invalidate();
-            }
-        }
-
-        /**
-         * Returns the drawable used as the foreground of this FrameLayout. The
-         * foreground drawable, if non-null, is always drawn on top of the children.
-         *
-         * @return A Drawable or null if no foreground was set.
-         */
-        getForeground() {
-            return this.mForeground;
-        }
-
-        onLayout(changed: boolean, left, top, right, bottom) {
-            super.onLayout(changed, left, top, right, bottom);
-            this.mForegroundBoundsChanged = this.mForegroundBoundsChanged || changed;
-        }
-
-        onSizeChanged(w, h, oldw, oldh) {
-            super.onSizeChanged(w, h, oldw, oldh);
-            this.mForegroundBoundsChanged = true;
-        }
-
-        draw(canvas) {
-            super.draw(canvas);
-
-            if (this.mForeground != null) {
-                const foreground = this.mForeground;
-
-                if (this.mForegroundBoundsChanged) {
-                    this.mForegroundBoundsChanged = false;
-                    const selfBounds = this.mSelfBounds;
-                    const overlayBounds = this.mOverlayBounds;
-
-                    const w = this.getRight() - this.getLeft();
-                    const h = this.getBottom() - this.getTop();
-
-                    if (this.mForegroundInPadding) {
-                        selfBounds.set(0, 0, w, h);
-                    } else {
-                        selfBounds.set(this.getPaddingLeft(), this.getPaddingTop(), w - this.getPaddingRight(), h - this.getPaddingBottom());
-                    }
-
-                    android.view.Gravity.apply(this.mForegroundGravity, foreground.getIntrinsicWidth(), foreground.getIntrinsicHeight(), selfBounds, overlayBounds);
-                    foreground.setBounds(overlayBounds);
-                }
-
-                foreground.draw(canvas);
-            }
-        }
-
-        drawableHotspotChanged(x, y) {
-            super.drawableHotspotChanged(x, y);
-            if (this.mForeground != null) {
-                this.mForeground.setHotspot(x, y);
-            }
-        }
-    }
-    PreLollipopCardView = PreLollipopCardViewImpl as any;
-}
+let BACKGROUND_DEFAULT_STATE_1: number[] = [android.R.attr.state_window_focused, android.R.attr.state_enabled];
+let BACKGROUND_DEFAULT_STATE_2: number[] = [android.R.attr.state_enabled];
+let BACKGROUND_SELECTED_STATE: number[] = [android.R.attr.state_window_focused, android.R.attr.state_enabled, android.R.attr.state_pressed];
+let BACKGROUND_CHECKED_STATE: number[] = [android.R.attr.state_window_focused, android.R.attr.state_enabled, android.R.attr.state_checked];
+let BACKGROUND_FOCUSED_STATE: number[] = [android.R.attr.state_focused, android.R.attr.state_window_focused, android.R.attr.state_enabled];
+let BACKGROUND_DISABLED_STATE: number[] = [-android.R.attr.state_enabled];
 
 export class CardView extends CardViewBase {
     nativeViewProtected: android.support.design.card.MaterialCardView;
@@ -300,9 +106,8 @@ export class CardView extends CardViewBase {
     }
 
     public createNativeView() {
-        initMDCCardView();
         // const newContext = new android.view.ContextThemeWrapper(this._context, ad.resources.getId('@style/Widget.MaterialComponents.CardView'));
-        const view = new MDCCardView(this._context);
+        const view = new android.support.design.card.MaterialCardView(this._context);
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             this.createStateListAnimator(view);
         }
@@ -311,7 +116,7 @@ export class CardView extends CardViewBase {
         return view;
     }
 
-    setRippleDrawable(view) {
+    setRippleDrawable(view: android.support.design.card.MaterialCardView) {
         if (android.os.Build.VERSION.SDK_INT >= 23) {
             const currentDrawable = view.getForeground();
             const rippleDrawable = this.getSelectedItemDrawable(this._context);
@@ -320,6 +125,7 @@ export class CardView extends CardViewBase {
             drawableArray[1] = currentDrawable;
             const newForeground = new android.graphics.drawable.LayerDrawable(drawableArray);
             view.setForeground(newForeground);
+            view.requestLayout();
         } else {
             //       view.setBackground(
             //         this.createCompatRippleDrawable(
@@ -391,11 +197,11 @@ export class CardView extends CardViewBase {
     }
 
     [interactableProperty.setNative](value: boolean) {
-        this.nativeViewProtected.setClickable(value);
+        this.nativeViewProtected.setEnabled(value);
     }
 
     [interactableProperty.getDefault]() {
-        this.nativeViewProtected.isClickable();
+        return this.nativeViewProtected.isEnabled();
     }
 
     [rippleColorProperty.setNative](color: Color) {

@@ -7,5 +7,5 @@ export declare class CardView extends CardViewBase {
     private createForegroundShapeDrawable;
     private createStateListAnimator;
     createNativeView(): globalAndroid.support.design.card.MaterialCardView;
-    setRippleDrawable(view: any): void;
+    setRippleDrawable(view: android.support.design.card.MaterialCardView): void;
 }

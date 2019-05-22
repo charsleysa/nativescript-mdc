@@ -4,8 +4,23 @@
         <ScrollView row="0">
             <StackLayout>
                 <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
-                    <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
+                    <StackLayout>
+                        <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
+                        <mdc:Button variant="flat" text="button1"></mdc:Button>
+                    </StackLayout>
                 </mdc:CardView>
+                <ListView items="{{ items }}">
+                    <ListView.itemTemplate>
+                        <StackLayout>
+                            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+                                <StackLayout>
+                                    <Label text="" class="text t-20 text-center c-black" textWrap="true"/>
+                                    <mdc:Button variant="flat" text="button1"></mdc:Button>
+                                </StackLayout>
+                            </mdc:CardView>
+                        </StackLayout>
+                    </ListView.itemTemplate>
+                </ListView>
                 <StackLayout>
                     <mdc:Ripple>
                         <Label text="Ripple" class="text t-20 text-center c-black" textWrap="true"/>
