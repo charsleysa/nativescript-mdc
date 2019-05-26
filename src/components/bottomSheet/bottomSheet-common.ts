@@ -2,9 +2,10 @@ import { View } from 'tns-core-modules/ui/core/view';
 import { createViewFromEntry } from 'tns-core-modules/ui/builder/builder';
 import { eachDescendant, EventData, Frame, ViewBase } from 'tns-core-modules/ui/frame/frame';
 
-declare module 'tns-core-modules/ui/core/view' {
+declare module 'tns-core-modules/ui/core/view/view' {
     interface View {
-        showBottomSheet(options: BottomSheetOptions): ViewBase;
+        showBottomSheet(view: ViewBase, options: ShowBottomSheetOptions): ViewBase;
+        showBottomSheet(moduleName: string, options: ShowBottomSheetOptions): ViewBase;
         _setupAsRootView(context: any): void;
         callLoaded(): void;
         callUnloaded(): void;
@@ -29,13 +30,13 @@ export interface ShownBottomSheetData extends EventData {
 export const shownInBottomSheetEvent = 'shownInBottomSheet';
 export const showingInBottomSheetEvent = 'showingInBottomSheet';
 
-export interface BottomSheetOptions {
-    view: string | ViewBase; // View instance to be shown in bottom sheet. Or the name of the module to load starting from the application root.
+export interface ShowBottomSheetOptions {
     context?: any; // Any context you want to pass to the view shown in bottom sheet. This same context will be available in the arguments of the shownInBottomSheet event handler.
-    animated?: boolean; // An optional parameter specifying whether to show the sheet view with animation.
     dismissOnBackgroundTap?: boolean; // An optional parameter specifying whether to dismiss the sheet when clicking on background.
     closeCallback?: Function; //  A function that will be called when the view is closed. Any arguments provided when calling shownInBottomSheet.closeCallback will be available here.
-    trackingScrollView?: string; // optional id of the scroll view to track
+    ios?: {
+        trackingScrollView?: string; // optional id of the scroll view to track
+    };
 }
 
 export abstract class ViewWithBottomSheetBase extends View {
@@ -61,7 +62,7 @@ export abstract class ViewWithBottomSheetBase extends View {
             return true;
         });
     }
-    protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
+    protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
         this._bottomSheetContext = options.context;
         const that = this;
         this._closeBottomSheetCallback = function(...originalArgs) {
@@ -106,20 +107,14 @@ export abstract class ViewWithBottomSheetBase extends View {
         }
     }
 
-    public showBottomSheet(options: BottomSheetOptions): ViewBase {
-        if (arguments.length === 0) {
-            throw new Error('showModal without parameters is deprecated. Please call showModal on a view instance instead.');
-        } else {
-            // const fullscreen: boolean = arguments[3];
-            // const animated = arguments[4];
-            // const stretched = arguments[5];
+    public showBottomSheet(view: ViewBase, options: ShowBottomSheetOptions): ViewBase;
+    public showBottomSheet(moduleName: string, options: ShowBottomSheetOptions): ViewBase;
+    public showBottomSheet(viewOrModuleName: string | ViewBase, options: ShowBottomSheetOptions): ViewBase {
+        const view = viewOrModuleName instanceof ViewBase
+            ? (viewOrModuleName as ViewWithBottomSheetBase)
+            : <ViewWithBottomSheetBase>createViewFromEntry({ moduleName: viewOrModuleName as string });
 
-            const view = options.view instanceof ViewBase ? (options.view as ViewWithBottomSheetBase) : <ViewWithBottomSheetBase>createViewFromEntry({
-                          moduleName: options.view as string
-                      });
-
-            view._showNativeBottomSheet(this, options);
-            return view;
-        }
+        view._showNativeBottomSheet(this, options);
+        return view;
     }
 }

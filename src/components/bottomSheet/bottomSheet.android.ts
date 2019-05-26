@@ -1,15 +1,13 @@
 import { View } from 'tns-core-modules/ui/core/view';
 import { fromObject } from 'tns-core-modules/data/observable/observable';
 
-import { BottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
+import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
 import { applyMixins } from '../core/material';
 
-export { BottomSheetOptions };
+export { ShowBottomSheetOptions as BottomSheetOptions };
 interface BottomSheetDataOptions {
     owner: View;
-    options: BottomSheetOptions;
-    // fullscreen: boolean;
-    // stretched: boolean;
+    options: ShowBottomSheetOptions;
     shownCallback: () => void;
     dismissCallback: () => void;
 }
@@ -46,8 +44,6 @@ function initializeBottomSheetDialogFragment() {
 
     class BottomSheetDialogFragmentImpl extends android.support.design.widget.BottomSheetDialogFragment {
         public owner: View;
-        private _fullscreen: boolean;
-        private _stretched: boolean;
         private _shownCallback: () => void;
         private _dismissCallback: () => void;
 
@@ -60,12 +56,9 @@ function initializeBottomSheetDialogFragment() {
             const ownerId = this.getArguments().getInt(DOMID);
             const options = getBottomSheetOptions(ownerId);
             this.owner = options.owner;
-            // this._fullscreen = options.fullscreen;
-            // this._stretched = options.stretched;
             this._dismissCallback = options.dismissCallback;
             this._shownCallback = options.shownCallback;
             this.owner._bottomSheetFragment = this;
-            // this.setStyle(androidx.fragment.app.DialogFragment.STYLE_NO_TITLE, 0);
 
             const dialog = super.onCreateDialog(savedInstanceState) as android.support.design.widget.BottomSheetDialog;
             if (options.options) {
@@ -73,22 +66,7 @@ function initializeBottomSheetDialogFragment() {
                 if (creationOptions.dismissOnBackgroundTap !== undefined) {
                     dialog.setCanceledOnTouchOutside(creationOptions.dismissOnBackgroundTap);
                 }
-                // if (creationOptions.cancelable !== undefined) {
-                //     dialog.setCancelable(creationOptions.cancelable);
-                // }
             }
-            // const dialog = new DialogImpl(this, this.getActivity(), this.getTheme());
-
-            // do not override alignment unless fullscreen modal will be shown;
-            // otherwise we might break component-level layout:
-            // https://github.com/NativeScript/NativeScript/issues/5392
-            // if (!this._fullscreen && !this._stretched) {
-            //     this.owner.horizontalAlignment = "center";
-            //     this.owner.verticalAlignment = "middle";
-            // } else {
-            //     this.owner.horizontalAlignment = "stretch";
-            //     this.owner.verticalAlignment = "stretch";
-            // }
 
             return dialog;
         }
@@ -103,17 +81,6 @@ function initializeBottomSheetDialogFragment() {
 
         public onStart(): void {
             super.onStart();
-            if (this._fullscreen) {
-                const window = this.getDialog().getWindow();
-                const length = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-                window.setLayout(length, length);
-                // This removes the default backgroundDrawable so there are no margins.
-                // window.setBackgroundDrawable(
-                //     new android.graphics.drawable.ColorDrawable(
-                //         android.graphics.Color.WHITE
-                //     )
-                // )
-            }
 
             const owner = this.owner;
             if (owner && !owner.isLoaded) {
@@ -159,11 +126,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         whenClosedCallback();
     }
 
-    protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
+    protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
         super._showNativeBottomSheet(parent, options);
-        // if (!this.backgroundColor) {
-        //     this.backgroundColor = new Color("White");
-        // }
 
         initializeBottomSheetDialogFragment();
 
@@ -175,8 +139,6 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         const bottomSheetOptions: BottomSheetDataOptions = {
             owner: this,
             options: options,
-            // fullscreen: !!fullscreen,
-            // stretched: !!stretched,
             shownCallback: () => {
                 this.bindingContext = fromObject(options.context);
                 this._raiseShownBottomSheetEvent();

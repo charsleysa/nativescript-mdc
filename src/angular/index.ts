@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { NativeScriptMDCActivityIndicatorModule } from '../components/activityIndicator/angular';
 import { NativeScriptMDCBottomNavigationModule } from '../components/bottomNavigation/angular';
+import { NativeScriptMDCBottomSheetModule } from '../components/bottomSheet/angular';
 import { NativeScriptMDCButtonModule } from '../components/button/angular';
 import { NativeScriptMDCCardViewModule } from '../components/cardView/angular';
 import { NativeScriptMDCProgressModule } from '../components/progress/angular';
@@ -12,6 +13,7 @@ import { NativeScriptMDCSliderModule } from '../components/slider/angular';
     imports: [
         NativeScriptMDCActivityIndicatorModule,
         NativeScriptMDCBottomNavigationModule,
+        NativeScriptMDCBottomSheetModule,
         NativeScriptMDCButtonModule,
         NativeScriptMDCCardViewModule,
         NativeScriptMDCProgressModule,
@@ -21,6 +23,7 @@ import { NativeScriptMDCSliderModule } from '../components/slider/angular';
     exports: [
         NativeScriptMDCActivityIndicatorModule,
         NativeScriptMDCBottomNavigationModule,
+        NativeScriptMDCBottomSheetModule,
         NativeScriptMDCButtonModule,
         NativeScriptMDCCardViewModule,
         NativeScriptMDCProgressModule,

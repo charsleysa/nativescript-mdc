@@ -24,6 +24,7 @@
                 <StackLayout>
                     <mdc:Ripple>
                         <Label text="Ripple" class="text t-20 text-center c-black" textWrap="true"/>
+                        <mdc:Button variant="flat" text="open bottom sheet" tap="{{ openBottomSheet }}"></mdc:Button>
                     </mdc:Ripple>
                 </StackLayout>
                 <StackLayout>

@@ -1,11 +1,12 @@
 import { ViewBase } from 'tns-core-modules/ui/page/page';
 
-import { BottomSheetOptions } from './bottomSheet-common';
+import { ShowBottomSheetOptions } from './bottomSheet-common';
 
-export { BottomSheetOptions };
-declare module 'tns-core-modules/ui/core/view' {
+export { ShowBottomSheetOptions };
+declare module 'tns-core-modules/ui/core/view/view' {
     interface View {
-        showBottomSheet(options: BottomSheetOptions): ViewBase;
+        showBottomSheet(view: ViewBase, options: ShowBottomSheetOptions): ViewBase;
+        showBottomSheet(moduleName: string, options: ShowBottomSheetOptions): ViewBase;
     }
 }
 

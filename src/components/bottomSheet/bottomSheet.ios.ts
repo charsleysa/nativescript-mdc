@@ -2,7 +2,7 @@ import { fromObject } from 'tns-core-modules/data/observable/observable';
 import { ios, traceCategories, traceError, traceMessageType, traceWrite, View, ViewBase } from 'tns-core-modules/ui/core/view';
 import { layout } from 'tns-core-modules/utils/utils';
 
-import { BottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
+import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
 import { applyMixins } from '../core/material';
 
 class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottomSheetControllerDelegate {
@@ -26,14 +26,9 @@ class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottom
     }
 }
 
-declare module 'tns-core-modules/ui/core/view' {
+declare module 'tns-core-modules/ui/core/view/view' {
     interface View {
         _setLayoutFlags(left: number, top: number, right: number, bottom: number);
-    }
-    namespace ios {
-        interface UILayoutViewController extends UIViewController {
-            owner: WeakRef<View>;
-        }
     }
 }
 
@@ -44,6 +39,69 @@ class BottomSheetUILayoutViewController extends UIViewController {
         const controller = <BottomSheetUILayoutViewController>BottomSheetUILayoutViewController.new();
         controller.owner = owner;
         return controller;
+    }
+
+    private initLayoutGuide(controller: UIViewController) {
+        const rootView = controller.view;
+        const layoutGuide = UILayoutGuide.alloc().init();
+        rootView.addLayoutGuide(layoutGuide);
+        NSLayoutConstraint.activateConstraints(<any>[
+            layoutGuide.topAnchor.constraintEqualToAnchor(controller.topLayoutGuide.bottomAnchor),
+            layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
+            layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
+            layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
+        ]);
+        return layoutGuide;
+    }
+
+    private layoutView(controller: UIViewController, owner: View): void {
+        let layoutGuide = controller.view.safeAreaLayoutGuide;
+        if (!layoutGuide) {
+            traceWrite(`safeAreaLayoutGuide during layout of ${owner}. Creating fallback constraints, but layout might be wrong.`, traceCategories.Layout, traceMessageType.error);
+
+            layoutGuide = this.initLayoutGuide(controller);
+        }
+        const safeArea = layoutGuide.layoutFrame;
+        let position = ios.getPositionFromFrame(safeArea);
+        const safeAreaSize = safeArea.size;
+
+        const hasChildViewControllers = controller.childViewControllers.count > 0;
+        if (hasChildViewControllers) {
+            const fullscreen = controller.view.frame;
+            position = ios.getPositionFromFrame(fullscreen);
+        }
+
+        const safeAreaWidth = layout.round(layout.toDevicePixels(safeAreaSize.width));
+        const safeAreaHeight = layout.round(layout.toDevicePixels(safeAreaSize.height));
+
+        const widthSpec = layout.makeMeasureSpec(safeAreaWidth, layout.EXACTLY);
+        const heightSpec = layout.makeMeasureSpec(safeAreaHeight, layout.UNSPECIFIED);
+
+        View.measureChild(null, owner, widthSpec, heightSpec);
+        View.layoutChild(null, owner, position.left, position.top, position.right, position.top + owner.getMeasuredHeight());
+
+        this.preferredContentSize = CGSizeMake(layout.toDeviceIndependentPixels(owner.getMeasuredWidth()), position.top + layout.toDeviceIndependentPixels(owner.getMeasuredHeight()));
+
+        this.layoutParent(owner.parent);
+    }
+
+    private layoutParent(view: ViewBase): void {
+        if (!view) {
+            return;
+        }
+
+        if (view instanceof View && view.nativeViewProtected) {
+            const frame = view.nativeViewProtected.frame;
+            const origin = frame.origin;
+            const size = frame.size;
+            const left = layout.toDevicePixels(origin.x);
+            const top = layout.toDevicePixels(origin.y);
+            const width = layout.toDevicePixels(size.width);
+            const height = layout.toDevicePixels(size.height);
+            view._setLayoutFlags(left, top, width + left, height + top);
+        }
+
+        this.layoutParent(view.parent);
     }
 
     // public viewWillLayoutSubviews(): void {
@@ -75,67 +133,6 @@ class BottomSheetUILayoutViewController extends UIViewController {
             owner.callLoaded();
         }
     }
-    initLayoutGuide(controller: UIViewController) {
-        const rootView = controller.view;
-        const layoutGuide = UILayoutGuide.alloc().init();
-        rootView.addLayoutGuide(layoutGuide);
-        NSLayoutConstraint.activateConstraints(<any>[
-            layoutGuide.topAnchor.constraintEqualToAnchor(controller.topLayoutGuide.bottomAnchor),
-            layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
-            layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
-            layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
-        ]);
-        return layoutGuide;
-    }
-    layoutView(controller: UIViewController, owner: View): void {
-        let layoutGuide = controller.view.safeAreaLayoutGuide;
-        if (!layoutGuide) {
-            traceWrite(`safeAreaLayoutGuide during layout of ${owner}. Creating fallback constraints, but layout might be wrong.`, traceCategories.Layout, traceMessageType.error);
-
-            layoutGuide = this.initLayoutGuide(controller);
-        }
-        const safeArea = layoutGuide.layoutFrame;
-        let position = ios.getPositionFromFrame(safeArea);
-        const safeAreaSize = safeArea.size;
-
-        const hasChildViewControllers = controller.childViewControllers.count > 0;
-        if (hasChildViewControllers) {
-            const fullscreen = controller.view.frame;
-            position = ios.getPositionFromFrame(fullscreen);
-        }
-
-        const safeAreaWidth = layout.round(layout.toDevicePixels(safeAreaSize.width));
-        const safeAreaHeight = layout.round(layout.toDevicePixels(safeAreaSize.height));
-
-        const widthSpec = layout.makeMeasureSpec(safeAreaWidth, layout.EXACTLY);
-        const heightSpec = layout.makeMeasureSpec(safeAreaHeight, layout.UNSPECIFIED);
-
-        View.measureChild(null, owner, widthSpec, heightSpec);
-        View.layoutChild(null, owner, position.left, position.top, position.right, position.top + owner.getMeasuredHeight());
-
-        this.preferredContentSize = CGSizeMake(layout.toDeviceIndependentPixels(owner.getMeasuredWidth()), position.top + layout.toDeviceIndependentPixels(owner.getMeasuredHeight()));
-
-        this.layoutParent(owner.parent);
-    }
-
-    layoutParent(view: ViewBase): void {
-        if (!view) {
-            return;
-        }
-
-        if (view instanceof View && view.nativeViewProtected) {
-            const frame = view.nativeViewProtected.frame;
-            const origin = frame.origin;
-            const size = frame.size;
-            const left = layout.toDevicePixels(origin.x);
-            const top = layout.toDevicePixels(origin.y);
-            const width = layout.toDevicePixels(size.width);
-            const height = layout.toDevicePixels(size.height);
-            view._setLayoutFlags(left, top, width + left, height + top);
-        }
-
-        this.layoutParent(view.parent);
-    }
 
     public viewDidDisappear(animated: boolean): void {
         super.viewDidDisappear(animated);
@@ -147,7 +144,7 @@ class BottomSheetUILayoutViewController extends UIViewController {
 }
 
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
-    protected _showNativeBottomSheet(parent: View, options: BottomSheetOptions) {
+    protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
         const parentWithController = ios.getParentWithViewController(parent);
         if (!parentWithController) {
             traceWrite(`Could not find parent with viewController for ${parent} while showing bottom sheet view.`, traceCategories.ViewHierarchy, traceMessageType.error);
@@ -186,15 +183,14 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         this.verticalAlignment = 'stretch';
 
         this._raiseShowingBottomSheetEvent();
-        // animated = animated === undefined ? true : !!animated;
         const bottomSheet = MDCBottomSheetController.alloc().initWithContentViewController(controller);
         bottomSheet.delegate = MDCBottomSheetControllerDelegateImpl.initWithOwner(new WeakRef(this));
         bottomSheet.isScrimAccessibilityElement = true;
         bottomSheet.scrimAccessibilityLabel = 'close';
         bottomSheet.dismissOnBackgroundTap = options.dismissOnBackgroundTap !== false;
 
-        if (options.trackingScrollView) {
-            const scrollView = this.getViewById(options.trackingScrollView);
+        if (options.ios && options.ios.trackingScrollView) {
+            const scrollView = this.getViewById(options.ios.trackingScrollView);
             if (scrollView && scrollView.nativeViewProtected instanceof UIScrollView) {
                 bottomSheet.trackingScrollView = scrollView.nativeViewProtected;
             }
