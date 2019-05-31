@@ -4,7 +4,6 @@ import { fromObject } from 'tns-core-modules/data/observable/observable';
 import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
 import { applyMixins } from '../core/material';
 
-export { ShowBottomSheetOptions as BottomSheetOptions };
 interface BottomSheetDataOptions {
     owner: View;
     options: ShowBottomSheetOptions;

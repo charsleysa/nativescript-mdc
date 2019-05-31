@@ -1,7 +1,8 @@
 import { Color } from 'tns-core-modules/ui/page/page';
+import { ad, layout } from 'tns-core-modules/utils/utils';
 
 import { rippleColorProperty } from '../core/cssproperties';
-import { getRippleColor, createRippleDrawable, getAttrColor, isPostLollipopMR1  } from '../core/material';
+import { createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/material';
 import { RippleBase } from './ripple-common';
 
 let MDCStackLayout: typeof org.nativescript.widgets.StackLayout;
@@ -195,7 +196,7 @@ function initializePreLollipopStackLayout() {
 
 export class Ripple extends RippleBase {
     nativeViewProtected: android.view.View;
-    ripple: android.graphics.drawable.RippleDrawable;
+    rippleDrawable: android.graphics.drawable.Drawable;
 
     public createNativeView() {
         initMDCStackLayout();
@@ -207,18 +208,19 @@ export class Ripple extends RippleBase {
         this.setRippleDrawable(view); // set default ripple
         return view;
     }
-    rippleDrawable: android.graphics.drawable.Drawable;
+
     getRippleColor() {
         return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorControlHighlight')));
     }
+
     setRippleDrawable(view: android.view.View) {
         if (!this.rippleDrawable) {
-            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor());
+            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), layout.toDevicePixels(Number(this.borderRadius) || 0));
             view.setForeground(this.rippleDrawable);
         }
     }
-    [rippleColorProperty.setNative](color: Color) {
 
+    [rippleColorProperty.setNative](color: Color) {
         this.setRippleDrawable(this.nativeViewProtected);
         const rippleColor = getRippleColor(color);
         if (isPostLollipopMR1()) {

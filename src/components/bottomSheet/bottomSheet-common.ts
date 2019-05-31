@@ -95,7 +95,7 @@ export abstract class ViewWithBottomSheetBase extends View {
         };
         this.notify(args);
     }
-    public closeBottomSheet(...args) {
+    public closeBottomSheet(...args: any[]): void {
         let closeCallback = this._closeBottomSheetCallback;
         if (closeCallback) {
             closeCallback.apply(undefined, arguments);

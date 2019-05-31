@@ -116,7 +116,7 @@ export class MDCBottomSheetService {
         const closeCallback = once((...args) => {
             options.doneCallback.apply(undefined, args);
             if (componentView) {
-                componentView.closeModal();
+                componentView.closeBottomSheet();
                 this.location._closeModalNavigation();
                 detachedLoaderRef.instance.detectChanges();
                 detachedLoaderRef.destroy();

@@ -46,11 +46,6 @@ let initDone = false;
 function init() {
     if (!initDone) {
         initDone = true;
-        // if (android.os.Build.VERSION.SDK_INT >= 23) {
-        // } else {
-        //     initializePreLollipopCardView()
-        //     MDCCardView = PreLollipopCardView as any
-        // }
         BACKGROUND_DEFAULT_STATE_1 = [android.R.attr.state_window_focused, android.R.attr.state_enabled];
         BACKGROUND_DEFAULT_STATE_2 = [android.R.attr.state_enabled];
         BACKGROUND_SELECTED_STATE = [android.R.attr.state_window_focused, android.R.attr.state_enabled, android.R.attr.state_pressed];
