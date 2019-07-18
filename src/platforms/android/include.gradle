@@ -1,7 +1,7 @@
 /* Include.gradle configuration: http://docs.nativescript.org/plugins/plugins#includegradle-specification */
 
 android {
-    
+
 }
 
 allprojects {
@@ -15,12 +15,24 @@ allprojects {
 
 dependencies {
     // Describe plugin native Android dependencies like
-	// compile "groupName:pluginName:ver" 
+	// compile "groupName:pluginName:ver"
     // EXAMPLE: compile "com.facebook.fresco:fresco:0.9.0+"
-    def supportVer = "28.0.0";
-    if(project.hasProperty("supportVersion")) {
-       supportVer = supportVersion
+    def androidXLegacyVersion = "1.0.0"
+    if (project.hasProperty("androidXLegacy")) {
+        androidXLegacyVersion = androidXLegacy
     }
-    implementation "com.android.support:appcompat-v7:$supportVer"
-    implementation "com.android.support:design:$supportVer"
+
+    def androidXAppCompatVersion = "1.0.2"
+    if (project.hasProperty("androidXAppCompat")) {
+        androidXAppCompatVersion = androidXAppCompat
+    }
+
+    def androidXMaterialVersion = "1.0.0"
+    if (project.hasProperty("androidXMaterial")) {
+        androidXMaterialVersion = androidXMaterial
+    }
+
+    implementation "androidx.legacy:legacy-support-v4:$androidXLegacyVersion"
+    implementation "androidx.appcompat:appcompat:$androidXAppCompatVersion"
+    implementation "com.google.android.material:material:$androidXMaterialVersion"
 }

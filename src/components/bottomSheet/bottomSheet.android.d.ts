@@ -2,7 +2,7 @@ import { View } from 'tns-core-modules/ui/core/view';
 import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
 declare module 'tns-core-modules/ui/core/view' {
     interface View {
-        _bottomSheetFragment: android.support.design.widget.BottomSheetDialogFragment;
+        _bottomSheetFragment: com.google.android.material.bottomsheet.BottomSheetDialogFragment;
     }
 }
 export declare class ViewWithBottomSheet extends ViewWithBottomSheetBase {

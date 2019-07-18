@@ -1,11 +1,21 @@
+import { Background } from 'tns-core-modules/ui/styling/background';
 import { TextFieldBase } from './textField-common';
+declare module 'tns-core-modules/ui/text-field/text-field' {
+    interface TextField {
+        _redrawNativeBackground(value: android.graphics.drawable.Drawable | Background): void;
+    }
+}
+export declare function initTextInputEditText(): void;
+export declare function getDefaultHintTextColorStateList(pressedColor: number, color?: number): globalAndroid.content.res.ColorStateList;
 export declare class TextField extends TextFieldBase {
-    editText: android.support.design.widget.TextInputEditText;
-    layoutView: android.support.design.widget.TextInputLayout;
-    nativeViewProtected: android.support.design.widget.TextInputLayout;
+    editText: com.google.android.material.textfield.TextInputEditText;
+    layoutView: com.google.android.material.textfield.TextInputLayout;
     constructor();
-    readonly nativeTextViewProtected: globalAndroid.support.design.widget.TextInputEditText;
-    createNativeView(): globalAndroid.support.design.widget.TextInputLayout;
-    focus(): boolean;
-    blur(): void;
+    readonly nativeTextViewProtected: com.google.android.material.textfield.TextInputEditText;
+    drawingBackground: boolean;
+    readonly nativeViewProtected: com.google.android.material.textfield.TextInputEditText | com.google.android.material.textfield.TextInputLayout;
+    createNativeView(): com.google.android.material.textfield.TextInputLayout;
+    _redrawNativeBackground(value: android.graphics.drawable.Drawable | Background): void;
+    requestFocus(): boolean;
+    clearFocus(): void;
 }

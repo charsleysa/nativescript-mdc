@@ -1,7 +1,7 @@
 import { Color, heightProperty } from 'tns-core-modules/ui/core/view';
 import { screen } from 'tns-core-modules/platform/platform';
 
-import { themer } from '../core/material';
+import { themer } from '../core/core';
 import { progressBackgroundColorProperty, ProgressBase, progressColorProperty } from './progress-common';
 
 export class Progress extends ProgressBase {
@@ -14,14 +14,7 @@ export class Progress extends ProgressBase {
 
     public createNativeView() {
         const result = MDCProgressView.new();
-        const colorScheme: MDCSemanticColorScheme = themer.getAppColorScheme();
-        if (colorScheme) {
-            MDCProgressViewColorThemer.applyColorSchemeToProgressView(colorScheme, result);
-            // light color is not applied
-            if (colorScheme.primaryColorVariant) {
-                result.trackTintColor = colorScheme.primaryColorVariant;
-            }
-        }
+        result.applyThemeWithScheme(themer.appScheme);
         return result;
     }
 

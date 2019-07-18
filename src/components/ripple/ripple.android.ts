@@ -2,7 +2,7 @@ import { Color } from 'tns-core-modules/ui/page/page';
 import { ad, layout } from 'tns-core-modules/utils/utils';
 
 import { rippleColorProperty } from '../core/cssproperties';
-import { createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/material';
+import { createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/core';
 import { RippleBase } from './ripple-common';
 
 let MDCStackLayout: typeof org.nativescript.widgets.StackLayout;
@@ -210,7 +210,7 @@ export class Ripple extends RippleBase {
     }
 
     getRippleColor() {
-        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorControlHighlight')));
+        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorPrimary')));
     }
 
     setRippleDrawable(view: android.view.View) {

@@ -7,27 +7,26 @@ export interface TypographyOptions {
 }
 
 export class Themer {
-    // appColorScheme: MDCSemanticColorScheme;
-    getOrcreateAppColorScheme();
-    getAppColorScheme();
-    setPrimaryColor(value: string);
-    setPrimaryColorVariant(value: string);
+    readonly appScheme;
+    readonly appColorScheme;
+    primaryColor: string;
+    primaryColorVariant: string;
 }
 
-export var themer: Themer;
+export const themer: Themer;
 
 export function install();
 export function applyMixins(derivedCtor: any, baseCtors: any[]);
 export function getRippleColor(color: string | Color): any;
 
 
-declare module 'tns-core-modules/ui/core/view' {
-    interface View {
-        elevation: Length
-        elevationHighlighted: Length
-        rippleColor: string | Color
-    }
-}
+// declare module 'tns-core-modules/ui/core/view' {
+//     interface View {
+//         elevation: Length
+//         elevationHighlighted: Length
+//         rippleColor: string | Color
+//     }
+// }
 
 // Android only
 export function createStateListAnimator(view, nativeView);

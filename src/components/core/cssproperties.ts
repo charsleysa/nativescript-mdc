@@ -1,4 +1,4 @@
-import { CssProperty } from 'tns-core-modules/ui/core/properties';
+import { CssProperty, InheritedCssProperty } from 'tns-core-modules/ui/core/properties';
 import { booleanConverter, Color, Length } from 'tns-core-modules/ui/core/view';
 import { Style } from 'tns-core-modules/ui/styling/style';
 
@@ -29,23 +29,39 @@ export const rippleColorProperty = new CssProperty<Style, Color>({
     valueConverter: v => new Color(v)
 });
 rippleColorProperty.register(Style);
+
 export const elevationProperty = new CssProperty<Style, Length>({
     name: 'elevation',
     cssName: 'elevation',
-
     valueConverter: v => Length.toDevicePixels(Length.parse(v), 0)
 });
 elevationProperty.register(Style);
+
 export const elevationHighlightedProperty = new CssProperty<Style, Length>({
     name: 'elevationHighlighted',
     cssName: 'elevation-highlighted',
-
     valueConverter: v => Length.toDevicePixels(Length.parse(v), 0)
 });
 elevationHighlightedProperty.register(Style);
+
+export const translationZHighlightedProperty = new CssProperty<Style, Length>({
+    name: 'translationZHighlighted',
+    cssName: 'translationZ-highlighted',
+
+    valueConverter: v => Length.parse(v)
+});
+translationZHighlightedProperty.register(Style);
 
 export const variantProperty = new CssProperty<Style, string>({
     name: 'variant',
     cssName: 'variant'
 });
 variantProperty.register(Style);
+
+export const tintColorProperty = new InheritedCssProperty<Style, Color>({
+    name: 'tintColor',
+    cssName: 'tint-color',
+    equalityComparer: Color.equals,
+    valueConverter: (value) => new Color(value)
+});
+tintColorProperty.register(Style);

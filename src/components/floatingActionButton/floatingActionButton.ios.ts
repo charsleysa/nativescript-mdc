@@ -1,7 +1,7 @@
 import { ImageSource } from 'tns-core-modules/image-source/image-source';
 
 import { elevationProperty } from '../core/cssproperties';
-import { themer } from '../core/material';
+import { themer } from '../core/core';
 import { FloatingActionButtonBase, imageSourceProperty, srcProperty } from './floatingActionButton-common';
 
 export class FloatingActionButton extends FloatingActionButtonBase {
@@ -17,7 +17,7 @@ export class FloatingActionButton extends FloatingActionButtonBase {
     }
     public createNativeView() {
         const result = MDCFloatingButton.new();
-        const colorScheme = themer.getAppColorScheme();
+        const colorScheme = themer.appColorScheme;
         if (colorScheme) {
             MDCFloatingButtonColorThemer.applySemanticColorSchemeToButton(colorScheme, result);
         }

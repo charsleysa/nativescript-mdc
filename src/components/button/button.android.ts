@@ -5,7 +5,7 @@ import { Background } from 'tns-core-modules/ui/styling/background';
 import { ButtonBase } from './button-common';
 import { elevationHighlightedProperty, elevationProperty, rippleColorProperty } from '../core/cssproperties';
 import { getEnabledColorStateList, getRippleColorStateList } from '../core/android/utils';
-import { getRippleColor, createStateListAnimator } from '../core/material';
+import { getRippleColor, createStateListAnimator } from '../core/core';
 
 let PRE_LOLLIPOP: boolean = undefined;
 
@@ -17,26 +17,24 @@ function isPreLollipop() {
 }
 
 export class Button extends ButtonBase {
-    nativeViewProtected: android.support.design.button.MaterialButton;
+    nativeViewProtected: com.google.android.material.button.MaterialButton;
 
     public isLoading: boolean;
 
-    get android(): android.support.design.button.MaterialButton {
+    get android(): com.google.android.material.button.MaterialButton {
         return this.nativeViewProtected;
     }
 
     public createNativeView() {
         let style = 'AppThemeMaterialButton';
-        if (this.variant === 'text' || this.variant === 'outline') {
+        if (this.variant === 'text') {
             style = 'AppThemeTextMaterialButton';
+        } else if (this.variant === 'outline') {
+            style = 'AppThemeOutlinedMaterialButton';
         } else if (this.variant === 'flat') {
             style = 'AppThemeFlatMaterialButton';
         }
-        const view = new android.support.design.button.MaterialButton(new android.view.ContextThemeWrapper(this._context, utils.ad.resources.getId(':style/' + style)));
-        if (this.variant === 'outline') {
-            view.setStrokeWidth(1);
-            view.setStrokeColor(android.content.res.ColorStateList.valueOf(new Color('gray').android));
-        }
+        const view = new com.google.android.material.button.MaterialButton(new android.view.ContextThemeWrapper(this._context, utils.ad.resources.getId(':style/' + style)));
         return view;
     }
     [rippleColorProperty.setNative](color: Color) {
@@ -48,7 +46,7 @@ export class Button extends ButtonBase {
     }
 
     [elevationProperty.setNative](value: number) {
-        android.support.v4.view.ViewCompat.setElevation(this.nativeViewProtected, value);
+        androidx.core.view.ViewCompat.setElevation(this.nativeViewProtected, value);
     }
     [elevationHighlightedProperty.setNative](value: number) {
         if (!this.nativeViewProtected) {
@@ -63,6 +61,19 @@ export class Button extends ButtonBase {
         const newValue = Length.toDevicePixels(typeof value === 'string' ? Length.parse(value) : value, 0);
         this.nativeViewProtected.setCornerRadius(newValue);
     }
+
+    [backgroundInternalProperty.getDefault](): Background {
+        const color = new Color(this.nativeViewProtected.getBackgroundTintList().getDefaultColor());
+        const cornerRadius = this.nativeViewProtected.getCornerRadius();
+
+        const background = this.style.backgroundInternal.withColor(color);
+        background.borderTopLeftRadius = cornerRadius;
+        background.borderTopRightRadius = cornerRadius;
+        background.borderBottomLeftRadius = cornerRadius;
+        background.borderBottomRightRadius = cornerRadius;
+
+        return background;
+    }
     [backgroundInternalProperty.setNative](value: android.graphics.drawable.Drawable | Background) {
         if (this.nativeViewProtected) {
             if (value instanceof android.graphics.drawable.Drawable) {
@@ -71,7 +82,7 @@ export class Button extends ButtonBase {
                 if (value.color) {
                     this.nativeViewProtected.setBackgroundTintList(getEnabledColorStateList(value.color.android, this.variant));
                 }
-                this.setCornerRadius(value.borderTopLeftRadius);
+                this.setCornerRadius(value.borderTopRightRadius);
             }
         }
     }

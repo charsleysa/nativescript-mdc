@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Page } from 'tns-core-modules/ui/page/page';
 import { addCss, ios as iosApp } from 'tns-core-modules/application';
 
-import { themer } from '../../core/material';
+import { themer } from '../../core/core';
 
 @Directive({
     selector: '[materialAppBar]'
@@ -25,10 +25,7 @@ export class AppBarDirective implements AfterViewInit {
         // _appBar.navigationBar.tintColor  = new Color('blue').ios;
         // _appBar.headerViewController.headerView.backgroundColor = new Color('yellow').ios;
         // _appBar.navigationBar.sizeToFit();
-        const colorScheme = themer.getAppColorScheme();
-        if (colorScheme) {
-            MDCAppBarColorThemer.applyColorSchemeToAppBarViewController(colorScheme, this._appBarController);
-        }
+        this._appBarController.applyPrimaryThemeWithScheme(themer.appScheme);
         console.log('createNativeView AppBar');
         this._addController();
         return null;

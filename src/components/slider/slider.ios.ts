@@ -1,7 +1,7 @@
 import { Color } from 'tns-core-modules/color/color';
 
 import { elevationProperty, rippleColorProperty } from '../core/cssproperties';
-import { themer } from '../core/material';
+import { themer } from '../core/core';
 import { SliderBase, thumbColorProperty, thumbHollowAtStartProperty, trackBackgroundColorProperty, trackFillColorProperty } from './slider-common';
 
 export class Slider extends SliderBase {
@@ -13,7 +13,7 @@ export class Slider extends SliderBase {
     public createNativeView() {
         const result = MDCSlider.new();
         result.statefulAPIEnabled = true;
-        const colorScheme = themer.getAppColorScheme();
+        const colorScheme = themer.appColorScheme;
         if (colorScheme) {
             MDCSliderColorThemer.applySemanticColorSchemeToSlider(colorScheme, result);
         }

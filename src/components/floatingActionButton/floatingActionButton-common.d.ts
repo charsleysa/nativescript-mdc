@@ -1,6 +1,7 @@
-import { Property, View } from 'tns-core-modules/ui/core/view';
+import { View } from 'tns-core-modules/ui/core/view/view';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 import { ImageSource } from 'tns-core-modules/image-source';
+import { Property } from 'tns-core-modules/ui/core/properties';
 export declare const imageSourceProperty: Property<FloatingActionButtonBase, ImageSource>;
 export declare const srcProperty: Property<FloatingActionButtonBase, any>;
 export declare abstract class FloatingActionButtonBase extends View {

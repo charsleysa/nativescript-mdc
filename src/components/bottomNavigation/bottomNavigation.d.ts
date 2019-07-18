@@ -7,7 +7,7 @@ export { OnTabSelectedEventData };
 
 export declare class BottomNavigation extends BottomNavigationBase {
 
-    readonly android: any; /* android.support.design.widget.BottomNavigationView */
+    readonly android: any; /* com.google.android.material.bottomnavigation.BottomNavigationView */
 
     readonly ios: any; /* MDCBottomNavigationBar */
 

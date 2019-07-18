@@ -1,28 +1,32 @@
-pod 'MaterialComponents/schemes/Color'
+pod 'MaterialComponents/schemes/Container'
 
 pod 'MaterialComponents/ActivityIndicator'
 pod 'MaterialComponents/ActivityIndicator+ColorThemer'
 
+pod 'MaterialComponents/AppBar'
+pod 'MaterialComponents/AppBar+Theming'
+
+pod 'MaterialComponents/BottomAppBar'
+pod 'MaterialComponents/BottomAppBar+ColorThemer'
+
 pod 'MaterialComponents/BottomSheet'
 
 pod 'MaterialComponents/BottomNavigation'
-pod 'MaterialComponents/BottomNavigation+ColorThemer'
+pod 'MaterialComponents/BottomNavigation+Theming'
 
 pod 'MaterialComponents/Buttons'
-pod 'MaterialComponents/Buttons+ButtonThemer'
+pod 'MaterialComponents/Buttons+Theming'
 
 pod 'MaterialComponents/Cards'
-pod 'MaterialComponents/Cards+ColorThemer'
+pod 'MaterialComponents/Cards+Theming'
 
 pod 'MaterialComponents/Dialogs'
-pod 'MaterialComponents/Dialogs+DialogThemer'
-pod 'MaterialComponents/Dialogs+TypographyThemer'
-
-pod 'MaterialComponents/Ink'
-pod 'MaterialComponents/Ink+ColorThemer'
+pod 'MaterialComponents/Dialogs+Theming'
 
 pod 'MaterialComponents/ProgressView'
-pod 'MaterialComponents/ProgressView+ColorThemer'
+pod 'MaterialComponents/ProgressView+Theming'
+
+pod 'MaterialComponents/Ripple'
 
 pod 'MaterialComponents/Slider'
 pod 'MaterialComponents/Slider+ColorThemer'
@@ -31,4 +35,4 @@ pod 'MaterialComponents/Snackbar'
 pod 'MaterialComponents/Snackbar+ColorThemer'
 
 pod 'MaterialComponents/TextFields'
-pod 'MaterialComponents/TextFields+ColorThemer'
+pod 'MaterialComponents/TextFields+Theming'

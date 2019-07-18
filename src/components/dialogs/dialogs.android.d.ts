@@ -1,8 +1,14 @@
 import { LoginResult, PromptResult } from 'tns-core-modules/ui/dialogs';
+declare module 'tns-core-modules/ui/core/view/view' {
+    interface View {
+        _setupAsRootView(context: any): void;
+        callLoaded(): void;
+    }
+}
 export declare function alert(arg: any): Promise<void>;
 export declare class AlertDialog {
     private options;
-    dialog: android.support.v7.app.AlertDialog;
+    dialog: androidx.appcompat.app.AlertDialog;
     constructor(options: any);
     show(): void;
     hide(): void;

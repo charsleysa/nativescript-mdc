@@ -20,4 +20,8 @@ export class HelloWorldModel extends Observable {
             }
         });
     }
+
+    public tapped(args: EventData) {
+        console.log('button pressed: ', args.object.toString());
+    }
 }

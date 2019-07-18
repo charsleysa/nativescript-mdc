@@ -1,8 +1,8 @@
 import { ButtonBase } from './button-common';
 export declare class Button extends ButtonBase {
-    nativeViewProtected: android.support.design.button.MaterialButton;
+    nativeViewProtected: com.google.android.material.button.MaterialButton;
     isLoading: boolean;
-    readonly android: android.support.design.button.MaterialButton;
-    createNativeView(): globalAndroid.support.design.button.MaterialButton;
+    readonly android: com.google.android.material.button.MaterialButton;
+    createNativeView(): com.google.android.material.button.MaterialButton;
     setCornerRadius(value: any): void;
 }

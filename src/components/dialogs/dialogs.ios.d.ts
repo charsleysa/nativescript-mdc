@@ -9,5 +9,5 @@ export declare class AlertDialog {
 }
 export declare function confirm(arg: any): Promise<boolean>;
 export declare function prompt(arg: any): Promise<PromptResult>;
-export declare function login(): Promise<LoginResult>;
+export declare function login(arg: any): Promise<LoginResult>;
 export declare function action(): Promise<string>;

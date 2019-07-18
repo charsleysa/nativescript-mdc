@@ -1,5 +1,5 @@
 import { BottomNavigationBase, BottomNavigationTabBase } from './bottomNavigation-common';
-import BottomNavigationView = android.support.design.widget.BottomNavigationView;
+import BottomNavigationView = com.google.android.material.bottomnavigation.BottomNavigationView;
 export declare class BottomNavigation extends BottomNavigationBase {
     nativeViewProtected: BottomNavigationView;
     readonly android: any;

@@ -7,7 +7,7 @@ import { CardViewBase } from './cardView-common'
  */
 export class CardView extends CardViewBase {
 
-    readonly android: any; /* android.support.design.card.MaterialCardView */
+    readonly android: any; /* com.google.android.material.card.MaterialCardView */
 
     readonly ios: any; /* MDCCard */
 }

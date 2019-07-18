@@ -1,7 +1,8 @@
-import { CSSType, Property, View } from 'tns-core-modules/ui/core/view';
+import { CSSType, View } from 'tns-core-modules/ui/core/view/view';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 import { isDataURI, isFileOrResourcePath, RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
 import { fromAsset, fromNativeSource, fromUrl, ImageSource } from 'tns-core-modules/image-source';
+import { Property } from 'tns-core-modules/ui/core/properties';
 import { cssProperty } from '../core/cssproperties';
 
 export const imageSourceProperty = new Property<FloatingActionButtonBase, ImageSource>({ name: 'imageSource' });
@@ -14,8 +15,13 @@ export const srcProperty = new Property<FloatingActionButtonBase, any>({
 export abstract class FloatingActionButtonBase extends View {
     constructor() {
         super();
-        this.style.width = this.style.height = 56;
-        this.style.margin = 5;
+        // we need to set the default through css or user would not be able to overload it through css...
+        this.style['css:width'] = 56;
+        this.style['css:height'] = 56;
+        this.style['css:margin-left'] = 4;
+        this.style['css:margin-right'] = 4;
+        this.style['css:margin-top'] = 11;
+        this.style['css:margin-bottom'] = 16;
     }
     @cssProperty elevation: number;
 
@@ -69,13 +75,13 @@ export abstract class FloatingActionButtonBase extends View {
                     //     source.fromResource(resPath).then(imageLoaded);
                     // }
                 } else {
-                    if (sync) {
-                        source.loadFromFile(value);
-                        imageLoaded();
-                    } else {
-                        this.imageSource = null;
-                        source.fromFile(value).then(imageLoaded);
-                    }
+                    // if (sync) {
+                    source.loadFromFile(value);
+                    imageLoaded();
+                    // } else {
+                    //     this.imageSource = null;
+                    //     source.fromFile(value).then(imageLoaded);
+                    // }
                 }
             } else {
                 this.imageSource = null;

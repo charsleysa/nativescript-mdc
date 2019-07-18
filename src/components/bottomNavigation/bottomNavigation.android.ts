@@ -16,25 +16,9 @@ import {
 } from './bottomNavigation-common';
 
 import BitmapDrawable = android.graphics.drawable.BitmapDrawable;
-import BottomNavigationView = android.support.design.widget.BottomNavigationView;
-import MenuBuilder = android.support.v7.view.menu.MenuBuilder;
-
-enum LabelVisibilityMode {
-    /**
-     * Label behaves as "labeled" when there are 3 items or less, or "selected" when there are 4 items
-     * or more.
-     */
-    LABEL_VISIBILITY_AUTO = -1,
-
-    /** Label is shown on the selected navigation item. */
-    LABEL_VISIBILITY_SELECTED = 0,
-
-    /** Label is shown on all navigation items. */
-    LABEL_VISIBILITY_LABELED = 1,
-
-    /** Label is not shown on any navigation items. */
-    LABEL_VISIBILITY_UNLABELED = 2
-}
+import BottomNavigationView = com.google.android.material.bottomnavigation.BottomNavigationView;
+import MenuBuilder = androidx.appcompat.view.menu.MenuBuilder;
+import LabelVisibilityMode = com.google.android.material.bottomnavigation.LabelVisibilityMode;
 
 export class BottomNavigation extends BottomNavigationBase {
     nativeViewProtected: BottomNavigationView;

@@ -1,7 +1,8 @@
 import { RippleBase } from './ripple-common';
 export declare class Ripple extends RippleBase {
+    nativeViewProtected: UIView;
+    rippleController: MDCRippleTouchController;
     constructor();
-    inkTouchController: MDCInkTouchController;
-    readonly ios: MDCInkView;
+    readonly ios: UIView;
     createNativeView(): UIView;
 }

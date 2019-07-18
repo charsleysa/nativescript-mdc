@@ -1,49 +1,58 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" class="page"
   xmlns:mdc="nativescript-mdc">
-    <GridLayout columns="*" rows="*, auto">
-        <ScrollView row="0">
-            <StackLayout>
-                <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+    <ScrollView>
+        <StackLayout>
+            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+                <StackLayout>
+                    <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
+                    <mdc:Button variant="flat" text="button1"></mdc:Button>
+                </StackLayout>
+            </mdc:CardView>
+            <ListView items="{{ items }}">
+                <ListView.itemTemplate>
                     <StackLayout>
-                        <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
-                        <mdc:Button variant="flat" text="button1"></mdc:Button>
+                        <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+                            <StackLayout>
+                                <Label text="" class="text t-20 text-center c-black" textWrap="true"/>
+                                <mdc:Button variant="flat" text="button1"></mdc:Button>
+                            </StackLayout>
+                        </mdc:CardView>
                     </StackLayout>
-                </mdc:CardView>
-                <ListView items="{{ items }}">
-                    <ListView.itemTemplate>
-                        <StackLayout>
-                            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
-                                <StackLayout>
-                                    <Label text="" class="text t-20 text-center c-black" textWrap="true"/>
-                                    <mdc:Button variant="flat" text="button1"></mdc:Button>
-                                </StackLayout>
-                            </mdc:CardView>
-                        </StackLayout>
-                    </ListView.itemTemplate>
-                </ListView>
-                <StackLayout>
-                    <mdc:Ripple>
-                        <Label text="Ripple" class="text t-20 text-center c-black" textWrap="true"/>
-                        <mdc:Button variant="flat" text="open bottom sheet" tap="{{ openBottomSheet }}"></mdc:Button>
-                    </mdc:Ripple>
-                </StackLayout>
-                <StackLayout>
-                    <mdc:ActivityIndicator busy="true"></mdc:ActivityIndicator>
-                    <mdc:Progress value="39"></mdc:Progress>
-                    <mdc:Slider value="39"></mdc:Slider>
-                </StackLayout>
-                <StackLayout>
-                    <mdc:Button text="default"></mdc:Button>
-                    <mdc:Button variant="outline" text="outline"></mdc:Button>
-                    <mdc:Button variant="flat" text="flat"></mdc:Button>
-                </StackLayout>
+                </ListView.itemTemplate>
+            </ListView>
+            <StackLayout>
+                <mdc:Ripple>
+                    <Label text="Ripple" class="text t-20 text-center c-black" textWrap="true"/>
+                    <mdc:Button variant="flat" text="open bottom sheet" tap="{{ openBottomSheet }}"></mdc:Button>
+                </mdc:Ripple>
             </StackLayout>
-        </ScrollView>
-        <mdc:BottomNavigation class="bottom-nav" loaded="loaded" row="1" titleVisibility="always">
-            <mdc:BottomNavigationTab title="First" icon="ic_home" />
-            <mdc:BottomNavigationTab title="Second" icon="ic_view_list" selectable="false" />
-            <mdc:BottomNavigationTab title="Third" icon="ic_menu" />
-            <mdc:BottomNavigationTab title="Forth" icon="ic_view_list" selectedIcon="ic_menu" />
-        </mdc:BottomNavigation>
-    </GridLayout>
+            <StackLayout>
+                <mdc:ActivityIndicator busy="true"></mdc:ActivityIndicator>
+                <mdc:Progress value="39"></mdc:Progress>
+                <mdc:Slider value="39"></mdc:Slider>
+            </StackLayout>
+            <StackLayout>
+                <mdc:Button text="default"></mdc:Button>
+                <mdc:Button variant="outline" text="outline"></mdc:Button>
+                <mdc:Button variant="flat" text="flat"></mdc:Button>
+            </StackLayout>
+            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+                <StackLayout>
+                    <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
+                    <mdc:Button variant="flat" text="button1"></mdc:Button>
+                </StackLayout>
+            </mdc:CardView>
+            <StackLayout>
+                <mdc:TextField></mdc:TextField>
+                <mdc:Button text="default"></mdc:Button>
+                <mdc:Button variant="outline" text="outline"></mdc:Button>
+                <mdc:Button variant="flat" text="flat"></mdc:Button>
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+    <mdc:BottomAppBar class="bottom-nav" style="background: red;">
+        <mdc:MainActionButton title="List" icon="res://ic_view_list" tap="{{ tapped }}" style="background-color: purple; tint-color: white;" />
+        <mdc:NavigationButton title="Menu" icon="res://ic_menu" tap="{{ tapped }}" style="tint-color: blue;" />
+        <mdc:ActionItem title="First" icon="res://ic_home" tap="{{ tapped }}" style="tint-color: green;" />
+    </mdc:BottomAppBar>
 </Page>

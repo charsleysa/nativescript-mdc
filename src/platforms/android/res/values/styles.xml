@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="AppThemeMaterialButton">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+    </style>
+    <style name="AppThemeTextMaterialButton">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
+    </style>
+    <style name="AppThemeOutlinedMaterialButton">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.OutlinedButton</item>
+    </style>
+    <style name="AppThemeFlatMaterialButton">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.UnelevatedButton</item>
+    </style>
+
+    <style name="AppThemeMaterialTextField">
+        <item name="materialButtonStyle">@style/Widget.Design.TextInputLayout</item>
+    </style>
+    <style name="AppThemeFilledMaterialTextField">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
+    </style>
+    <style name="AppThemeOutlinedMaterialTextField">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+    </style>
+</resources>

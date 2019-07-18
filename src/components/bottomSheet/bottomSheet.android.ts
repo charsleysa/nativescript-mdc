@@ -2,7 +2,7 @@ import { View } from 'tns-core-modules/ui/core/view';
 import { fromObject } from 'tns-core-modules/data/observable/observable';
 
 import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
-import { applyMixins } from '../core/material';
+import { applyMixins } from '../core/core';
 
 interface BottomSheetDataOptions {
     owner: View;
@@ -27,21 +27,21 @@ function getBottomSheetOptions(domId: number): BottomSheetDataOptions {
 
 declare module 'tns-core-modules/ui/core/view' {
     interface View {
-        _bottomSheetFragment: android.support.design.widget.BottomSheetDialogFragment;
+        _bottomSheetFragment: com.google.android.material.bottomsheet.BottomSheetDialogFragment;
     }
 }
 
 let BottomSheetDialogFragment: BottomSheetDialogFragment;
 
 interface BottomSheetDialogFragment {
-    new (): android.support.design.widget.BottomSheetDialogFragment;
+    new (): com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 }
 function initializeBottomSheetDialogFragment() {
     if (BottomSheetDialogFragment) {
         return;
     }
 
-    class BottomSheetDialogFragmentImpl extends android.support.design.widget.BottomSheetDialogFragment {
+    class BottomSheetDialogFragmentImpl extends com.google.android.material.bottomsheet.BottomSheetDialogFragment {
         public owner: View;
         private _shownCallback: () => void;
         private _dismissCallback: () => void;
@@ -59,7 +59,7 @@ function initializeBottomSheetDialogFragment() {
             this._shownCallback = options.shownCallback;
             this.owner._bottomSheetFragment = this;
 
-            const dialog = super.onCreateDialog(savedInstanceState) as android.support.design.widget.BottomSheetDialog;
+            const dialog = super.onCreateDialog(savedInstanceState) as com.google.android.material.bottomsheet.BottomSheetDialog;
             if (options.options) {
                 const creationOptions = options.options;
                 if (creationOptions.dismissOnBackgroundTap !== undefined) {

@@ -1,7 +1,7 @@
 import { colorProperty, Color } from 'tns-core-modules/ui/core/view';
 import { screen } from 'tns-core-modules/platform/platform';
 
-import { themer } from '../core/material';
+import { themer } from '../core/core';
 import { ActivityIndicatorBase, busyProperty } from './activityIndicator-common';
 
 declare module 'tns-core-modules/ui/core/view' {
@@ -18,7 +18,7 @@ export class ActivityIndicator extends ActivityIndicatorBase {
     }
     createNativeView() {
         const view = MDCActivityIndicator.new();
-        const colorScheme = this.colorThemer || themer.getAppColorScheme();
+        const colorScheme = this.colorThemer || themer.appColorScheme;
         if (colorScheme) {
             MDCActivityIndicatorColorThemer.applySemanticColorSchemeToActivityIndicator(colorScheme, view);
         }

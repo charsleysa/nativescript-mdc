@@ -1,24 +1,24 @@
-import * as application from 'tns-core-modules/application/application';
-import { Color, Length } from 'tns-core-modules/ui/page/page';
-import { ad, layout } from 'tns-core-modules/utils/utils';
-import { backgroundColorProperty, backgroundInternalProperty } from 'tns-core-modules/ui/core/view/view';
+import { Color } from 'tns-core-modules/ui/page/page';
+import { layout } from 'tns-core-modules/utils/utils';
+import { backgroundInternalProperty } from 'tns-core-modules/ui/core/view/view';
+import { Background } from 'tns-core-modules/ui/styling/background';
 
-import { elevationProperty, rippleColorProperty } from '../core/cssproperties';
-import { createStateListAnimator, createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/material';
-import { CardViewBase, borderColorProperty, borderRadiusProperty, borderWidthProperty, interactableProperty } from './cardView-common';
+import { isPostLollipop } from '../core/android/utils';
+import { elevationProperty, rippleColorProperty, elevationHighlightedProperty } from '../core/cssproperties';
+import { createStateListAnimator, createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/core';
+import { CardViewBase, interactableProperty } from './cardView-common';
 
 export class CardView extends CardViewBase {
-    nativeViewProtected: android.support.design.card.MaterialCardView;
+    nativeViewProtected: com.google.android.material.card.MaterialCardView;
     rippleDrawable: android.graphics.drawable.Drawable;
 
-    get android(): android.support.design.card.MaterialCardView {
+    get android(): com.google.android.material.card.MaterialCardView {
         return this.nativeViewProtected;
     }
 
     public createNativeView() {
-        // const newContext = new android.view.ContextThemeWrapper(this._context, ad.resources.getId('@style/Widget.MaterialComponents.CardView'));
-        const view = new android.support.design.card.MaterialCardView(this._context);
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
+        const view = new com.google.android.material.card.MaterialCardView(this._context);
+        if (isPostLollipop()) {
             createStateListAnimator(this, view);
         }
         view.setClickable(true); // Give it same default as iOS
@@ -30,7 +30,7 @@ export class CardView extends CardViewBase {
         return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorControlHighlight')));
     }
 
-    setRippleDrawable(view: android.support.design.card.MaterialCardView) {
+    setRippleDrawable(view: com.google.android.material.card.MaterialCardView) {
         if (!this.rippleDrawable) {
             this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), layout.toDevicePixels(Number(this.borderRadius) || 0));
         }
@@ -44,65 +44,37 @@ export class CardView extends CardViewBase {
         view.requestLayout();
     }
 
-    [backgroundColorProperty.setNative](value: Color) {
-        try {
-            this.nativeViewProtected.setCardBackgroundColor(value !== undefined ? value.android : new Color('#FFFFFF').android);
-        } catch (error) {
-            // do nothing, catch bad color value
-            console.log('nativescript-mdc --- invalid background-color value:', error);
+    [backgroundInternalProperty.setNative](value: Background) {
+        if (this.nativeViewProtected) {
+            this.nativeViewProtected.setCardBackgroundColor(new Color(value.color != null ? value.color + '' : '#FFFFFF').ios);
+            this.nativeViewProtected.setStrokeWidth(value.borderTopWidth);
+            this.nativeViewProtected.setStrokeColor(value.borderTopColor ? value.borderTopColor.android : -1);
+            this.nativeViewProtected.setRadius(value.borderTopRightRadius);
+            this.setRippleDrawable(this.nativeViewProtected);
         }
-    }
-
-    [backgroundInternalProperty.setNative](value: any) {
-        if (value) {
-            try {
-                this.nativeViewProtected.setCardBackgroundColor(
-                    new Color(value.color !== undefined ? value.color + '' : '#FFFFFF').android
-                );
-            } catch (error) {
-                // do nothing, catch bad color value
-                console.log('nativescript-mdc --- invalid background-color value:', error);
-            }
-        }
-    }
-
-    [borderColorProperty.setNative](value: Color) {
-        this.nativeViewProtected.setStrokeColor(value !== undefined ? value.android : new Color('#FFFFFF').android);
-        this.setRippleDrawable(this.nativeViewProtected);
-    }
-
-    [borderColorProperty.getDefault](): Color {
-        return new Color(this.nativeViewProtected.getStrokeColor());
-    }
-
-    [borderRadiusProperty.setNative](value: number) {
-        this.nativeViewProtected.setRadius(layout.toDevicePixels(value));
-        this.setRippleDrawable(this.nativeViewProtected);
-    }
-
-    [borderRadiusProperty.getDefault](): number {
-        return layout.toDeviceIndependentPixels(this.nativeViewProtected.getRadius());
-    }
-
-    [borderWidthProperty.setNative](value: number) {
-        this.nativeViewProtected.setStrokeWidth(layout.toDevicePixels(value));
-        this.setRippleDrawable(this.nativeViewProtected);
-    }
-
-    [borderWidthProperty.getDefault](): number {
-        return layout.toDeviceIndependentPixels(this.nativeViewProtected.getStrokeWidth());
     }
 
     [elevationProperty.setNative](value: number) {
-        android.support.v4.view.ViewCompat.setElevation(this.nativeViewProtected, value);
+        androidx.core.view.ViewCompat.setElevation(this.nativeViewProtected, value);
         // Refresh state list animator if elevation changes
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
+        if (isPostLollipop()) {
             createStateListAnimator(this, this.nativeViewProtected);
         }
     }
 
     [elevationProperty.getDefault](): number {
-        return android.support.v4.view.ViewCompat.getElevation(this.nativeViewProtected);
+        return androidx.core.view.ViewCompat.getElevation(this.nativeViewProtected);
+    }
+
+    [elevationHighlightedProperty.setNative](value: number) {
+        // Refresh state list animator if elevation changes
+        if (isPostLollipop()) {
+            createStateListAnimator(this, this.nativeViewProtected);
+        }
+    }
+
+    [elevationHighlightedProperty.getDefault](): number {
+        return androidx.core.view.ViewCompat.getElevation(this.nativeViewProtected) * 2;
     }
 
     [interactableProperty.setNative](value: boolean) {
@@ -114,11 +86,6 @@ export class CardView extends CardViewBase {
     }
 
     [rippleColorProperty.setNative](color: Color) {
-        // if (android.os.Build.VERSION.SDK_INT >= 23) {
-        //     (this.nativeViewProtected.getForeground() as any).setColor(android.content.res.ColorStateList.valueOf(color.android));
-        // } else {
-        //     this.setRippleDrawable(this.nativeViewProtected);
-        // }
         this.setRippleDrawable(this.nativeViewProtected);
         const rippleColor = getRippleColor(color);
         if (isPostLollipopMR1()) {

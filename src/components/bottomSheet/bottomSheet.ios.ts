@@ -3,7 +3,7 @@ import { ios, traceCategories, traceError, traceMessageType, traceWrite, View, V
 import { layout } from 'tns-core-modules/utils/utils';
 
 import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
-import { applyMixins } from '../core/material';
+import { applyMixins } from '../core/core';
 
 class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottomSheetControllerDelegate {
     public static ObjCProtocols = [MDCBottomSheetControllerDelegate];

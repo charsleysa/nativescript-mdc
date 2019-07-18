@@ -12,15 +12,18 @@ export abstract class TextFieldBase extends NTextField {
     constructor() {
         super();
     }
-    abstract blur();
+    abstract requestFocus();
+    abstract clearFocus();
 
     @cssProperty helper: string;
     @cssProperty maxLength: number;
     @cssProperty errorColor: Color;
     @cssProperty floating: boolean;
     @cssProperty placeholderColor: Color;
-    @cssProperty variant: string;
+    @cssProperty variant: string = 'filled';
     @cssProperty error: string;
+    @cssProperty strokeColor: Color;
+    @cssProperty floatingColor: Color;
 }
 
 export const errorColorProperty = new CssProperty<Style, Color>({
@@ -42,7 +45,8 @@ export const errorProperty = new CssProperty<Style, string>({
 errorProperty.register(Style);
 export const maxLengthProperty = new CssProperty<Style, number>({
     name: 'maxLength',
-    cssName: 'max-length'
+    cssName: 'max-length',
+    valueConverter: v => parseFloat(v)
 });
 maxLengthProperty.register(Style);
 export const floatingProperty = new CssProperty<Style, boolean>({
@@ -51,3 +55,17 @@ export const floatingProperty = new CssProperty<Style, boolean>({
     valueConverter: booleanConverter
 });
 floatingProperty.register(Style);
+export const floatingColorProperty = new CssProperty<Style, Color>({
+    name: 'floatingColor',
+    cssName: 'floating-color',
+    equalityComparer: Color.equals,
+    valueConverter: v => new Color(v)
+});
+floatingColorProperty.register(Style);
+export const strokeColorProperty = new CssProperty<Style, Color>({
+    name: 'strokeColor',
+    cssName: 'stroke-color',
+    equalityComparer: Color.equals,
+    valueConverter: v => new Color(v)
+});
+strokeColorProperty.register(Style);

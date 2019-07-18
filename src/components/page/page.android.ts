@@ -1,60 +1,117 @@
-import { Page as INSPage, View } from 'tns-core-modules/ui/page/page';
+import { View, Color } from 'tns-core-modules/ui/page/page';
 import { ActionBar } from 'tns-core-modules/ui/action-bar/action-bar';
 import * as application from 'tns-core-modules/application';
+import {
+    isEnabled as traceEnabled,
+    write as traceWrite,
+    notifyEvent as traceNotifyEvent,
+    categories as traceCategories
+} from 'tns-core-modules/trace';
 
-import { applyMixins } from '../core/material';
+import { applyMixins } from '../core/core';
+import { BottomAppBar } from '../bottomAppBar/bottomAppBar';
 
-function getLayout(id: string) {
-    const context: android.content.Context = application.android.context;
-    return context.getResources().getIdentifier(id, 'layout', context.getPackageName());
+import { MDCPageBase } from './page-common';
+
+declare module 'tns-core-modules/ui/page' {
+    interface Page {
+        updateActionBar();
+    }
 }
 
-function getId(id: string) {
-    const context: android.content.Context = application.android.context;
-    return context.getResources().getIdentifier(id, 'id', context.getPackageName());
-}
+import AppBarLayout = com.google.android.material.appbar.AppBarLayout;
+import CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-export class Page extends INSPage {
-    appBarLayout: android.support.design.widget.AppBarLayout;
-    collapsingToolbarLayout: android.support.design.widget.CollapsingToolbarLayout;
-    nativeViewProtected: android.support.design.widget.CoordinatorLayout;
-    contentLayout: android.widget.LinearLayout;
+export class MDCPage extends MDCPageBase {
+    appBarLayout: AppBarLayout;
+    nativeViewProtected: CoordinatorLayout;
+    contentLayout: CoordinatorLayout;
 
-    createNativeView() {
-        const layout = android.view.LayoutInflater.from(this._context).inflate(getLayout('material_page'), null, false) as android.support.design.widget.CoordinatorLayout;
+    public createNativeView() {
+        const layout = new CoordinatorLayout(this._context);
 
-        this.appBarLayout = layout.findViewById(getId('appbarLayout')) as android.support.design.widget.AppBarLayout;
-        this.collapsingToolbarLayout = layout.findViewById(getId('collapsingToolbarLayout')) as android.support.design.widget.CollapsingToolbarLayout;
-        this.contentLayout = layout.findViewById(getId('contentLayout')) as android.widget.LinearLayout;
+        this.appBarLayout = new AppBarLayout(this._context);
+        this.contentLayout = new CoordinatorLayout(this._context);
+
+        layout.addView(this.appBarLayout, new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT));
+        layout.addView(this.contentLayout, new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT));
+
         return layout;
     }
-    _addViewToNativeVisualTree(child: View, atIndex?: number): boolean {
-        // super._addViewToNativeVisualTree(child);
+
+    public onLoaded() {
+        View.prototype.onLoaded.call(this); // super
+        if (this.actionBarHidden !== undefined) {
+            this.updateActionBar();
+        }
+        if (this.hasBottomAppBar) {
+            this.bottomAppBar.update();
+        }
+    }
+
+    public _addViewToNativeVisualTree(child: View, atIndex?: number): boolean {
+        View.prototype._addViewToNativeVisualTree.call(this, child, atIndex); // super
 
         if (this.nativeViewProtected && child.nativeViewProtected) {
-            if (child instanceof ActionBar) {
-                const params = new android.support.design.widget.AppBarLayout.LayoutParams(-1, -1);
-                // const  params =  (child.nativeViewProtected as android.support.v7.widget.Toolbar).getLayoutParams() as  (android.support.design.widget.AppBarLayout.LayoutParams);
-                params.setScrollFlags(0);
-                // params.setScrollFlags(android.support.design.widget.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | android.support.design.widget.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
-                child.nativeViewProtected.setLayoutParams(params);
-                this.appBarLayout.addView(child.nativeViewProtected);
-            } else {
-                this.contentLayout.addView(child.nativeViewProtected);
+            if (traceEnabled()) {
+                traceWrite(`${this}.nativeView.addView(${child}.nativeView, ${atIndex})`, traceCategories.VisualTreeEvents);
             }
+
+            if (child instanceof ActionBar) {
+                const params = new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.MATCH_PARENT, AppBarLayout.LayoutParams.WRAP_CONTENT);
+                // const  params =  (child.nativeViewProtected as androidx.appcompat.widget.Toolbar).getLayoutParams() as  (com.google.android.material.appbar.AppBarLayout.LayoutParams);
+                params.setScrollFlags(0);
+                // params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+                this.appBarLayout.addView(child.nativeViewProtected, params);
+            } else if (child instanceof BottomAppBar) {
+                const params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+                params.gravity = android.view.Gravity.BOTTOM;
+                this.nativeViewProtected.addView(child.nativeViewProtected, params);
+
+                const floatingActionButtonParams = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.WRAP_CONTENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+                floatingActionButtonParams.setAnchorId(child.nativeViewProtected.getId());
+                this.nativeViewProtected.addView((child as any).floatingActionButton, floatingActionButtonParams);
+            } else {
+                const params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT);
+                this.contentLayout.addView(child.nativeViewProtected, params);
+            }
+
             if (child instanceof View) {
                 (this as any)._updateNativeLayoutParams(child);
             }
+
             return true;
         }
 
         return false;
     }
+
+    public _removeViewFromNativeVisualTree(child: View): void {
+        View.prototype._removeViewFromNativeVisualTree.call(this, child); // super
+
+        const nativeView = this.nativeViewProtected;
+        const childView = child.nativeViewProtected;
+        const fabChildView = (child as any).floatingActionButton;
+        if (nativeView && childView) {
+            if (child instanceof ActionBar) {
+                this.appBarLayout.removeView(childView);
+            } else if (child instanceof BottomAppBar) {
+                this.nativeViewProtected.removeView(childView);
+                this.nativeViewProtected.removeView(fabChildView);
+            } else {
+                this.contentLayout.removeView(childView);
+            }
+            if (traceEnabled()) {
+                traceWrite(`${nativeView}.removeView(${childView})`, traceCategories.VisualTreeEvents);
+                traceNotifyEvent(child, 'childInLayoutRemovedFromNativeVisualTree');
+            }
+        }
+    }
 }
 
 export function overridePage() {
     const NSPage = require('tns-core-modules/ui/page/page').Page;
-    applyMixins(NSPage, [Page]);
+    applyMixins(NSPage, [MDCPageBase, MDCPage]);
 }
 export function install() {
     overridePage();

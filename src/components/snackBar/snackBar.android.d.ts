@@ -1,13 +1,14 @@
-import { View } from 'tns-core-modules/ui/core/view';
-import { DismissReasons, SnackBarOptions } from './snackBar-common';
-export declare class SnackBar {
+import { SnackBarBase, SnackBarOptions } from './snackBar-common';
+export { DismissReasons, SnackBarAction } from './snackBar-common';
+export declare class SnackBar extends SnackBarBase {
     private static SNACKBAR_TEXT_ID;
     private _snackbar;
-    constructor();
-    simple(snackText: string, textColor?: string, backgroundColor?: string, maxLines?: number, isRTL?: boolean, view?: View): Promise<any>;
-    action(options: SnackBarOptions): Promise<{}>;
+    private _snackbarCallback;
+    constructor(options?: SnackBarOptions);
+    initSnack(options: SnackBarOptions, resolve?: Function): void;
+    show(): Promise<{}>;
     dismiss(): Promise<{}>;
-    _getReason(value: number): DismissReasons;
     private _setBackgroundColor;
     private _setTextColor;
 }
+export declare function showSnack(options: SnackBarOptions): any;

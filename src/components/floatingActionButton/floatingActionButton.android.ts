@@ -2,22 +2,17 @@ import { ImageSource } from 'tns-core-modules/image-source';
 import { backgroundInternalProperty } from 'tns-core-modules/ui/page/page';
 import { Background } from 'tns-core-modules/ui/styling/background';
 
-import { elevationProperty } from '../core/cssproperties';
+import { elevationProperty, translationZHighlightedProperty } from '../core/cssproperties';
 import { FloatingActionButtonBase, imageSourceProperty, srcProperty } from './floatingActionButton-common';
 
-let MDCFabButton: typeof android.support.design.widget.FloatingActionButton;
-
 export class FloatingActionButton extends FloatingActionButtonBase {
-    nativeViewProtected: android.support.design.widget.FloatingActionButton;
+    nativeViewProtected: com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-    get android(): android.support.design.widget.FloatingActionButton {
+    get android(): com.google.android.material.floatingactionbutton.FloatingActionButton {
         return this.nativeViewProtected;
     }
     public createNativeView() {
-        if (!MDCFabButton) {
-            MDCFabButton = android.support.design.widget.FloatingActionButton;
-        }
-        const view = new MDCFabButton(this._context);
+        const view = new com.google.android.material.floatingactionbutton.FloatingActionButton(this._context);
         return view;
     }
 
@@ -44,6 +39,10 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         this.nativeViewProtected.setCompatElevation(value);
     }
 
+    [translationZHighlightedProperty.setNative](value: number) {
+        this.nativeViewProtected.setTranslationZ(value);
+    }
+
     get size(): string {
         return this.style['size'];
     }
@@ -52,29 +51,26 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         if (this.nativeViewProtected) {
             switch (value) {
                 case 'auto':
-                    this.nativeViewProtected.setSize(MDCFabButton.SIZE_AUTO);
+                    this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_AUTO);
                     break;
                 case 'mini':
-                    this.nativeViewProtected.setSize(MDCFabButton.SIZE_MINI);
+                    this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_MINI);
                     break;
                 default:
-                    this.nativeViewProtected.setSize(MDCFabButton.SIZE_NORMAL);
+                    this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_NORMAL);
                     break;
             }
         }
     }
+
     [backgroundInternalProperty.setNative](value: android.graphics.drawable.Drawable | Background) {
         if (this.nativeViewProtected) {
             if (value instanceof android.graphics.drawable.Drawable) {
                 this.nativeViewProtected.setBackgroundDrawable(value);
             } else {
-                // if (android.os.Build.VERSION.SDK_INT >= 21) {
                 if (value.color) {
                     this.nativeViewProtected.setBackgroundTintList(android.content.res.ColorStateList.valueOf(value.color.android));
                 }
-                // } else {
-                //     (this as any)._redrawNativeBackground(value);
-                // }
             }
         }
     }

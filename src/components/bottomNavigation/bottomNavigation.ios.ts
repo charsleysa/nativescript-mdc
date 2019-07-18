@@ -1,10 +1,10 @@
 import { Color } from 'tns-core-modules/color/color';
 import { fromResource } from 'tns-core-modules/image-source/image-source';
 import { screen } from 'tns-core-modules/platform/platform';
-import { ios } from 'tns-core-modules/application/application';
-import { View, layout } from 'tns-core-modules/ui/core/view/view';
+import { ios as iosApp } from 'tns-core-modules/application/application';
+import { ios as iosView, layout } from 'tns-core-modules/ui/core/view';
 
-import { themer } from '../core/material';
+import { themer } from '../core/core';
 
 import {
     activeColorCssProperty,
@@ -18,6 +18,13 @@ import {
     tabsProperty,
     titleVisibilityProperty
 } from './bottomNavigation-common';
+
+
+declare module 'tns-core-modules/ui/core/view/view' {
+    interface View {
+        _setNativeViewFrame(nativeView: UIView, frame: CGRect): void;
+    }
+}
 
 export declare class MDCBottomNavigationBarDelegate { }
 
@@ -62,10 +69,7 @@ export class BottomNavigation extends BottomNavigationBase {
     createNativeView() {
         this._delegate = BottomNavigationDelegate.initWithOwner(new WeakRef(this));
         const view = MDCBottomNavigationBar.alloc().init();
-        const colorScheme = themer.getAppColorScheme();
-        if (colorScheme) {
-            MDCBottomNavigationBarColorThemer.applySemanticColorSchemeToBottomNavigation(colorScheme, view);
-        }
+        view.applyPrimaryThemeWithScheme(themer.appScheme);
         return view;
     }
 
@@ -90,21 +94,15 @@ export class BottomNavigation extends BottomNavigationBase {
             return;
         }
 
-        let bottomSafeArea = 0;
-        if (ios.window.safeAreaInsets) {
-            bottomSafeArea = ios.window.safeAreaInsets.bottom;
-        }
+        const bottomSafeArea = (iosApp.window.safeAreaInsets) ? iosApp.window.safeAreaInsets.bottom : 0;
+        const adjustmentPixels = layout.toDevicePixels(bottomSafeArea);
 
         const nativeView = this.nativeViewProtected;
-        const frame = CGRectMake(
-            layout.toDeviceIndependentPixels(left),
-            layout.toDeviceIndependentPixels(top),
-            layout.toDeviceIndependentPixels(right - left),
-            layout.toDeviceIndependentPixels(bottom - top) + bottomSafeArea
+        const frame = iosView.getFrameFromPosition(
+            { left, top, right, bottom },
+            { left: 0, top: -adjustmentPixels, right: 0, bottom: -adjustmentPixels }
         );
-
-        // Method not defined in .d.ts file but it's there
-        (this as any)._setNativeViewFrame(nativeView, frame);
+        this._setNativeViewFrame(nativeView, frame);
     }
 
     createTabs(tabs: BottomNavigationTab[]) {

@@ -2,8 +2,8 @@ import { ActionBar } from 'tns-core-modules/ui/action-bar/action-bar';
 import { Color } from 'tns-core-modules/color/color';
 import { layout } from 'tns-core-modules/utils/utils';
 
+import { themer } from '../core/core';
 import { AppBarBase } from './appBar-common';
-import { themer } from '../core/material';
 
 declare module 'tns-core-modules/ui/action-bar/action-bar' {
     interface ActionBar {
@@ -23,10 +23,7 @@ export class AppBar extends AppBarBase {
         // _appBar.navigationBar.tintColor  = new Color('blue').ios;
         // _appBar.headerViewController.headerView.backgroundColor = new Color('yellow').ios;
         // _appBar.navigationBar.sizeToFit();
-        const colorScheme = themer.getAppColorScheme();
-        if (colorScheme) {
-            MDCAppBarColorThemer.applyColorSchemeToAppBarViewController(colorScheme, this._appBarController);
-        }
+        this._appBarController.applyPrimaryThemeWithScheme(themer.appScheme);
         console.log('createNativeView AppBar');
         this._addController();
         return null;
