@@ -2,16 +2,30 @@
 
 NativeScript-MDC provides Material Design Components using the official MDC libraries for iOS and Android.
 
-Currently only Card and Bottom Navigation have been implemented.
+Currently only the following components have been implemented:
+- Activity Indicator
+- Bottom App Bar
+- Bottom Navigation
+- Bottom Sheet
+- Button
+- Card View
+- Dialogs
+- Floating Action Button
+- Progress
+- Ripple
+- Slider
+- Snack Bar
+- Text Field
 
 Thanks to the following plugins for providing a reference when building this plugin:
 [nativescript-bottom-navigation](https://github.com/henrychavez/nativescript-bottom-navigation)
 [nativescript-cardview](https://github.com/bradmartin/nativescript-cardview)
 [nativescript-floatingactionbutton](https://github.com/bradmartin/nativescript-floatingactionbutton)
+[nativescript-material-components](https://github.com/Akylas/nativescript-material-components)
 
 ## (Optional) Prerequisites / Requirements
 
-You need NativeScript version `^4.0.0` to be able to use this plugin.
+You need NativeScript version `^6.0.0` to be able to use this plugin.
 
 ## Installation
 
