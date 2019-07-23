@@ -1,151 +1,212 @@
-import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
-import { BottomAppBar } from '../bottomAppBar';
+import { Directive, Component, ElementRef, Optional, OnDestroy } from '@angular/core';
+import { Page } from 'tns-core-modules/ui/page';
+
 import { isBlank } from 'nativescript-angular/lang-facade';
+import {
+    NgView,
+    ViewClassMeta,
+    ViewExtensions,
+    isInvisibleNode,
+    isView,
+    registerElement,
+} from 'nativescript-angular/element-registry';
 
-@Directive({
-    selector: 'MDCBottomAppBar'
+import {
+    BottomAppBar,
+    ActionItem,
+    ActionItems,
+    NavigationButton,
+    MainActionButton
+} from '../bottomAppBar';
+
+export function isActionItem(view: any): view is ActionItem {
+    return view instanceof ActionItem;
+}
+
+export function isNavigationButton(view: any): view is NavigationButton {
+    return view instanceof NavigationButton;
+}
+
+export function isMainActionButton(view: any): view is MainActionButton {
+    return view instanceof MainActionButton;
+}
+
+type NgBottomAppBar = (BottomAppBar & ViewExtensions);
+
+export const bottomAppBarMeta: ViewClassMeta = {
+    skipAddToDom: true,
+    insertChild: (parent: NgBottomAppBar, child: NgView, next: any) => {
+        if (isInvisibleNode(child)) {
+            return;
+        } else if (isMainActionButton(child)) {
+            parent.mainActionButton = child;
+            child.parentNode = parent;
+        } else if (isNavigationButton(child)) {
+            parent.navigationButton = child;
+            child.parentNode = parent;
+        } else if (isActionItem(child)) {
+            addActionItem(parent, child, next);
+            child.parentNode = parent;
+        }
+    },
+    removeChild: (parent: NgBottomAppBar, child: NgView) => {
+        if (isInvisibleNode(child)) {
+            return;
+        } else if (isMainActionButton(child)) {
+            if (parent.mainActionButton === child) {
+                parent.mainActionButton = null;
+            }
+
+            child.parentNode = null;
+        } else if (isNavigationButton(child)) {
+            if (parent.navigationButton === child) {
+                parent.navigationButton = null;
+            }
+
+            child.parentNode = null;
+        } else if (isActionItem(child)) {
+            parent.actionItems.removeItem(child);
+            child.parentNode = null;
+        }
+    },
+};
+
+const addActionItem = (bar: NgBottomAppBar, item: ActionItem, next: ActionItem) => {
+    if (next) {
+        insertActionItemBefore(bar, item, next);
+    } else {
+        appendActionItem(bar, item);
+    }
+};
+
+const insertActionItemBefore = (bar: NgBottomAppBar, item: ActionItem, next: ActionItem) => {
+    const actionItems: ActionItems = bar.actionItems;
+    const actionItemsCollection: ActionItem[] = actionItems.getItems();
+
+    const indexToInsert = actionItemsCollection.indexOf(next);
+    actionItemsCollection.splice(indexToInsert, 0, item);
+
+    (<any>actionItems).setItems(actionItemsCollection);
+};
+
+const appendActionItem = (bar: NgBottomAppBar, item: ActionItem) => {
+    bar.actionItems.addItem(item);
+};
+
+@Component({
+    selector: 'MDCBottomAppBar',
+    template: '<ng-content></ng-content>'
 })
-export class BottomAppBarDirective implements AfterViewInit {
+export class BottomAppBarComponent {
+    constructor(public element: ElementRef, private page: Page) {
+        if (!this.page) {
+            throw new Error('Inside BottomAppBarComponent but no Page found in DI.');
+        }
 
-    // public bottomNavigation: BottomNavigation;
-    // private _viewInitialized: boolean;
-
-    // constructor(element: ElementRef) {
-    //     this.bottomNavigation = element.nativeElement;
-    // }
-
-    // private _activeColor: string;
-
-    // @Input()
-    // get activeColor(): string {
-    //     return this._activeColor;
-    // }
-
-    // set activeColor(value: string) {
-    //     this._activeColor = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.activeColor = this._activeColor;
-    //     }
-    // }
-
-    // private _inactiveColor: string;
-
-    // @Input()
-    // get inactiveColor(): string {
-    //     return this._inactiveColor;
-    // }
-
-    // set inactiveColor(value: string) {
-    //     this._inactiveColor = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.inactiveColor = this._inactiveColor;
-    //     }
-    // }
-
-    // private _backgroundColor: string;
-
-    // @Input()
-    // get backgroundColor(): string {
-    //     return this._backgroundColor;
-    // }
-
-    // set backgroundColor(value: string) {
-    //     this._backgroundColor = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.backgroundColor = this._backgroundColor;
-    //     }
-    // }
-
-    // private _titleVisibility: 'selected' | 'always' | 'never';
-
-    // @Input()
-    // get titleVisibility(): 'selected' | 'always' | 'never' {
-    //     return this._titleVisibility;
-    // }
-
-    // set titleVisibility(value: 'selected' | 'always' | 'never') {
-    //     this._titleVisibility = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.titleVisibility = this._titleVisibility;
-    //     }
-    // }
-
-    // private _tabs: BottomNavigationTab[];
-
-    // @Input()
-    // get tabs(): BottomNavigationTab[] {
-    //     return this._tabs;
-    // }
-
-    // set tabs(value: BottomNavigationTab[]) {
-    //     this._tabs = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.tabs = this._tabs;
-    //     }
-    // }
-
-    // private _selectedTabIndex: number;
-
-    // @Input()
-    // get selectedTabIndex(): number {
-    //     return this._selectedTabIndex;
-    // }
-
-    // set selectedTabIndex(value: number) {
-    //     this._selectedTabIndex = value;
-    //     if (this._viewInitialized) {
-    //         this.bottomNavigation.selectedTabIndex = this._selectedTabIndex;
-    //     }
-    // }
-
-    ngAfterViewInit(): void {
-        // this._viewInitialized = true;
-        // if (!isBlank(this._activeColor)) { this.bottomNavigation.activeColor = this._activeColor; }
-        // if (!isBlank(this._inactiveColor)) { this.bottomNavigation.inactiveColor = this._inactiveColor; }
-        // if (!isBlank(this._backgroundColor)) { this.bottomNavigation.backgroundColor = this._backgroundColor; }
-        // if (!isBlank(this._titleVisibility)) { this.bottomNavigation.titleVisibility = this._titleVisibility; }
-        // if (!isBlank(this._tabs)) { this.bottomNavigation.tabs = this._tabs; }
-        // if (!isBlank(this._selectedTabIndex)) { this.bottomNavigation.selectedTabIndex = this._selectedTabIndex; }
+        this.page.bottomAppBar = this.element.nativeElement;
+        this.page.bottomAppBar.update();
     }
 }
 
-// @Directive({
-//     selector: 'MDCBottomNavigationTab'
-// })
-// export class BottomNavigationTabDirective {
+@Component({
+    selector: 'MDCBottomAppBarExtension',
+    template: ''
+})
+export class BottomAppBarScope { // tslint:disable-line:component-class-suffix
+    constructor(private page: Page) {
+        if (!this.page) {
+            throw new Error('Inside BottomAppBarScope but no Page found in DI.');
+        }
+    }
 
-//     private _title: string;
+    public onMainActionButtonInit(mainActionBtn: MainActionButtonDirective) {
+        this.page.bottomAppBar.mainActionButton = mainActionBtn.element.nativeElement;
+    }
 
-//     @Input()
-//     get title(): string {
-//         return this._title;
-//     }
+    public onMainActionButtonDestroy(mainActionBtn: MainActionButtonDirective) {
+        const mainAction = <MainActionButton>mainActionBtn.element.nativeElement;
+        if (mainAction && this.page.bottomAppBar.mainActionButton === mainAction) {
+            this.page.bottomAppBar.mainActionButton = null;
+        }
+    }
 
-//     set title(value: string) {
-//         this._title = value;
-//     }
+    public onNavButtonInit(navBtn: NavigationButtonDirective) {
+        this.page.bottomAppBar.navigationButton = navBtn.element.nativeElement;
+    }
 
-//     private _icon: string;
+    public onNavButtonDestroy(navBtn: NavigationButtonDirective) {
+        const nav = <NavigationButton>navBtn.element.nativeElement;
+        if (nav && this.page.bottomAppBar.navigationButton === nav) {
+            this.page.bottomAppBar.navigationButton = null;
+        }
+    }
 
-//     @Input()
-//     get icon(): string {
-//         return this._icon;
-//     }
+    public onActionInit(item: ActionItemDirective) {
+        this.page.bottomAppBar.actionItems.addItem(item.element.nativeElement);
+    }
 
-//     set icon(value: string) {
-//         this._icon = value;
-//     }
+    public onActionDestroy(item: ActionItemDirective) {
+        if (item.element.nativeElement.bottomAppBar) {
+            this.page.bottomAppBar.actionItems.removeItem(item.element.nativeElement);
+        }
+    }
+}
 
-//     @Input()
-//     private _selectable: boolean;
+@Directive({
+    selector: 'MDCActionItem' // tslint:disable-line:directive-selector
+})
+export class ActionItemDirective implements OnDestroy {
+    constructor(public element: ElementRef, @Optional() private ownerScope: BottomAppBarScope) {
+        if (this.ownerScope) {
+            this.ownerScope.onActionInit(this);
+        }
+    }
 
-//     get selectable(): boolean {
-//         return this._selectable;
-//     }
+    ngOnDestroy() {
+        if (this.ownerScope) {
+            this.ownerScope.onActionDestroy(this);
+        }
+    }
+}
 
-//     set selectable(value: boolean) {
-//         this._selectable = value;
-//     }
-// }
+@Directive({
+    selector: 'MDCNavigationButton' // tslint:disable-line:directive-selector
+})
+export class NavigationButtonDirective implements OnDestroy {
+    constructor(public element: ElementRef, @Optional() private ownerScope: BottomAppBarScope) {
+        if (this.ownerScope) {
+            this.ownerScope.onNavButtonInit(this);
+        }
+    }
 
-export const DIRECTIVES = [BottomAppBarDirective];
+    ngOnDestroy() {
+        if (this.ownerScope) {
+            this.ownerScope.onNavButtonDestroy(this);
+        }
+    }
+}
+
+@Directive({
+    selector: 'MDCMainActionButton' // tslint:disable-line:directive-selector
+})
+export class MainActionButtonDirective implements OnDestroy {
+    constructor(public element: ElementRef, @Optional() private ownerScope: BottomAppBarScope) {
+        if (this.ownerScope) {
+            this.ownerScope.onMainActionButtonInit(this);
+        }
+    }
+
+    ngOnDestroy() {
+        if (this.ownerScope) {
+            this.ownerScope.onMainActionButtonDestroy(this);
+        }
+    }
+}
+
+export const DIRECTIVES = [
+    BottomAppBarComponent,
+    BottomAppBarScope,
+    ActionItemDirective,
+    NavigationButtonDirective,
+    MainActionButtonDirective
+];

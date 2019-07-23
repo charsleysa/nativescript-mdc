@@ -16,6 +16,11 @@ export class BottomAppBar extends View {
     navigationButton: NavigationButton;
 
     /**
+     * Gets or sets the main action button (a.k.a. floating action button).
+     */
+    mainActionButton: MainActionButton;
+
+    /**
      * Gets the collection of action items.
      */
     actionItems: ActionItems;
