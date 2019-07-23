@@ -2,18 +2,14 @@ import { Color } from 'tns-core-modules/color/color';
 import { fromResource } from 'tns-core-modules/image-source/image-source';
 import { screen } from 'tns-core-modules/platform/platform';
 import { ios as iosApp } from 'tns-core-modules/application/application';
-import { ios as iosView, layout } from 'tns-core-modules/ui/core/view';
+import { ios as iosView, layout, backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 
 import { themer } from '../core/core';
-
+import { getColor } from '../core/ios/utils';
 import {
-    activeColorCssProperty,
     activeColorProperty,
-    backgroundColorCssProperty,
-    backgroundColorProperty,
     BottomNavigationBase,
     BottomNavigationTabBase,
-    inactiveColorCssProperty,
     inactiveColorProperty,
     tabsProperty,
     titleVisibilityProperty
@@ -74,10 +70,9 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     initNativeView(): void {
-        this.nativeViewProtected.selectedItemTintColor = new Color(this.activeColor).ios;
-        this.nativeViewProtected.selectedItemTitleColor = new Color(this.activeColor).ios;
-        this.nativeViewProtected.unselectedItemTintColor = new Color(this.inactiveColor).ios;
-        this.nativeViewProtected.barTintColor = new Color(this.backgroundColor).ios;
+        this.nativeViewProtected.selectedItemTintColor = this.style.activeColor.ios;
+        this.nativeViewProtected.selectedItemTitleColor = this.style.activeColor.ios;
+        this.nativeViewProtected.unselectedItemTintColor = this.style.inactiveColor.ios;
     }
 
     disposeNativeView() {
@@ -121,6 +116,10 @@ export class BottomNavigation extends BottomNavigationBase {
         this.nativeViewProtected.selectedItem = bottomNavigationTabs[this.selectedTabIndex];
     }
 
+    protected selectTabNative(index: number): void {
+        this.nativeViewProtected.selectedItem = this.nativeViewProtected.items[index];
+    }
+
     [tabsProperty.getDefault](): BottomNavigationTab[] {
         return null;
     }
@@ -148,34 +147,29 @@ export class BottomNavigation extends BottomNavigationBase {
         }
     }
 
-    [activeColorProperty.setNative](activeColor: string) {
-        this.nativeViewProtected.selectedItemTintColor = new Color(activeColor).ios;
-        this.nativeViewProtected.selectedItemTitleColor = new Color(activeColor).ios;
+    [activeColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.selectedItemTintColor);
     }
 
-    [activeColorCssProperty.setNative](activeColor: Color) {
-        this.nativeViewProtected.selectedItemTintColor = activeColor.ios;
-        this.nativeViewProtected.selectedItemTitleColor = activeColor.ios;
+    [activeColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.selectedItemTintColor = value.ios;
+        this.nativeViewProtected.selectedItemTitleColor = value.ios;
     }
 
-    [inactiveColorProperty.setNative](inactiveColor: string) {
-        this.nativeViewProtected.unselectedItemTintColor = new Color(inactiveColor).ios;
+    [inactiveColorProperty.setNative](): Color {
+        return getColor(this.nativeViewProtected.unselectedItemTintColor);
     }
 
-    [inactiveColorCssProperty.setNative](inactiveColor: Color) {
-        this.nativeViewProtected.unselectedItemTintColor = inactiveColor.ios;
+    [inactiveColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.unselectedItemTintColor = value.ios;
     }
 
-    [backgroundColorProperty.setNative](backgroundColor: string) {
-        this.nativeViewProtected.barTintColor = new Color(backgroundColor).ios;
+    [backgroundColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.barTintColor);
     }
 
-    [backgroundColorCssProperty.setNative](backgroundColor: Color) {
-        this.nativeViewProtected.barTintColor = backgroundColor.ios;
-    }
-
-    protected selectTabNative(index: number): void {
-        this.nativeViewProtected.selectedItem = this.nativeViewProtected.items[index];
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.barTintColor = value.ios;
     }
 }
 

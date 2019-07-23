@@ -1,3 +1,4 @@
+import { Background } from 'tns-core-modules/ui/styling/background';
 import { CardViewBase } from './cardView-common';
 export declare class CardView extends CardViewBase {
     nativeViewProtected: com.google.android.material.card.MaterialCardView;
@@ -6,4 +7,5 @@ export declare class CardView extends CardViewBase {
     createNativeView(): com.google.android.material.card.MaterialCardView;
     getRippleColor(): any;
     setRippleDrawable(view: com.google.android.material.card.MaterialCardView): void;
+    _redrawNativeBackground(value: Background): void;
 }

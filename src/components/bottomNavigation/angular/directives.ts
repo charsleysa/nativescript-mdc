@@ -14,48 +14,6 @@ export class BottomNavigationDirective implements AfterViewInit {
         this.bottomNavigation = element.nativeElement;
     }
 
-    private _activeColor: string;
-
-    @Input()
-    get activeColor(): string {
-        return this._activeColor;
-    }
-
-    set activeColor(value: string) {
-        this._activeColor = value;
-        if (this._viewInitialized) {
-            this.bottomNavigation.activeColor = this._activeColor;
-        }
-    }
-
-    private _inactiveColor: string;
-
-    @Input()
-    get inactiveColor(): string {
-        return this._inactiveColor;
-    }
-
-    set inactiveColor(value: string) {
-        this._inactiveColor = value;
-        if (this._viewInitialized) {
-            this.bottomNavigation.inactiveColor = this._inactiveColor;
-        }
-    }
-
-    private _backgroundColor: string;
-
-    @Input()
-    get backgroundColor(): string {
-        return this._backgroundColor;
-    }
-
-    set backgroundColor(value: string) {
-        this._backgroundColor = value;
-        if (this._viewInitialized) {
-            this.bottomNavigation.backgroundColor = this._backgroundColor;
-        }
-    }
-
     private _titleVisibility: 'selected' | 'always' | 'never';
 
     @Input()
@@ -100,9 +58,6 @@ export class BottomNavigationDirective implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this._viewInitialized = true;
-        if (!isBlank(this._activeColor)) { this.bottomNavigation.activeColor = this._activeColor; }
-        if (!isBlank(this._inactiveColor)) { this.bottomNavigation.inactiveColor = this._inactiveColor; }
-        if (!isBlank(this._backgroundColor)) { this.bottomNavigation.backgroundColor = this._backgroundColor; }
         if (!isBlank(this._titleVisibility)) { this.bottomNavigation.titleVisibility = this._titleVisibility; }
         if (!isBlank(this._tabs)) { this.bottomNavigation.tabs = this._tabs; }
         if (!isBlank(this._selectedTabIndex)) { this.bottomNavigation.selectedTabIndex = this._selectedTabIndex; }

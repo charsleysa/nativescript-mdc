@@ -13,13 +13,10 @@
         <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.UnelevatedButton</item>
     </style>
 
-    <style name="AppThemeMaterialTextField">
-        <item name="materialButtonStyle">@style/Widget.Design.TextInputLayout</item>
-    </style>
     <style name="AppThemeFilledMaterialTextField">
-        <item name="materialButtonStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
     </style>
     <style name="AppThemeOutlinedMaterialTextField">
-        <item name="materialButtonStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>
 </resources>

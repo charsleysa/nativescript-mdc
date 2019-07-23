@@ -1,61 +1,24 @@
-import { backgroundInternalProperty, placeholderColorProperty } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
+import { placeholderColorProperty } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
 import { Color } from 'tns-core-modules/color';
-import { Style } from 'tns-core-modules/ui/styling/style';
 import { Background } from 'tns-core-modules/ui/styling/background';
 import { screen } from 'tns-core-modules/platform/platform';
+import {
+    backgroundColorProperty,
+    borderTopColorProperty,
+    borderTopLeftRadiusProperty,
+    borderTopRightRadiusProperty,
+    borderBottomLeftRadiusProperty,
+    borderBottomRightRadiusProperty,
+    Length
+} from 'tns-core-modules/ui/core/view';
 
-import { themer } from '../core/core';
-import { TextFieldBase, errorColorProperty, errorProperty, floatingColorProperty, floatingProperty, helperProperty, maxLengthProperty, strokeColorProperty } from './textField-common';
-
-let colorScheme: MDCSemanticColorScheme;
-function getColorScheme() {
-    if (!colorScheme) {
-        colorScheme = MDCSemanticColorScheme.new();
-    }
-    return colorScheme;
-}
+import { getColor } from '../core/ios/utils';
+import { themer, getColorWithDefaultAlpha } from '../core/core';
+import { TextFieldBase, errorColorProperty, errorProperty, floatingColorProperty, floatingProperty, helperProperty, maxLengthProperty } from './textField-common';
 
 declare module 'tns-core-modules/ui/text-field/text-field' {
     interface TextField {
         _updateAttributedPlaceholder();
-    }
-}
-
-class MDCTextInputControllerUnderlineImpl extends MDCTextInputControllerUnderline {
-    private _owner: WeakRef<TextField>;
-    public static initWithOwner(owner: WeakRef<TextField>): MDCTextInputControllerUnderlineImpl {
-        const handler = <MDCTextInputControllerUnderlineImpl>MDCTextInputControllerUnderlineImpl.new();
-        handler._owner = owner;
-        return handler;
-    }
-
-    textInsets(defaultValue) {
-        let result = super.textInsets(defaultValue);
-        const owner = this._owner ? this._owner.get() : null;
-        if (owner) {
-            result = owner._getTextInsetsForBounds(result);
-        }
-        return result;
-    }
-}
-
-class MDCTextInputControllerImpl extends MDCTextInputControllerBase {
-    private _owner: WeakRef<TextField>;
-    public static initWithOwner(owner: WeakRef<TextField>): MDCTextInputControllerImpl {
-        const handler = <MDCTextInputControllerImpl>MDCTextInputControllerUnderlineImpl.new();
-        handler.underlineHeightActive = 0;
-        handler.underlineHeightNormal = 0;
-        handler._owner = owner;
-        return handler;
-    }
-
-    textInsets(defaultValue) {
-        let result = super.textInsets(defaultValue);
-        const owner = this._owner ? this._owner.get() : null;
-        if (owner) {
-            result = owner._getTextInsetsForBounds(result);
-        }
-        return result;
     }
 }
 
@@ -94,25 +57,28 @@ class MDCTextInputControllerFilledImpl extends MDCTextInputControllerFilled {
 
 export class TextField extends TextFieldBase {
     nativeViewProtected: MDCTextField;
-    private _controller: MDCTextInputControllerBase;
-    public readonly style: Style & { variant: 'outline' | 'underline' | 'filled' };
+    private _controller: MDCTextInputControllerFilled | MDCTextInputControllerOutlined;
 
-    public clearFocus() {
-        this.dismissSoftInput();
+    get ios(): MDCTextField {
+        return this.nativeViewProtected;
     }
 
-    public requestFocus() {
-        this.focus();
+    public createNativeView() {
+        const view = MDCTextField.new();
+        const owner = new WeakRef(this);
+        this._controller = (this.variant === 'outlined')
+            ? MDCTextInputControllerOutlinedImpl.initWithOwner(owner)
+            : MDCTextInputControllerFilledImpl.initWithOwner(owner);
+        this._controller.textInput = view;
+        view.textInsetsMode = MDCTextInputTextInsetsMode.IfContent;
+
+        this._controller.applyThemeWithScheme(themer.appScheme);
+
+        return view;
     }
 
-    _getTextInsetsForBounds(insets: UIEdgeInsets): UIEdgeInsets {
+    public _getTextInsetsForBounds(insets: UIEdgeInsets): UIEdgeInsets {
         const scale = screen.mainScreen.scale;
-
-        if (this.variant === 'underline' && this._controller.underlineHeightNormal === 0) {
-            // if no underline/custom background, remove all insets like on android
-            insets.top = 0;
-            insets.bottom = 0;
-        }
 
         insets.left += (this.effectiveBorderLeftWidth + this.effectivePaddingLeft) / scale;
         insets.top += (this.effectiveBorderTopWidth + this.effectivePaddingTop) / scale;
@@ -122,29 +88,12 @@ export class TextField extends TextFieldBase {
         return insets;
     }
 
-    // variant = 'underline';
-    public createNativeView() {
-        // const view = MDCTextFieldImpl.initWithOwner(new WeakRef(this));
-        const view = MDCTextField.new();
-        const colorScheme = themer.appColorScheme;
-        const owner = new WeakRef(this);
-        if (this.style.variant === 'filled') {
-            this._controller = MDCTextInputControllerFilledImpl.initWithOwner(owner);
-        } else if (this.style.variant === 'outline') {
-            this._controller = MDCTextInputControllerOutlinedImpl.initWithOwner(owner);
-        } else if (this.style.variant === 'underline') {
-            this._controller = MDCTextInputControllerUnderlineImpl.initWithOwner(owner);
-        } else {
-            this._controller = MDCTextInputControllerImpl.initWithOwner(owner);
-        }
-        this._controller.textInput = view;
-        view.textInsetsMode = MDCTextInputTextInsetsMode.IfContent;
+    public clearFocus() {
+        this.dismissSoftInput();
+    }
 
-        if (colorScheme) {
-            MDCTextFieldColorThemer.applySemanticColorSchemeToTextInput(colorScheme, view);
-            MDCTextFieldColorThemer.applySemanticColorSchemeToTextInputController(colorScheme, this._controller);
-        }
-        return view;
+    public requestFocus() {
+        this.focus();
     }
 
     // TODO: check why i was checking for isFirstResponder
@@ -155,11 +104,8 @@ export class TextField extends TextFieldBase {
     //         super.dismissSoftInput();
     //     }
     // }
-    get ios(): MDCTextField {
-        return this.nativeViewProtected;
-    }
 
-    blur() {
+    public blur() {
         this.dismissSoftInput();
     }
 
@@ -181,10 +127,6 @@ export class TextField extends TextFieldBase {
         const color = value instanceof Color ? value.ios : value;
         this._controller.errorColor = color;
     }
-    [strokeColorProperty.setNative](value: Color) {
-        const color = value instanceof Color ? value.ios : value;
-        this._controller.activeColor = color;
-    }
     [helperProperty.setNative](value: string) {
         this._controller.helperText = value;
     }
@@ -197,18 +139,76 @@ export class TextField extends TextFieldBase {
     [errorProperty.setNative](value: string) {
         this._controller.setErrorTextErrorAccessibilityValue(value, value);
     }
-    [backgroundInternalProperty.setNative](value: Background) {
-        if (value.color) {
-            this._controller.borderFillColor = value.color.ios;
-        }
-        if (value.borderTopColor) {
-            this._controller.normalColor = value.borderTopColor.ios;
-        }
 
-        this.borderTopLeftRadius = value.borderTopLeftRadius;
-        this.borderTopRightRadius = value.borderTopRightRadius;
-        this.borderBottomLeftRadius = value.borderBottomLeftRadius;
-        this.borderBottomRightRadius = value.borderBottomRightRadius;
-        // TODO: for now no control over corner radius
+    [backgroundColorProperty.getDefault](): Color {
+        if (this._controller instanceof MDCTextInputControllerFilled) {
+            return getColor(this._controller.borderFillColor);
+        } else {
+            return getColor(this._controller.activeColor);
+        }
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        if (this._controller instanceof MDCTextInputControllerFilled) {
+            this._controller.borderFillColor = getColorWithDefaultAlpha(value, 15).ios;
+        } else {
+            this._controller.activeColor = value.ios;
+        }
+    }
+
+    [borderTopColorProperty.getDefault](): Color {
+        if (this._controller instanceof MDCTextInputControllerFilled) {
+            return getColor(this._controller.activeColor);
+        } else {
+            return getColor(this._controller.normalColor);
+        }
+    }
+
+    [borderTopColorProperty.setNative](value: Color) {
+        if (this._controller instanceof MDCTextInputControllerFilled) {
+            this._controller.activeColor = value.ios;
+        } else {
+            this._controller.normalColor = getColorWithDefaultAlpha(value, 138).ios;
+        }
+    }
+
+    [borderTopLeftRadiusProperty.getDefault](): Length {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+        return { unit: 'px', value: 0 };
+    }
+
+    [borderTopLeftRadiusProperty.setNative](value: Length) {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+    }
+
+    [borderTopRightRadiusProperty.getDefault](): Length {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+        return { unit: 'px', value: 0 };
+    }
+
+    [borderTopRightRadiusProperty.setNative](value: Length) {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+    }
+
+    [borderBottomLeftRadiusProperty.getDefault](): Length {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+        return { unit: 'px', value: 0 };
+    }
+
+    [borderBottomLeftRadiusProperty.setNative](value: Length) {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+    }
+
+    [borderBottomRightRadiusProperty.getDefault](): Length {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+        return { unit: 'px', value: 0 };
+    }
+
+    [borderBottomRightRadiusProperty.setNative](value: Length) {
+        // Corner manipulation not yet supported in ios: https://github.com/material-components/material-components-ios/issues/2631
+    }
+
+    _redrawNativeBackground(value: Background): void {
+        return;
     }
 }

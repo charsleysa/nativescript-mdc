@@ -1,11 +1,17 @@
-import { Color } from 'tns-core-modules/ui/page/page';
+import { Color } from 'tns-core-modules/color';
 import { layout } from 'tns-core-modules/utils/utils';
-import { backgroundInternalProperty } from 'tns-core-modules/ui/core/view/view';
+import {
+    backgroundColorProperty,
+    borderTopColorProperty,
+    borderTopWidthProperty,
+    borderTopRightRadiusProperty,
+    Length
+} from 'tns-core-modules/ui/core/view';
 import { Background } from 'tns-core-modules/ui/styling/background';
 
-import { isPostLollipop } from '../core/android/utils';
+import { isPostLollipop, createStateListAnimator, createRippleDrawable, getAttrColor, isPostLollipopMR1 } from '../core/android/utils';
 import { elevationProperty, rippleColorProperty, elevationHighlightedProperty } from '../core/cssproperties';
-import { createStateListAnimator, createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/core';
+import { getRippleColor } from '../core/core';
 import { CardViewBase, interactableProperty } from './cardView-common';
 
 export class CardView extends CardViewBase {
@@ -27,12 +33,12 @@ export class CardView extends CardViewBase {
     }
 
     getRippleColor() {
-        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorControlHighlight')));
+        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorPrimary')));
     }
 
     setRippleDrawable(view: com.google.android.material.card.MaterialCardView) {
         if (!this.rippleDrawable) {
-            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), layout.toDevicePixels(Number(this.borderRadius) || 0));
+            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), Number(this.style.backgroundInternal.borderTopRightRadius) || 0);
         }
 
         const currentDrawable = view.getForeground();
@@ -42,16 +48,6 @@ export class CardView extends CardViewBase {
         const newForeground = new android.graphics.drawable.LayerDrawable(drawableArray);
         view.setForeground(newForeground);
         view.requestLayout();
-    }
-
-    [backgroundInternalProperty.setNative](value: Background) {
-        if (this.nativeViewProtected) {
-            this.nativeViewProtected.setCardBackgroundColor(new Color(value.color != null ? value.color + '' : '#FFFFFF').ios);
-            this.nativeViewProtected.setStrokeWidth(value.borderTopWidth);
-            this.nativeViewProtected.setStrokeColor(value.borderTopColor ? value.borderTopColor.android : -1);
-            this.nativeViewProtected.setRadius(value.borderTopRightRadius);
-            this.setRippleDrawable(this.nativeViewProtected);
-        }
     }
 
     [elevationProperty.setNative](value: number) {
@@ -93,5 +89,45 @@ export class CardView extends CardViewBase {
         } else {
             (this.rippleDrawable as any).rippleShape.getPaint().setColor(rippleColor);
         }
+    }
+
+    [backgroundColorProperty.getDefault](): Color {
+        return new Color(this.nativeViewProtected.getCardBackgroundColor().getDefaultColor());
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setCardBackgroundColor(value.android);
+        this.setRippleDrawable(this.nativeViewProtected);
+    }
+
+    [borderTopColorProperty.getDefault](): Color {
+        return new Color(this.nativeViewProtected.getStrokeColor());
+    }
+
+    [borderTopColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setStrokeColor(value.android);
+        this.setRippleDrawable(this.nativeViewProtected);
+    }
+
+    [borderTopWidthProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getStrokeWidth() };
+    }
+
+    [borderTopWidthProperty.setNative](value: Length) {
+        this.nativeViewProtected.setStrokeWidth(Length.toDevicePixels(value));
+        this.setRippleDrawable(this.nativeViewProtected);
+    }
+
+    [borderTopRightRadiusProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getRadius() };
+    }
+
+    [borderTopRightRadiusProperty.setNative](value: Length) {
+        this.nativeViewProtected.setRadius(Length.toDevicePixels(value));
+        this.setRippleDrawable(this.nativeViewProtected);
+    }
+
+    _redrawNativeBackground(value: Background): void {
+        return;
     }
 }

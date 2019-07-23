@@ -15,12 +15,10 @@ import {
 
 export type TextFieldProperties = Partial<Pick<TextField, keyof TextField>>;
 export class TextField extends NTextField {
-    /*
-     * nativeView
-     * @Android : com.google.android.material.textfield.TextInputLayout
-     * @iOS : MDCTextField
-     */
-    nativeViewProtected: any;
+
+    readonly android: any; // com.google.android.material.textfield.TextInputLayout
+
+    readonly ios: any; // MDCTextField
 
     helper: string;
     maxLength: number;
@@ -35,5 +33,3 @@ export class TextField extends NTextField {
     requestFocus();
     clearFocus();
 }
-
-export function initTextInputEditText(); // android only

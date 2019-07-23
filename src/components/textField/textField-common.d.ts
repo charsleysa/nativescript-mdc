@@ -13,7 +13,6 @@ export declare abstract class TextFieldBase extends NTextField {
     placeholderColor: Color;
     variant: string;
     error: string;
-    strokeColor: Color;
     floatingColor: Color;
 }
 export declare const errorColorProperty: CssProperty<Style, Color>;
@@ -22,4 +21,3 @@ export declare const errorProperty: CssProperty<Style, string>;
 export declare const maxLengthProperty: CssProperty<Style, number>;
 export declare const floatingProperty: CssProperty<Style, boolean>;
 export declare const floatingColorProperty: CssProperty<Style, Color>;
-export declare const strokeColorProperty: CssProperty<Style, Color>;

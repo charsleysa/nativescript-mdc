@@ -1,15 +1,12 @@
 import { Color } from 'tns-core-modules/color/color';
 import { fromResource } from 'tns-core-modules/image-source/image-source';
 import { ad } from 'tns-core-modules/utils/utils';
+import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 
 import {
-    activeColorCssProperty,
     activeColorProperty,
-    backgroundColorCssProperty,
-    backgroundColorProperty,
     BottomNavigationBase,
     BottomNavigationTabBase,
-    inactiveColorCssProperty,
     inactiveColorProperty,
     tabsProperty,
     titleVisibilityProperty
@@ -53,8 +50,7 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     initNativeView(): void {
-        this.setTabColors(new Color(this.activeColor), new Color(this.inactiveColor));
-        this.nativeViewProtected.setBackgroundColor(new Color(this.backgroundColor).android);
+        this.setTabColors(this.style.activeColor, this.style.inactiveColor);
     }
 
     createTabs(tabs: BottomNavigationTab[]) {
@@ -135,6 +131,10 @@ export class BottomNavigation extends BottomNavigationBase {
         }
     }
 
+    protected selectTabNative(index: number): void {
+        this.nativeViewProtected.setSelectedItemId(index);
+    }
+
     [tabsProperty.getDefault](): BottomNavigationTab[] {
         return null;
     }
@@ -144,7 +144,7 @@ export class BottomNavigation extends BottomNavigationBase {
     }
 
     [titleVisibilityProperty.getDefault](): string {
-        switch ((this.nativeViewProtected as any).getLabelVisibilityMode()) {
+        switch (this.nativeViewProtected.getLabelVisibilityMode()) {
             case LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED:
                 return 'never';
             case LabelVisibilityMode.LABEL_VISIBILITY_LABELED:
@@ -158,46 +158,33 @@ export class BottomNavigation extends BottomNavigationBase {
     [titleVisibilityProperty.setNative](value: string) {
         switch (value) {
             case 'never':
-                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
+                this.nativeViewProtected.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
                 break;
             case 'always':
-                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
+                this.nativeViewProtected.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
                 break;
             case 'selected':
             default:
-                (this.nativeViewProtected as any).setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_SELECTED);
+                this.nativeViewProtected.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_SELECTED);
                 break;
         }
     }
 
-    [activeColorProperty.setNative](activeColor: string) {
-        this.setTabColors(new Color(activeColor), new Color(this.inactiveColor));
+    [activeColorProperty.setNative](value: Color) {
+        this.setTabColors(value, this.style.inactiveColor);
     }
 
-    [activeColorCssProperty.setNative](activeColor: Color) {
-        this.setTabColors(activeColor, new Color(this.inactiveColor));
+    [inactiveColorProperty.setNative](value: Color) {
+        this.setTabColors(this.style.activeColor, value);
     }
 
-    [inactiveColorProperty.setNative](inactiveColor: string) {
-        this.setTabColors(new Color(this.activeColor), new Color(inactiveColor));
+    [backgroundColorProperty.getDefault](): Color {
+        return new Color((this.nativeViewProtected.getBackground() as com.google.android.material.shape.MaterialShapeDrawable).getTintList().getDefaultColor());
     }
 
-    [inactiveColorCssProperty.setNative](inactiveColor: Color) {
-        this.setTabColors(new Color(this.activeColor), inactiveColor);
+    [backgroundColorProperty.setNative](value: Color) {
+        (this.nativeViewProtected.getBackground() as com.google.android.material.shape.MaterialShapeDrawable).setTint(value.android);
     }
-
-    [backgroundColorProperty.setNative](backgroundColor: string) {
-        this.nativeViewProtected.setBackgroundColor(new Color(backgroundColor).android);
-    }
-
-    [backgroundColorCssProperty.setNative](backgroundColor: Color) {
-        this.nativeViewProtected.setBackgroundColor(backgroundColor.android);
-    }
-
-    protected selectTabNative(index: number): void {
-        this.nativeViewProtected.setSelectedItemId(index);
-    }
-
 }
 
 export class BottomNavigationTab extends BottomNavigationTabBase {

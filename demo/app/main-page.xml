@@ -2,7 +2,7 @@
   xmlns:mdc="nativescript-mdc">
     <ScrollView>
         <StackLayout>
-            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+            <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
                 <StackLayout>
                     <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
                     <mdc:Button variant="flat" text="button1"></mdc:Button>
@@ -11,7 +11,7 @@
             <ListView items="{{ items }}">
                 <ListView.itemTemplate>
                     <StackLayout>
-                        <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+                        <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
                             <StackLayout>
                                 <Label text="" class="text t-20 text-center c-black" textWrap="true"/>
                                 <mdc:Button variant="flat" text="button1"></mdc:Button>
@@ -33,19 +33,21 @@
             </StackLayout>
             <StackLayout>
                 <mdc:Button text="default"></mdc:Button>
-                <mdc:Button variant="outline" text="outline"></mdc:Button>
+                <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
             </StackLayout>
-            <mdc:CardView class="card" elevation="5" borderRadius="15" interactable="true">
+            <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
                 <StackLayout>
                     <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
                     <mdc:Button variant="flat" text="button1"></mdc:Button>
                 </StackLayout>
             </mdc:CardView>
             <StackLayout>
-                <mdc:TextField></mdc:TextField>
-                <mdc:Button text="default"></mdc:Button>
-                <mdc:Button variant="outline" text="outline"></mdc:Button>
+                <mdc:TextField class="text-field"></mdc:TextField>
+                <mdc:TextField class="text-field" variant="outlined"></mdc:TextField>
+                <mdc:TextField class="text-field" variant="filled"></mdc:TextField>
+                <mdc:Button text="default" style="background: red;"></mdc:Button>
+                <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
             </StackLayout>
         </StackLayout>

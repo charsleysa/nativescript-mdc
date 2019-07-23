@@ -1,10 +1,17 @@
-import { Color } from 'tns-core-modules/ui/page/page';
-import { backgroundInternalProperty } from 'tns-core-modules/ui/core/view/view';
+import { Color } from 'tns-core-modules/color';
+import {
+    backgroundColorProperty,
+    borderTopColorProperty,
+    borderTopWidthProperty,
+    borderTopRightRadiusProperty,
+    Length
+} from 'tns-core-modules/ui/core/view';
 import { Background } from 'tns-core-modules/ui/styling/background';
 import { layout } from 'tns-core-modules/utils/utils';
 
 import { elevationProperty, rippleColorProperty, elevationHighlightedProperty } from '../core/cssproperties';
 import { getRippleColor, themer } from '../core/core';
+import { getColor } from '../core/ios/utils';
 import { CardViewBase, interactableProperty } from './cardView-common';
 
 // use custom class to get the same behavior as android which is
@@ -36,19 +43,6 @@ export class CardView extends CardViewBase {
     }
     _setNativeClipToBounds() {
         // this.ios.clipsToBounds = true;
-    }
-
-    [backgroundInternalProperty.setNative](value: Background) {
-        if (this.nativeViewProtected) {
-            this.nativeViewProtected.backgroundColor = new Color(value.color != null ? value.color + '' : '#FFFFFF').ios;
-            this.nativeViewProtected.setBorderWidthForState(layout.toDeviceIndependentPixels(value.borderTopWidth), UIControlState.Normal);
-            this.nativeViewProtected.setBorderColorForState(value.borderTopColor ? value.borderTopColor.ios : null, UIControlState.Normal);
-            this.nativeViewProtected.cornerRadius = layout.toDeviceIndependentPixels(value.borderTopRightRadius);
-        }
-    }
-
-    [backgroundInternalProperty.getDefault]() {
-        return this.nativeViewProtected.backgroundColor;
     }
 
     [elevationProperty.setNative](value: number) {
@@ -84,5 +78,41 @@ export class CardView extends CardViewBase {
 
     [rippleColorProperty.getDefault]() {
         return this.nativeViewProtected.rippleView.rippleColor;
+    }
+
+    [backgroundColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.backgroundColor);
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.backgroundColor = value.ios;
+    }
+
+    [borderTopColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.borderColorForState(UIControlState.Normal));
+    }
+
+    [borderTopColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setBorderColorForState(value.ios, UIControlState.Normal);
+    }
+
+    [borderTopWidthProperty.getDefault](): Length {
+        return { unit: 'dip', value: this.nativeViewProtected.borderWidthForState(UIControlState.Normal) };
+    }
+
+    [borderTopWidthProperty.setNative](value: Length) {
+        this.nativeViewProtected.setBorderWidthForState(layout.toDeviceIndependentPixels(Length.toDevicePixels(value, 0)), UIControlState.Normal);
+    }
+
+    [borderTopRightRadiusProperty.getDefault](): Length {
+        return { unit: 'dip', value: this.nativeViewProtected.cornerRadius };
+    }
+
+    [borderTopRightRadiusProperty.setNative](value: Length) {
+        this.nativeViewProtected.cornerRadius = layout.toDeviceIndependentPixels(Length.toDevicePixels(value, 0));
+    }
+
+    _redrawNativeBackground(value: Background): void {
+        return;
     }
 }

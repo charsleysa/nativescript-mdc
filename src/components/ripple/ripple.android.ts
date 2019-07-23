@@ -1,8 +1,9 @@
 import { Color } from 'tns-core-modules/ui/page/page';
 import { ad, layout } from 'tns-core-modules/utils/utils';
 
+import { createRippleDrawable, getAttrColor, isPostLollipopMR1 } from '../core/android/utils';
 import { rippleColorProperty } from '../core/cssproperties';
-import { createRippleDrawable, getAttrColor, getRippleColor, isPostLollipopMR1 } from '../core/core';
+import { getRippleColor } from '../core/core';
 import { RippleBase } from './ripple-common';
 
 let MDCStackLayout: typeof org.nativescript.widgets.StackLayout;
@@ -215,7 +216,7 @@ export class Ripple extends RippleBase {
 
     setRippleDrawable(view: android.view.View) {
         if (!this.rippleDrawable) {
-            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), layout.toDevicePixels(Number(this.borderRadius) || 0));
+            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), Number(this.style.backgroundInternal.borderTopRightRadius) || 0);
             view.setForeground(this.rippleDrawable);
         }
     }

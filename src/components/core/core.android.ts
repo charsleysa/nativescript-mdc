@@ -33,3 +33,8 @@ export function getRippleColor(color: string | Color) {
     }
     return null;
 }
+
+export function getColorWithDefaultAlpha(color: string | Color, alpha: number): Color {
+    const temp = typeof color === 'string' ? new Color(color) : color;
+    return new Color(temp.a !== 255 ? temp.a : alpha, temp.r, temp.g, temp.b);
+}

@@ -1,10 +1,20 @@
 import { Color } from 'tns-core-modules/color';
 import { ad } from 'tns-core-modules/utils/utils';
 import { Background } from 'tns-core-modules/ui/styling/background';
-import { backgroundInternalProperty, borderBottomLeftRadiusProperty, hintProperty, placeholderColorProperty } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
+import { hintProperty, placeholderColorProperty } from 'tns-core-modules/ui/editable-text-base/editable-text-base';
+import {
+    backgroundColorProperty,
+    borderTopColorProperty,
+    borderTopLeftRadiusProperty,
+    borderTopRightRadiusProperty,
+    borderBottomLeftRadiusProperty,
+    borderBottomRightRadiusProperty,
+    Length
+} from 'tns-core-modules/ui/core/view';
 
 import { getFocusedColorStateList, getLayout, handleClearFocus, stateSets } from '../core/android/utils';
-import { TextFieldBase, errorColorProperty, errorProperty, floatingColorProperty, floatingProperty, helperProperty, maxLengthProperty, strokeColorProperty } from './textField-common';
+import { getColorWithDefaultAlpha } from '../core/core';
+import { TextFieldBase, errorColorProperty, errorProperty, floatingColorProperty, floatingProperty, helperProperty, maxLengthProperty } from './textField-common';
 
 declare module 'tns-core-modules/ui/text-field/text-field' {
     interface TextField {
@@ -19,11 +29,10 @@ interface TextInputEditText extends com.google.android.material.textfield.TextIn
 }
 let TextInputEditText: TextInputEditText;
 
-export function initTextInputEditText() {
+function initTextInputEditText() {
     if (TextInputEditText) {
         return;
     }
-    @JavaProxy('org.nativescript.material.TextInputEditText')
     class TextInputEditTextImpl extends com.google.android.material.textfield.TextInputEditText {
         public owner: WeakRef<TextField>;
         constructor(context: android.content.Context) {
@@ -59,35 +68,28 @@ export function getDefaultHintTextColorStateList(pressedColor: number, color = 1
 
 export class TextField extends TextFieldBase {
     editText: com.google.android.material.textfield.TextInputEditText;
-    layoutView: com.google.android.material.textfield.TextInputLayout;
+    nativeViewProtected: com.google.android.material.textfield.TextInputLayout;
 
-    // nativeViewProtected: com.google.android.material.textfield.TextInputLayout;
+    get nativeTextViewProtected() {
+        return this.editText;
+    }
+
+    get android(): com.google.android.material.textfield.TextInputLayout {
+        return this.nativeViewProtected;
+    }
+
     constructor() {
         super();
     }
-    get nativeTextViewProtected() {
-        return this.editText as com.google.android.material.textfield.TextInputEditText;
-    }
-
-    drawingBackground = false;
-    get nativeViewProtected() {
-        if (this.drawingBackground) {
-            return this.editText;
-        }
-        return this.layoutView;
-    }
 
     public createNativeView() {
-        let style = 'AppThemeMaterialTextField';
-        if (this.variant === 'filled') {
-            style = 'AppThemeFilledMaterialTextField';
-        } else if (this.variant === 'outline') {
-            style = 'AppThemeOutlinedMaterialTextField';
-        }
+        const style = (this.variant === 'outlined')
+            ? 'AppThemeOutlinedMaterialTextField'
+            : 'AppThemeFilledMaterialTextField';
 
         initTextInputEditText();
 
-        const layoutView = this.layoutView = new com.google.android.material.textfield.TextInputLayout(new android.view.ContextThemeWrapper(this._context, ad.resources.getId(':style/' + style)));
+        const layoutView = new com.google.android.material.textfield.TextInputLayout(new android.view.ContextThemeWrapper(this._context, ad.resources.getId(':style/' + style)));
         const editText = this.editText = new TextInputEditText(layoutView.getContext());
         editText.setLayoutParams(new android.widget.LinearLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.MATCH_PARENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT));
         layoutView.addView(editText);
@@ -96,103 +98,127 @@ export class TextField extends TextFieldBase {
         return layoutView;
     }
 
-    [borderBottomLeftRadiusProperty.getDefault]() {
-        console.log('borderBottomLeftRadiusProperty.getDefault', this.layoutView.getBoxCornerRadiusTopStart());
-        return this.layoutView.getBoxCornerRadiusTopStart();
-    }
-
-    _redrawNativeBackground(value: android.graphics.drawable.Drawable | Background): void {
-        // trick for the background to be applied to the editText so that it removes the border line
-        this.drawingBackground = true;
-        super._redrawNativeBackground(value);
-        this.drawingBackground = false;
-    }
-
-    [hintProperty.getDefault](): string {
-        return this.layoutView.getHint();
-    }
-    [hintProperty.setNative](value: string) {
-        const text = value === null || value === undefined ? null : value.toString();
-        this.layoutView.setHint(text);
-    }
-
-    [placeholderColorProperty.setNative](value: Color) {
-        const placeholderColor = value instanceof Color ? value.android : value;
-        const floatingColor = this.floatingColor instanceof Color ? this.floatingColor.android : placeholderColor;
-
-        this.layoutView.setDefaultHintTextColor(getDefaultHintTextColorStateList(floatingColor, placeholderColor));
-    }
-    [floatingColorProperty.setNative](value: Color) {
-        const floatingColor = value instanceof Color ? value.android : value;
-        const placeholderColor = this.placeholderColor instanceof Color ? this.placeholderColor.android : undefined;
-        this.layoutView.setDefaultHintTextColor(getDefaultHintTextColorStateList(floatingColor, placeholderColor));
-    }
-
     public requestFocus() {
-        if (this.layoutView) {
+        if (this.nativeViewProtected) {
             // because of setFocusableInTouchMode fix we need this for focus to work
-            const oldDesc = this.layoutView.getDescendantFocusability();
-            this.layoutView.setDescendantFocusability(android.view.ViewGroup.FOCUS_AFTER_DESCENDANTS);
+            const oldDesc = this.nativeViewProtected.getDescendantFocusability();
+            this.nativeViewProtected.setDescendantFocusability(android.view.ViewGroup.FOCUS_AFTER_DESCENDANTS);
             // }
-            this.layoutView.requestFocus();
+            this.nativeViewProtected.requestFocus();
             setTimeout(() => {
-                this.layoutView.setDescendantFocusability(oldDesc);
+                this.nativeViewProtected.setDescendantFocusability(oldDesc);
                 ad.showSoftInput(this.nativeTextViewProtected);
             }, 0);
         }
 
         return false;
     }
+
     public clearFocus() {
         handleClearFocus(this.nativeViewProtected);
         this.dismissSoftInput();
     }
 
+    [hintProperty.getDefault](): string {
+        return this.nativeViewProtected.getHint();
+    }
+    [hintProperty.setNative](value: string) {
+        const text = value === null || value === undefined ? null : value.toString();
+        this.nativeViewProtected.setHint(text);
+    }
+
+    [placeholderColorProperty.setNative](value: Color) {
+        const placeholderColor = value instanceof Color ? value.android : value;
+        const floatingColor = this.floatingColor instanceof Color ? this.floatingColor.android : placeholderColor;
+
+        this.nativeViewProtected.setDefaultHintTextColor(getDefaultHintTextColorStateList(floatingColor, placeholderColor));
+    }
+    [floatingColorProperty.setNative](value: Color) {
+        const floatingColor = value instanceof Color ? value.android : value;
+        const placeholderColor = this.placeholderColor instanceof Color ? this.placeholderColor.android : undefined;
+        this.nativeViewProtected.setDefaultHintTextColor(getDefaultHintTextColorStateList(floatingColor, placeholderColor));
+    }
+
     [errorColorProperty.setNative](value: Color) {
         const color = value instanceof Color ? value.android : value;
-        (this.layoutView as any).setErrorTextColor(android.content.res.ColorStateList.valueOf(color));
+        this.nativeViewProtected.setErrorTextColor(android.content.res.ColorStateList.valueOf(color));
     }
 
     [helperProperty.setNative](value: string) {
-        (this.layoutView as any).setHelperText(!!value ? value : null);
+        this.nativeViewProtected.setHelperText(!!value ? value : null);
     }
     [errorProperty.setNative](value: string) {
-        this.layoutView.setError(!!value ? value : null);
-        this.layoutView.setErrorEnabled(!!value);
+        this.nativeViewProtected.setError(!!value ? value : null);
+        this.nativeViewProtected.setErrorEnabled(!!value);
     }
 
     [maxLengthProperty.setNative](value: number) {
-        this.layoutView.setCounterEnabled(value > 0);
-        this.layoutView.setCounterMaxLength(value);
+        this.nativeViewProtected.setCounterEnabled(value > 0);
+        this.nativeViewProtected.setCounterMaxLength(value);
     }
 
     [floatingProperty.setNative](value: boolean) {
-        this.layoutView.setHintEnabled(!!value);
+        this.nativeViewProtected.setHintEnabled(!!value);
     }
 
-    [strokeColorProperty.setNative](value: Color) {
-        const color = value instanceof Color ? value.android : value;
-        this.layoutView.setBoxStrokeColor(color);
-        // this.editText.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+    [backgroundColorProperty.getDefault](): Color {
+        return new Color(this.nativeViewProtected.getBoxStrokeColor());
     }
-    [backgroundInternalProperty.setNative](value: Background) {
-        if (this.nativeViewProtected) {
-            if (value instanceof android.graphics.drawable.Drawable) {
-                this.nativeViewProtected.setBackgroundDrawable(value);
-            } else {
-                if (value.color) {
-                    this.layoutView.setBoxBackgroundColor(value.color.android);
-                }
-                if (value.borderTopColor) {
-                    this.layoutView.setBoxStrokeColor(value.borderTopColor.android);
-                }
 
-                this.borderTopLeftRadius = value.borderTopLeftRadius;
-                this.borderTopRightRadius = value.borderTopRightRadius;
-                this.borderBottomLeftRadius = value.borderBottomLeftRadius;
-                this.borderBottomRightRadius = value.borderBottomRightRadius;
-                this.layoutView.setBoxCornerRadii(this.borderTopLeftRadius, this.borderTopRightRadius, this.borderBottomLeftRadius, this.borderBottomRightRadius);
-            }
-        }
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setBoxBackgroundColor(getColorWithDefaultAlpha(value, 31).android);
+    }
+
+    [borderTopColorProperty.getDefault](): Color {
+        return new Color(this.nativeViewProtected.getBoxStrokeColor());
+    }
+
+    [borderTopColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setBoxStrokeColor(value.android);
+    }
+
+    [borderTopLeftRadiusProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getBoxCornerRadiusTopStart() };
+    }
+
+    [borderTopLeftRadiusProperty.setNative](value: Length) {
+        this.setCorners();
+    }
+
+    [borderTopRightRadiusProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getBoxCornerRadiusTopEnd() };
+    }
+
+    [borderTopRightRadiusProperty.setNative](value: Length) {
+        this.setCorners();
+    }
+
+    [borderBottomLeftRadiusProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getBoxCornerRadiusBottomStart() };
+    }
+
+    [borderBottomLeftRadiusProperty.setNative](value: Length) {
+        this.setCorners();
+    }
+
+    [borderBottomRightRadiusProperty.getDefault](): Length {
+        return { unit: 'px', value: this.nativeViewProtected.getBoxCornerRadiusBottomEnd() };
+    }
+
+    [borderBottomRightRadiusProperty.setNative](value: Length) {
+        this.setCorners();
+    }
+
+    setCorners() {
+        this.nativeViewProtected.setBoxCornerRadii(
+            Length.toDevicePixels(this.style.borderTopLeftRadius),
+            Length.toDevicePixels(this.style.borderTopRightRadius),
+            Length.toDevicePixels(this.style.borderBottomLeftRadius),
+            Length.toDevicePixels(this.style.borderBottomRightRadius)
+        );
+    }
+
+    _redrawNativeBackground(value: Background): void {
+        return;
     }
 }

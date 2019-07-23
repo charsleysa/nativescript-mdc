@@ -1,4 +1,4 @@
-import { Style } from 'tns-core-modules/ui/styling/style';
+import { Background } from 'tns-core-modules/ui/styling/background';
 import { TextFieldBase } from './textField-common';
 declare module 'tns-core-modules/ui/text-field/text-field' {
     interface TextField {
@@ -8,13 +8,11 @@ declare module 'tns-core-modules/ui/text-field/text-field' {
 export declare class TextField extends TextFieldBase {
     nativeViewProtected: MDCTextField;
     private _controller;
-    readonly style: Style & {
-        variant: 'outline' | 'underline' | 'filled';
-    };
+    readonly ios: MDCTextField;
+    createNativeView(): MDCTextField;
+    _getTextInsetsForBounds(insets: UIEdgeInsets): UIEdgeInsets;
     clearFocus(): void;
     requestFocus(): void;
-    _getTextInsetsForBounds(insets: UIEdgeInsets): UIEdgeInsets;
-    createNativeView(): MDCTextField;
-    readonly ios: MDCTextField;
     blur(): void;
+    _redrawNativeBackground(value: Background): void;
 }

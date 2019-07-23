@@ -18,6 +18,7 @@ export const themer: Themer;
 export function install();
 export function applyMixins(derivedCtor: any, baseCtors: any[]);
 export function getRippleColor(color: string | Color): any;
+export function getColorWithDefaultAlpha(color: string | Color, alpha: number): Color;
 
 
 // declare module 'tns-core-modules/ui/core/view' {
@@ -27,9 +28,3 @@ export function getRippleColor(color: string | Color): any;
 //         rippleColor: string | Color
 //     }
 // }
-
-// Android only
-export function createStateListAnimator(view, nativeView);
-export function createRippleDrawable(view, rippleColor, radius?);
-export function getAttrColor(context, name);
-export function isPostLollipopMR1();

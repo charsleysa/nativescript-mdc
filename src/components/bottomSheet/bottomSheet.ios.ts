@@ -62,6 +62,7 @@ class BottomSheetUILayoutViewController extends UIViewController {
             layoutGuide = this.initLayoutGuide(controller);
         }
         const safeArea = layoutGuide.layoutFrame;
+        console.log('safe area', safeArea.origin.x, safeArea.origin.y, safeArea.size.width, safeArea.size.height);
         let position = ios.getPositionFromFrame(safeArea);
         const safeAreaSize = safeArea.size;
 
@@ -104,13 +105,13 @@ class BottomSheetUILayoutViewController extends UIViewController {
         this.layoutParent(view.parent);
     }
 
-    // public viewWillLayoutSubviews(): void {
-    //     super.viewWillLayoutSubviews();
-    //     const owner = this.owner.get();
-    //     if (owner) {
-    //         ios.updateConstraints(this, owner);
-    //     }
-    // }
+    public viewWillLayoutSubviews(): void {
+        super.viewWillLayoutSubviews();
+        const owner = this.owner.get();
+        if (owner) {
+            ios.updateConstraints(this, owner);
+        }
+    }
 
     public viewDidLayoutSubviews(): void {
         super.viewDidLayoutSubviews();

@@ -4,7 +4,7 @@ import { cssProperty } from '../core/cssproperties';
 
 @CSSType('MDCButton')
 export abstract class ButtonBase extends Button {
-    public variant: string;
+    @cssProperty variant: string;
     @cssProperty elevation: number;
     @cssProperty elevationHighlighted: number;
     @cssProperty rippleColor: Color | string;
@@ -14,8 +14,3 @@ export abstract class ButtonBase extends Button {
         this.style.margin = 5;
     }
 }
-
-export const variantProperty = new Property<ButtonBase, string>({
-    name: 'variant'
-});
-variantProperty.register(ButtonBase);

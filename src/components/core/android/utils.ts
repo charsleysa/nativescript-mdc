@@ -195,7 +195,7 @@ export function getFocusedColorStateList(color: number, variant: string) {
 export function createStateListAnimator(view: ViewBase, nativeView: android.view.View) {
     const elevation = view.style['elevation'] !== undefined ? view.style['elevation'] : 2;
     const translationZ = view.style['translationZ'] !== undefined ? view.style['translationZ'] : 0;
-    const elevationSelected = view.style['elevationHighlighted'] !== undefined ? view.style['elevationHighlighted'] : 3 * elevation;
+    const elevationSelected = view.style['elevationHighlighted'] !== undefined ? view.style['elevationHighlighted'] : 2 * elevation;
     // compute translationSelectedZ base on elevationSelected
     const translationSelectedZ = view.style['translationZHighlighted'] ? view.style['translationZHighlighted'] : translationZ + elevationSelected;
     const animationDuration = 100;

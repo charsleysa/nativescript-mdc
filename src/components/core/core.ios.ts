@@ -62,6 +62,11 @@ export function getRippleColor(color: string | Color): UIColor {
     return null;
 }
 
+export function getColorWithDefaultAlpha(color: string | Color, alpha: number): Color {
+    const temp = typeof color === 'string' ? new Color(color) : color;
+    return new Color(temp.a !== 255 ? temp.a : alpha, temp.r, temp.g, temp.b);
+}
+
 // class ViewWithElevationAndRipple extends View {
 //     @cssProperty elevation: number;
 //     @cssProperty elevationHighlighted: number;

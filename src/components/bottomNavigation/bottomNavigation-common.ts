@@ -4,6 +4,7 @@ import { EventData } from 'tns-core-modules/data/observable/observable';
 import { Style } from 'tns-core-modules/ui/styling/style/style';
 import { Color } from 'tns-core-modules/color/color';
 import { booleanConverter } from 'tns-core-modules/ui/core/view-base/view-base';
+import { cssProperty } from '../core/cssproperties';
 
 /**
  * Event interface for tab selected event
@@ -28,22 +29,17 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
     /**
      * Get or set the style of visibilty for the title of the tabs.
      */
-    public titleVisibility: 'selected' | 'always' | 'never' = 'selected';
+    public titleVisibility: 'selected' | 'always' | 'never';
 
     /**
      * Get or set the color of the icon and title of the selected tab.
      */
-    public activeColor: string = 'blue';
+    @cssProperty activeColor: string | Color;
 
     /**
      * Get or set the color of the icon and title of not selected tabs.
      */
-    public inactiveColor: string = 'gray';
-
-    /**
-     * Get or set the backgroundColor of the bottomNavigation
-     */
-    public backgroundColor: string = 'white';
+    @cssProperty inactiveColor: string | Color;
 
     /**
      * Method allowing to manually select a tab
@@ -66,15 +62,22 @@ export abstract class BottomNavigationBase extends View implements AddChildFromB
     }
 
     _addChildFromBuilder(name: string, value: any): void {
-        if (name === 'BottomNavigationTab' || name === 'MDCBottomNavigationTab') {
+        if (value instanceof BottomNavigationTabBase) {
             if (!this.tabs) {
-                this.tabs = <BottomNavigationTabBase[]>[];
+                this.tabs = [];
             }
-            this.tabs.push(<BottomNavigationTabBase>value);
+            this.tabs.push(value);
         }
     }
 
     protected abstract selectTabNative(index: number): void;
+}
+
+declare module 'tns-core-modules/ui/styling/style' {
+    interface Style {
+        activeColor: Color;
+        inactiveColor: Color;
+    }
 }
 
 export const tabsProperty = new Property<BottomNavigationBase, BottomNavigationTabBase[]>({
@@ -84,48 +87,28 @@ export const tabsProperty = new Property<BottomNavigationBase, BottomNavigationT
 tabsProperty.register(BottomNavigationBase);
 
 export const titleVisibilityProperty = new Property<BottomNavigationBase, string>({
-    name: 'titleVisibility'
+    name: 'titleVisibility',
+    defaultValue: 'selected'
 });
 titleVisibilityProperty.register(BottomNavigationBase);
 
-export const activeColorProperty = new Property<BottomNavigationBase, string>({
-    name: 'activeColor'
-});
-activeColorProperty.register(BottomNavigationBase);
-
-export const activeColorCssProperty = new CssProperty<Style, Color>({
-    name: 'tabActiveColor',
+export const activeColorProperty = new CssProperty<Style, Color>({
+    name: 'activeColor',
     cssName: 'tab-active-color',
     equalityComparer: Color.equals,
-    valueConverter: (v) => new Color(v)
+    valueConverter: (v) => new Color(v),
+    defaultValue: new Color('blue')
 });
-activeColorCssProperty.register(Style);
+activeColorProperty.register(Style);
 
-export const inactiveColorProperty = new Property<BottomNavigationBase, string>({
-    name: 'inactiveColor'
-});
-inactiveColorProperty.register(BottomNavigationBase);
-
-export const inactiveColorCssProperty = new CssProperty<Style, Color>({
-    name: "tabInactiveColor",
-    cssName: "tab-inactive-color",
+export const inactiveColorProperty = new CssProperty<Style, Color>({
+    name: 'inactiveColor',
+    cssName: 'tab-inactive-color',
     equalityComparer: Color.equals,
-    valueConverter: (v) => new Color(v)
+    valueConverter: (v) => new Color(v),
+    defaultValue: new Color('gray')
 });
-inactiveColorCssProperty.register(Style);
-
-export const backgroundColorProperty = new Property<BottomNavigationBase, string>({
-    name: 'backgroundColor'
-});
-backgroundColorProperty.register(BottomNavigationBase);
-
-export const backgroundColorCssProperty = new CssProperty<Style, Color>({
-    name: 'tabBackgroundColor',
-    cssName: 'tab-background-color',
-    equalityComparer: Color.equals,
-    valueConverter: v => new Color(v)
-});
-backgroundColorCssProperty.register(Style);
+inactiveColorProperty.register(Style);
 
 export class BottomNavigationTabBase {
 

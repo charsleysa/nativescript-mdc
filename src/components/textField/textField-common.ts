@@ -12,6 +12,7 @@ export abstract class TextFieldBase extends NTextField {
     constructor() {
         super();
     }
+
     abstract requestFocus();
     abstract clearFocus();
 
@@ -22,7 +23,6 @@ export abstract class TextFieldBase extends NTextField {
     @cssProperty placeholderColor: Color;
     @cssProperty variant: string = 'filled';
     @cssProperty error: string;
-    @cssProperty strokeColor: Color;
     @cssProperty floatingColor: Color;
 }
 
@@ -62,10 +62,3 @@ export const floatingColorProperty = new CssProperty<Style, Color>({
     valueConverter: v => new Color(v)
 });
 floatingColorProperty.register(Style);
-export const strokeColorProperty = new CssProperty<Style, Color>({
-    name: 'strokeColor',
-    cssName: 'stroke-color',
-    equalityComparer: Color.equals,
-    valueConverter: v => new Color(v)
-});
-strokeColorProperty.register(Style);

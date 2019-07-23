@@ -10,3 +10,4 @@ export declare class Themer {
 export declare const themer: Themer;
 export declare function install(): void;
 export declare function getRippleColor(color: string | Color): number;
+export declare function getColorWithDefaultAlpha(color: string | Color, alpha: number): Color;

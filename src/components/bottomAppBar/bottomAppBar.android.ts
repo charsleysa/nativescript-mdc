@@ -1,13 +1,9 @@
+import { Color } from 'tns-core-modules/color/color';
 import { Page } from 'tns-core-modules/ui/page/page';
 import { RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
 import { fromFileOrResource } from 'tns-core-modules/image-source';
 import * as application from 'tns-core-modules/application';
-import {
-    paddingTopProperty,
-    paddingRightProperty,
-    paddingBottomProperty,
-    paddingLeftProperty
-} from 'tns-core-modules/ui/core/view/view';
+import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 import { Background } from 'tns-core-modules/ui/styling/background';
 
 import { AndroidActionItemSettings } from './bottomAppBar';
@@ -208,8 +204,11 @@ export class BottomAppBar extends BottomAppBarBase {
                 this.floatingActionButton.setSupportBackgroundTintList(android.content.res.ColorStateList.valueOf(background.color.android));
             }
             const tintColor = mainActionButton.style.tintColor;
-            if (tintColor) {
-                this.floatingActionButton.setSupportImageTintList(android.content.res.ColorStateList.valueOf(tintColor.android));
+            const iconDrawable = this.floatingActionButton.getDrawable();
+            if (tintColor && iconDrawable) {
+                iconDrawable.setColorFilter(tintColor.android, android.graphics.PorterDuff.Mode.SRC_IN);
+                this.floatingActionButton.setSupportImageTintList(android.content.res.ColorStateList.valueOf(tintColor.argb));
+                this.floatingActionButton.setSupportImageTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
             }
 
             const mainActionBtn = new WeakRef(mainActionButton);
@@ -342,27 +341,16 @@ export class BottomAppBar extends BottomAppBarBase {
         }
     }
 
+    [backgroundColorProperty.getDefault](): Color {
+        return new Color(this.nativeViewProtected.getBackgroundTint().getDefaultColor());
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setBackgroundTint(android.content.res.ColorStateList.valueOf(value.android));
+    }
+
     _redrawNativeBackground(value: Background): void {
-        const nativeView = this.nativeViewProtected;
-        if (!nativeView) {
-            return;
-        }
-
-        if (value.color) {
-            nativeView.setBackgroundTint(android.content.res.ColorStateList.valueOf(value.color.android));
-        }
-
-        const style = this.style;
-        const paddingTop = paddingTopProperty.isSet(style) ? this.effectivePaddingTop : this._defaultPaddingTop;
-        const paddingRight = paddingRightProperty.isSet(style) ? this.effectivePaddingRight : this._defaultPaddingRight;
-        const paddingBottom = paddingBottomProperty.isSet(style) ? this.effectivePaddingBottom : this._defaultPaddingBottom;
-        const paddingLeft = paddingLeftProperty.isSet(style) ? this.effectivePaddingLeft : this._defaultPaddingLeft;
-
-        if (this._isPaddingRelative) {
-            nativeView.setPaddingRelative(paddingLeft, paddingTop, paddingRight, paddingBottom);
-        } else {
-            nativeView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-        }
+        return;
     }
 }
 

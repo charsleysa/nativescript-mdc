@@ -1,10 +1,12 @@
+import { Color } from 'tns-core-modules/color/color';
 import { fromFileOrResource } from 'tns-core-modules/image-source';
 import { ios as iosApp } from 'tns-core-modules/application/application';
-import { ios as iosView } from 'tns-core-modules/ui/core/view';
+import { ios as iosView, backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 import { ios as iosUtils } from 'tns-core-modules/utils/utils';
 import { ios as iosBackground, Background } from 'tns-core-modules/ui/styling/background';
 
 import { themer } from '../core/core';
+import { getColor } from '../core/ios/utils';
 import { IOSActionItemSettings, ActionItem as ActionItemDefinition } from './bottomAppBar';
 import {
     ActionItemBase,
@@ -286,19 +288,16 @@ export class BottomAppBar extends BottomAppBarBase {
         this._setNativeViewFrame(nativeView, frame);
     }
 
+    [backgroundColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.barTintColor);
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.barTintColor = value.ios;
+    }
+
     _redrawNativeBackground(value: Background): void {
-        let updateSuspended = this._isPresentationLayerUpdateSuspeneded();
-        if (!updateSuspended) {
-            CATransaction.begin();
-        }
-
-        this.nativeViewProtected.barTintColor = value.color.ios;
-
-        if (!updateSuspended) {
-            CATransaction.commit();
-        }
-
-        this._nativeBackgroundState = "drawn";
+        return;
     }
 
     [iosIconRenderingModeProperty.getDefault](): 'automatic' | 'alwaysOriginal' | 'alwaysTemplate' {

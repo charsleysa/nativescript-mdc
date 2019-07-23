@@ -1,6 +1,12 @@
+import { Color } from 'tns-core-modules/color';
 import { Background } from 'tns-core-modules/ui/styling/background';
-import { backgroundInternalProperty, Color, fontInternalProperty, Length } from 'tns-core-modules/ui/page/page';
 import { Font } from 'tns-core-modules/ui/styling/font';
+import {
+    backgroundColorProperty,
+    borderTopRightRadiusProperty,
+    fontInternalProperty,
+    Length
+} from 'tns-core-modules/ui/core/view';
 
 import { elevationHighlightedProperty, elevationProperty, rippleColorProperty } from '../core/cssproperties';
 import { themer, getRippleColor } from '../core/core';
@@ -24,7 +30,7 @@ export class Button extends ButtonBase {
             view.setElevationForState(MDCShadowElevationNone, UIControlState.Normal);
             view.setElevationForState(MDCShadowElevationNone, UIControlState.Highlighted);
             view.setElevationForState(MDCShadowElevationNone, UIControlState.Disabled);
-        } else if (this.variant === 'outline') {
+        } else if (this.variant === 'outlined') {
             view.applyOutlinedThemeWithScheme(themer.appScheme);
         } else {
             view.applyContainedThemeWithScheme(themer.appScheme);
@@ -48,6 +54,39 @@ export class Button extends ButtonBase {
         this.nativeViewProtected.setElevationForState(value, UIControlState.Highlighted);
     }
 
+    [fontInternalProperty.setNative](value: Font | UIFont) {
+        if (!(value instanceof Font) || !this.formattedText) {
+            const nativeView = this.nativeViewProtected;
+            const font = value instanceof Font ? value.getUIFont(nativeView.font) : value;
+            nativeView.setTitleFontForState(font, UIControlState.Normal);
+        }
+    }
+
+    [backgroundColorProperty.getDefault](): Color {
+        return getColor(this.nativeViewProtected.backgroundColorForState(UIControlState.Normal));
+    }
+
+    [backgroundColorProperty.setNative](value: Color) {
+        this.nativeViewProtected.setBackgroundColorForState(value.ios, UIControlState.Normal);
+        if (this.variant === 'outline') {
+            this.nativeViewProtected.setBackgroundColorForState(new Color('transparent').ios, UIControlState.Disabled);
+        }
+    }
+
+    [borderTopRightRadiusProperty.getDefault](): Length {
+        const cornerTreatment = (themer.appScheme.shapeScheme as MDCShapeScheme).smallComponentShape.topRightCorner;
+        const cornerRadius = (cornerTreatment.class() === MDCRoundedCornerTreatment.class())
+            ? (cornerTreatment as MDCRoundedCornerTreatment).radius
+            : (cornerTreatment.class() === MDCRoundedCornerTreatment.class())
+                ? (cornerTreatment as MDCCutCornerTreatment).cut
+                : 0;
+        return { unit: 'px', value: cornerRadius };
+    }
+
+    [borderTopRightRadiusProperty.setNative](value: Length) {
+        this.setCornerRadius(value);
+    }
+
     setCornerRadius(value) {
         const newValue = Length.toDevicePixels(typeof value === 'string' ? Length.parse(value) : value, 0);
         const shapeScheme = MDCShapeScheme.new();
@@ -55,48 +94,15 @@ export class Button extends ButtonBase {
         MDCButtonShapeThemer.applyShapeSchemeToButton(shapeScheme, this.nativeViewProtected);
     }
 
-    [backgroundInternalProperty.getDefault](): Background {
-        const color = getColor(this.nativeViewProtected.backgroundColorForState(UIControlState.Normal));
-        const cornerTreatment = (themer.appScheme.shapeScheme as MDCShapeScheme).smallComponentShape.topRightCorner;
-        const cornerRadius = (cornerTreatment.class() === MDCRoundedCornerTreatment.class())
-            ? (cornerTreatment as MDCRoundedCornerTreatment).radius
-            : (cornerTreatment.class() === MDCRoundedCornerTreatment.class())
-                ? (cornerTreatment as MDCCutCornerTreatment).cut
-                : 0;
-
-        const background = this.style.backgroundInternal.withColor(color);
-        background.borderTopLeftRadius = cornerRadius;
-        background.borderTopRightRadius = cornerRadius;
-        background.borderBottomLeftRadius = cornerRadius;
-        background.borderBottomRightRadius = cornerRadius;
-
-        return background;
+    _redrawNativeBackground(value: Background): void {
+        return;
     }
 
-    [backgroundInternalProperty.setNative](value: Background) {
-        if (this.nativeViewProtected) {
-            if (value.color) {
-                this.nativeViewProtected.setBackgroundColorForState(value.color.ios, UIControlState.Normal);
-                if (this.variant === 'outline') {
-                    this.nativeViewProtected.setBackgroundColorForState(new Color('transparent').ios, UIControlState.Disabled);
-                }
-            }
-            this.setCornerRadius(value.borderTopRightRadius);
-        }
-    }
     _setNativeClipToBounds() {
         // const backgroundInternal = this.style.backgroundInternal;
         // this.nativeViewProtected.clipsToBounds =
         //     this.nativeViewProtected instanceof UIScrollView ||
         //     backgroundInternal.hasBorderWidth() ||
         //     backgroundInternal.hasBorderRadius();
-    }
-
-    [fontInternalProperty.setNative](value: Font | UIFont) {
-        if (!(value instanceof Font) || !this.formattedText) {
-            const nativeView = this.nativeViewProtected;
-            const font = value instanceof Font ? value.getUIFont(nativeView.font) : value;
-            nativeView.setTitleFontForState(font, UIControlState.Normal);
-        }
     }
 }
