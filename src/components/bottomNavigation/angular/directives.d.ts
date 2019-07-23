@@ -4,12 +4,6 @@ export declare class BottomNavigationDirective implements AfterViewInit {
     bottomNavigation: BottomNavigation;
     private _viewInitialized;
     constructor(element: ElementRef);
-    private _activeColor;
-    activeColor: string;
-    private _inactiveColor;
-    inactiveColor: string;
-    private _backgroundColor;
-    backgroundColor: string;
     private _titleVisibility;
     titleVisibility: 'selected' | 'always' | 'never';
     private _tabs;

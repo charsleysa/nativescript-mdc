@@ -11,22 +11,23 @@ export declare abstract class BottomNavigationBase extends View implements AddCh
     tabs: BottomNavigationTabBase[];
     selectedTabIndex: number;
     titleVisibility: 'selected' | 'always' | 'never';
-    activeColor: string;
-    inactiveColor: string;
-    backgroundColor: string;
+    activeColor: string | Color;
+    inactiveColor: string | Color;
     selectTab(index: number): void;
     onTabSelected(index: number): void;
     _addChildFromBuilder(name: string, value: any): void;
     protected abstract selectTabNative(index: number): void;
 }
+declare module 'tns-core-modules/ui/styling/style' {
+    interface Style {
+        activeColor: Color;
+        inactiveColor: Color;
+    }
+}
 export declare const tabsProperty: Property<BottomNavigationBase, BottomNavigationTabBase[]>;
 export declare const titleVisibilityProperty: Property<BottomNavigationBase, string>;
-export declare const activeColorProperty: Property<BottomNavigationBase, string>;
-export declare const activeColorCssProperty: CssProperty<Style, Color>;
-export declare const inactiveColorProperty: Property<BottomNavigationBase, string>;
-export declare const inactiveColorCssProperty: CssProperty<Style, Color>;
-export declare const backgroundColorProperty: Property<BottomNavigationBase, string>;
-export declare const backgroundColorCssProperty: CssProperty<Style, Color>;
+export declare const activeColorProperty: CssProperty<Style, Color>;
+export declare const inactiveColorProperty: CssProperty<Style, Color>;
 export declare class BottomNavigationTabBase {
     constructor(title: string, icon: string, selectedIcon?: string, selectable?: boolean, parent?: WeakRef<BottomNavigationBase>);
     private _title;
