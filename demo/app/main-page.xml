@@ -33,6 +33,7 @@
             </StackLayout>
             <StackLayout>
                 <mdc:Button text="default"></mdc:Button>
+                <mdc:Button variant="text" text="text"></mdc:Button>
                 <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
             </StackLayout>
@@ -47,6 +48,7 @@
                 <mdc:TextField class="text-field" variant="outlined"></mdc:TextField>
                 <mdc:TextField class="text-field" variant="filled"></mdc:TextField>
                 <mdc:Button text="default" style="background: red;"></mdc:Button>
+                <mdc:Button variant="text" text="text" style="border-radius: 18; ripple-color: red;"></mdc:Button>
                 <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
             </StackLayout>

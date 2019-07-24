@@ -7,6 +7,7 @@ import {
     fontInternalProperty,
     Length
 } from 'tns-core-modules/ui/core/view';
+import { layout } from 'tns-core-modules/utils/utils';
 
 import { elevationHighlightedProperty, elevationProperty, rippleColorProperty } from '../core/cssproperties';
 import { themer, getRippleColor } from '../core/core';
@@ -87,8 +88,8 @@ export class Button extends ButtonBase {
         this.setCornerRadius(value);
     }
 
-    setCornerRadius(value) {
-        const newValue = Length.toDevicePixels(typeof value === 'string' ? Length.parse(value) : value, 0);
+    setCornerRadius(value: Length) {
+        const newValue = layout.toDeviceIndependentPixels(Length.toDevicePixels(value));
         const shapeScheme = MDCShapeScheme.new();
         shapeScheme.smallComponentShape = MDCShapeCategory.alloc().initCornersWithFamilyAndSize(MDCShapeCornerFamily.Rounded, newValue);
         MDCButtonShapeThemer.applyShapeSchemeToButton(shapeScheme, this.nativeViewProtected);
