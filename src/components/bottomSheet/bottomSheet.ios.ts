@@ -62,7 +62,6 @@ class BottomSheetUILayoutViewController extends UIViewController {
             layoutGuide = this.initLayoutGuide(controller);
         }
         const safeArea = layoutGuide.layoutFrame;
-        console.log('safe area', safeArea.origin.x, safeArea.origin.y, safeArea.size.width, safeArea.size.height);
         let position = ios.getPositionFromFrame(safeArea);
         const safeAreaSize = safeArea.size;
 

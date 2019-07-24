@@ -41,7 +41,7 @@ export class Button extends ButtonBase {
     }
 
     [rippleColorProperty.setNative](color: Color) {
-        ((this.nativeViewProtected as any).rippleView as MDCStatefulRippleView).rippleColor = getRippleColor(color);
+        this.nativeViewProtected.inkColor = getRippleColor(color);
     }
 
     [elevationProperty.setNative](value: number) {
