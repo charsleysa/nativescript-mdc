@@ -55,6 +55,7 @@ export class BottomAppBarBase extends View implements BottomAppBarDefinition {
     set mainActionButton(value: MainActionButtonBase) {
         if (this._mainActionButton !== value) {
             if (this._mainActionButton) {
+                this._removeView(this._mainActionButton);
                 this._mainActionButton.bottomAppBar = undefined;
             }
 
@@ -62,6 +63,7 @@ export class BottomAppBarBase extends View implements BottomAppBarDefinition {
 
             if (this._mainActionButton) {
                 this._mainActionButton.bottomAppBar = this;
+                this._addView(this._mainActionButton);
             }
 
             this.update();
@@ -333,7 +335,7 @@ export class MainActionButtonBase extends ViewBase implements MainActionButtonDe
     }
 
     public _raiseTap() {
-        this._emit(ActionItemBase.tapEvent);
+        this._emit(MainActionButtonBase.tapEvent);
     }
 
     public _onVisibilityChanged(visibility: string) {

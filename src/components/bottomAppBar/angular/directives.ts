@@ -34,7 +34,7 @@ export function isMainActionButton(view: any): view is MainActionButton {
 type NgBottomAppBar = (BottomAppBar & ViewExtensions);
 
 export const bottomAppBarMeta: ViewClassMeta = {
-    skipAddToDom: true,
+    skipAddToDom: false,
     insertChild: (parent: NgBottomAppBar, child: NgView, next: any) => {
         if (isInvisibleNode(child)) {
             return;
