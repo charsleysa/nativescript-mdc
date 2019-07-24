@@ -11,4 +11,4 @@ import { DIRECTIVES } from './directives';
 })
 export class NativeScriptMDCTextFieldModule {}
 
-registerElement('MDCTextField', () => require('../textfield').TextField);
+registerElement('MDCTextField', () => require('../textField').TextField);
