@@ -33,7 +33,7 @@ export class CardView extends CardViewBase {
     }
 
     getRippleColor() {
-        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorPrimary')));
+        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorOnSurface')));
     }
 
     setRippleDrawable(view: com.google.android.material.card.MaterialCardView) {

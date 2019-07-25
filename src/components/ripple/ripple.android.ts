@@ -211,7 +211,7 @@ export class Ripple extends RippleBase {
     }
 
     getRippleColor() {
-        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorPrimary')));
+        return getRippleColor(this.style['rippleColor'] ? this.style['rippleColor'] : new Color(getAttrColor(this._context, 'colorOnSurface')));
     }
 
     setRippleDrawable(view: android.view.View) {
