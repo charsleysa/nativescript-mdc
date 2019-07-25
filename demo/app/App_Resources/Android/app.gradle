@@ -13,6 +13,7 @@ android {
     compileSdk = "28"
     targetSdk = "28"
     supportVersion = "28.0.0"
+    androidXMaterial = "1.1.0-alpha07"
   }
   defaultConfig {
     generatedDensities = []

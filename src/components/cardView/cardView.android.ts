@@ -74,11 +74,11 @@ export class CardView extends CardViewBase {
     }
 
     [interactableProperty.setNative](value: boolean) {
-        this.nativeViewProtected.setEnabled(value);
+        this.nativeViewProtected.setClickable(value);
     }
 
     [interactableProperty.getDefault]() {
-        return this.nativeViewProtected.isEnabled();
+        return this.nativeViewProtected.isClickable();
     }
 
     [rippleColorProperty.setNative](color: Color) {

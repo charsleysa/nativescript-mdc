@@ -37,7 +37,7 @@
                 <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
             </StackLayout>
-            <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
+            <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="false">
                 <StackLayout>
                     <Label text="{{ message }}" class="text t-20 text-center c-black" textWrap="true"/>
                     <mdc:Button variant="flat" text="button1"></mdc:Button>
