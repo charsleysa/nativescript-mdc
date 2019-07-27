@@ -1,3 +1,5 @@
+import { ImageSource } from 'tns-core-modules/image-source/image-source';
+
 import { FloatingActionButtonBase } from './floatingActionButton-common';
 
 export declare class FloatingActionButton extends FloatingActionButtonBase {
@@ -9,4 +11,12 @@ export declare class FloatingActionButton extends FloatingActionButtonBase {
     show(): void;
 
     hide(): void;
+
+    fabSize: string;
+
+    imageSource: ImageSource;
+
+    src: string | ImageSource;
+
+    isLoading: boolean;
 }

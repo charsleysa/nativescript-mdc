@@ -1,37 +1,68 @@
+import { Color } from 'tns-core-modules/color/color';
 import { ImageSource } from 'tns-core-modules/image-source/image-source';
+import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 
-import { elevationProperty } from '../core/cssproperties';
+import { elevationProperty, tintColorProperty } from '../core/cssproperties';
 import { themer } from '../core/core';
 import { FloatingActionButtonBase, imageSourceProperty, srcProperty } from './floatingActionButton-common';
 
 export class FloatingActionButton extends FloatingActionButtonBase {
     nativeViewProtected: MDCFloatingButton;
+    private _templateImageWasCreated: boolean;
 
     get ios(): MDCFloatingButton {
         return this.nativeViewProtected;
     }
 
-    public _setNativeImage(nativeImage: UIImage) {
-        // this.nativeViewProtected.setImageForState(nativeImage ? nativeImage.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate) : nativeImage, UIControlState.Normal);
-        this.nativeViewProtected.setImageForState(nativeImage, UIControlState.Normal);
-    }
     public createNativeView() {
-        const result = MDCFloatingButton.new();
-        const colorScheme = themer.appColorScheme;
-        if (colorScheme) {
-            MDCFloatingButtonColorThemer.applySemanticColorSchemeToButton(colorScheme, result);
+        const view = MDCFloatingButton.floatingButtonWithShape(this.fabSize === 'mini' ? MDCFloatingButtonShape.Mini : MDCFloatingButtonShape.Default);
+        view.applySecondaryThemeWithScheme(themer.appScheme);
+        return view;
+    }
+
+    private setTintColor(value: Color) {
+        const image = this.nativeViewProtected.imageForState(UIControlState.Normal);
+        if (value && image && !this._templateImageWasCreated) {
+            this.nativeViewProtected.setImageForState(image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+            this._templateImageWasCreated = true;
+        } else if (!value && image && this._templateImageWasCreated) {
+            this._templateImageWasCreated = false;
+            this.nativeViewProtected.setImageForState(image.imageWithRenderingMode(UIImageRenderingMode.Automatic), UIControlState.Normal);
         }
-        return result;
+        this.nativeViewProtected.tintColor = value ? value.ios : null;
     }
-    [elevationProperty.setNative](value: number) {
-        this.nativeViewProtected.setElevationForState(value, UIControlState.Normal);
-        this.nativeViewProtected.setElevationForState(value * 2, UIControlState.Highlighted);
+
+    public _setNativeImage(nativeImage: UIImage) {
+        this.nativeViewProtected.setImageForState(nativeImage, UIControlState.Normal);
+        this._templateImageWasCreated = false;
+        this.setTintColor(this.style.tintColor);
     }
+
+    [tintColorProperty.setNative](value: Color) {
+        this.setTintColor(value);
+    }
+
     [imageSourceProperty.setNative](value: ImageSource) {
         this._setNativeImage(value ? value.ios : null);
     }
 
     [srcProperty.setNative](value: any) {
         this._createImageSourceFromSrc(value);
+    }
+
+    [elevationProperty.setNative](value: number) {
+        this.nativeViewProtected.setElevationForState(value, UIControlState.Normal);
+        this.nativeViewProtected.setElevationForState(value * 2, UIControlState.Highlighted);
+    }
+
+    [backgroundColorProperty.getDefault](): Color {
+        return undefined;
+    }
+    [backgroundColorProperty.setNative](value: Color) {
+        if (value === undefined) {
+            this.nativeViewProtected.setBackgroundColorForState(null, UIControlState.Normal);
+        } else {
+            this.nativeViewProtected.setBackgroundColorForState(value.ios, UIControlState.Normal);
+        }
     }
 }

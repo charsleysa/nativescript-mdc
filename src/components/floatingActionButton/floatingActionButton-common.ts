@@ -1,15 +1,10 @@
-import { CSSType, View } from 'tns-core-modules/ui/core/view/view';
+import { CSSType, View, traceEnabled, traceWrite, traceCategories, booleanConverter } from 'tns-core-modules/ui/core/view';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
-import { isDataURI, isFileOrResourcePath, RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
 import { fromAsset, fromNativeSource, fromUrl, ImageSource } from 'tns-core-modules/image-source';
+import { isDataURI, isFontIconURI, isFileOrResourcePath, RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
 import { Property } from 'tns-core-modules/ui/core/properties';
+
 import { cssProperty } from '../core/cssproperties';
-
-export const imageSourceProperty = new Property<FloatingActionButtonBase, ImageSource>({ name: 'imageSource' });
-
-export const srcProperty = new Property<FloatingActionButtonBase, any>({
-    name: 'src'
-});
 
 @CSSType('MDCFloatingActionButton')
 export abstract class FloatingActionButtonBase extends View {
@@ -23,19 +18,18 @@ export abstract class FloatingActionButtonBase extends View {
         this.style['css:margin-top'] = 11;
         this.style['css:margin-bottom'] = 16;
     }
+
     @cssProperty elevation: number;
 
-    public srcCompat: string;
     public fabSize: string;
-    public fabCustomSize: number;
     public imageSource: ImageSource;
     public src: string | ImageSource;
     public isLoading: boolean;
 
     /**
-     * @internal //copied from image common
+     * @internal
      */
-    protected _createImageSourceFromSrc(value: string | ImageSource | ImageAsset): void {
+    public _createImageSourceFromSrc(value: string | ImageSource | ImageAsset): void {
         const originalValue = value;
         if (typeof value === 'string' || value instanceof String) {
             value = value.trim();
@@ -46,7 +40,7 @@ export abstract class FloatingActionButtonBase extends View {
 
             const source = new ImageSource();
             const imageLoaded = () => {
-                const currentValue = this.src;
+                let currentValue = this.src;
                 if (currentValue !== originalValue) {
                     return;
                 }
@@ -54,41 +48,45 @@ export abstract class FloatingActionButtonBase extends View {
                 this.isLoading = false;
             };
 
-            if (isDataURI(value)) {
+            if (isFontIconURI(value)) {
+                const fontIconCode = value.split('//')[1];
+                if (fontIconCode !== undefined) {
+                    // support sync mode only
+                    const font = this.style.fontInternal;
+                    const color = this.style.color;
+                    source.loadFromFontIconCode(fontIconCode, font, color);
+                    imageLoaded();
+                }
+            } else if (isDataURI(value)) {
                 const base64Data = value.split(',')[1];
                 if (base64Data !== undefined) {
-                    // if (sync) {
                     source.loadFromBase64(base64Data);
                     imageLoaded();
-                    // } else {
-                    //     source.fromBase64(base64Data).then(imageLoaded);
-                    // }
                 }
             } else if (isFileOrResourcePath(value)) {
                 if (value.indexOf(RESOURCE_PREFIX) === 0) {
                     const resPath = value.substr(RESOURCE_PREFIX.length);
-                    // if (sync) {
                     source.loadFromResource(resPath);
                     imageLoaded();
-                    // } else {
-                    //     this.imageSource = null;
-                    //     source.fromResource(resPath).then(imageLoaded);
-                    // }
                 } else {
-                    // if (sync) {
                     source.loadFromFile(value);
                     imageLoaded();
-                    // } else {
-                    //     this.imageSource = null;
-                    //     source.fromFile(value).then(imageLoaded);
-                    // }
                 }
             } else {
                 this.imageSource = null;
-                fromUrl(value).then(r => {
+                fromUrl(value).then((r) => {
                     if (this['_url'] === value) {
                         this.imageSource = r;
                         this.isLoading = false;
+                    }
+                }, err => {
+                    // catch: Response content may not be converted to an Image
+                    this.isLoading = false;
+                    if (traceEnabled()) {
+                        if (typeof err === 'object' && err.message) {
+                            err = err.message;
+                        }
+                        traceWrite(err, traceCategories.Debug);
                     }
                 });
             }
@@ -96,16 +94,28 @@ export abstract class FloatingActionButtonBase extends View {
             // Support binding the imageSource trough the src property
             this.imageSource = value;
             this.isLoading = false;
-        } else if (value instanceof ImageAsset) {
-            fromAsset(value).then(result => {
+        }
+        else if (value instanceof ImageAsset) {
+            fromAsset(value).then((result) => {
                 this.imageSource = result;
                 this.isLoading = false;
             });
-        } else {
+        }
+        else {
             this.imageSource = fromNativeSource(value);
             this.isLoading = false;
         }
     }
 }
+
+export const fabSizeProperty = new Property<FloatingActionButtonBase, 'auto' | 'mini' | 'normal'>({ name: 'fabSize', defaultValue: 'normal' });
+fabSizeProperty.register(FloatingActionButtonBase);
+
+export const imageSourceProperty = new Property<FloatingActionButtonBase, ImageSource>({ name: 'imageSource' });
 imageSourceProperty.register(FloatingActionButtonBase);
+
+export const srcProperty = new Property<FloatingActionButtonBase, any>({ name: 'src' });
 srcProperty.register(FloatingActionButtonBase);
+
+export const isLoadingProperty = new Property<FloatingActionButtonBase, boolean>({ name: 'isLoading', defaultValue: false, valueConverter: booleanConverter });
+isLoadingProperty.register(FloatingActionButtonBase);

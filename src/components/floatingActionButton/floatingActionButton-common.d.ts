@@ -1,17 +1,17 @@
-import { View } from 'tns-core-modules/ui/core/view/view';
+import { View } from 'tns-core-modules/ui/core/view';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 import { ImageSource } from 'tns-core-modules/image-source';
 import { Property } from 'tns-core-modules/ui/core/properties';
-export declare const imageSourceProperty: Property<FloatingActionButtonBase, ImageSource>;
-export declare const srcProperty: Property<FloatingActionButtonBase, any>;
 export declare abstract class FloatingActionButtonBase extends View {
     constructor();
     elevation: number;
-    srcCompat: string;
     fabSize: string;
-    fabCustomSize: number;
     imageSource: ImageSource;
     src: string | ImageSource;
     isLoading: boolean;
-    protected _createImageSourceFromSrc(value: string | ImageSource | ImageAsset): void;
+    _createImageSourceFromSrc(value: string | ImageSource | ImageAsset): void;
 }
+export declare const fabSizeProperty: Property<FloatingActionButtonBase, "auto" | "normal" | "mini">;
+export declare const imageSourceProperty: Property<FloatingActionButtonBase, ImageSource>;
+export declare const srcProperty: Property<FloatingActionButtonBase, any>;
+export declare const isLoadingProperty: Property<FloatingActionButtonBase, boolean>;

@@ -5,5 +5,4 @@ export declare class FloatingActionButton extends FloatingActionButtonBase {
     createNativeView(): com.google.android.material.floatingactionbutton.FloatingActionButton;
     show(): void;
     hide(): void;
-    size: string;
 }
