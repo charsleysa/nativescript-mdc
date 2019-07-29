@@ -99,18 +99,6 @@ export abstract class FloatingActionButtonBase extends View {
             this.isLoading = false;
         }
     }
-
-    public measure(widthMeasureSpec: number, heightMeasureSpec: number): void {
-        console.log('measure');
-        const unspecified = layout.makeMeasureSpec(0, layout.UNSPECIFIED);
-        super.measure(unspecified, unspecified);
-    }
-
-    public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
-        console.log('onMeasure');
-        const unspecified = layout.makeMeasureSpec(0, layout.UNSPECIFIED);
-        super.onMeasure(unspecified, unspecified);
-    }
 }
 
 export const fabSizeProperty = new Property<FloatingActionButtonBase, 'mini' | 'normal'>({ name: 'fabSize', defaultValue: 'normal' });
