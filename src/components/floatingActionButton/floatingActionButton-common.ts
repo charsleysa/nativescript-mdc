@@ -1,4 +1,4 @@
-import { CSSType, View, traceEnabled, traceWrite, traceCategories, booleanConverter } from 'tns-core-modules/ui/core/view';
+import { CSSType, View, traceEnabled, traceWrite, traceCategories, booleanConverter, layout } from 'tns-core-modules/ui/core/view';
 import { ImageAsset } from 'tns-core-modules/image-asset/image-asset';
 import { fromAsset, fromNativeSource, fromUrl, ImageSource } from 'tns-core-modules/image-source';
 import { isDataURI, isFontIconURI, isFileOrResourcePath, RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
@@ -11,19 +11,14 @@ export abstract class FloatingActionButtonBase extends View {
     constructor() {
         super();
         // we need to set the default through css or user would not be able to overload it through css...
-        this.style['css:width'] = 56;
-        this.style['css:height'] = 56;
-        this.style['css:margin-left'] = 4;
-        this.style['css:margin-right'] = 4;
-        this.style['css:margin-top'] = 11;
-        this.style['css:margin-bottom'] = 16;
+        this.style['css:margin'] = 16;
     }
 
     @cssProperty elevation: number;
 
     public fabSize: string;
     public imageSource: ImageSource;
-    public src: string | ImageSource;
+    public icon: string | ImageSource;
     public isLoading: boolean;
 
     /**
@@ -40,7 +35,7 @@ export abstract class FloatingActionButtonBase extends View {
 
             const source = new ImageSource();
             const imageLoaded = () => {
-                let currentValue = this.src;
+                let currentValue = this.icon;
                 if (currentValue !== originalValue) {
                     return;
                 }
@@ -94,28 +89,38 @@ export abstract class FloatingActionButtonBase extends View {
             // Support binding the imageSource trough the src property
             this.imageSource = value;
             this.isLoading = false;
-        }
-        else if (value instanceof ImageAsset) {
+        } else if (value instanceof ImageAsset) {
             fromAsset(value).then((result) => {
                 this.imageSource = result;
                 this.isLoading = false;
             });
-        }
-        else {
+        } else {
             this.imageSource = fromNativeSource(value);
             this.isLoading = false;
         }
     }
+
+    public measure(widthMeasureSpec: number, heightMeasureSpec: number): void {
+        console.log('measure');
+        const unspecified = layout.makeMeasureSpec(0, layout.UNSPECIFIED);
+        super.measure(unspecified, unspecified);
+    }
+
+    public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number): void {
+        console.log('onMeasure');
+        const unspecified = layout.makeMeasureSpec(0, layout.UNSPECIFIED);
+        super.onMeasure(unspecified, unspecified);
+    }
 }
 
-export const fabSizeProperty = new Property<FloatingActionButtonBase, 'auto' | 'mini' | 'normal'>({ name: 'fabSize', defaultValue: 'normal' });
+export const fabSizeProperty = new Property<FloatingActionButtonBase, 'mini' | 'normal'>({ name: 'fabSize', defaultValue: 'normal' });
 fabSizeProperty.register(FloatingActionButtonBase);
 
 export const imageSourceProperty = new Property<FloatingActionButtonBase, ImageSource>({ name: 'imageSource' });
 imageSourceProperty.register(FloatingActionButtonBase);
 
-export const srcProperty = new Property<FloatingActionButtonBase, any>({ name: 'src' });
-srcProperty.register(FloatingActionButtonBase);
+export const iconProperty = new Property<FloatingActionButtonBase, any>({ name: 'icon' });
+iconProperty.register(FloatingActionButtonBase);
 
 export const isLoadingProperty = new Property<FloatingActionButtonBase, boolean>({ name: 'isLoading', defaultValue: false, valueConverter: booleanConverter });
 isLoadingProperty.register(FloatingActionButtonBase);

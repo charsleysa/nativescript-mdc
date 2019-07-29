@@ -1,10 +1,10 @@
 import { Color } from 'tns-core-modules/color';
 import { ImageSource } from 'tns-core-modules/image-source';
-import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
+import { backgroundColorProperty, widthProperty } from 'tns-core-modules/ui/core/view';
 import { ad } from 'tns-core-modules/utils/utils';
 
 import { elevationProperty, translationZHighlightedProperty, tintColorProperty } from '../core/cssproperties';
-import { FloatingActionButtonBase, fabSizeProperty, imageSourceProperty, srcProperty } from './floatingActionButton-common';
+import { FloatingActionButtonBase, fabSizeProperty, imageSourceProperty, iconProperty } from './floatingActionButton-common';
 
 export class FloatingActionButton extends FloatingActionButtonBase {
     nativeViewProtected: com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -13,7 +13,17 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         return this.nativeViewProtected;
     }
     public createNativeView() {
-        const view = new com.google.android.material.floatingactionbutton.FloatingActionButton(new android.view.ContextThemeWrapper(this._context, ad.resources.getId(':style/AppThemeFloatingActionButton')));
+        const view = new com.google.android.material.floatingactionbutton.FloatingActionButton(this._context);
+        view.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        if (this.fabSize === 'mini') {
+            view.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+            this.style.width = 40;
+            this.style.height = 40;
+        } else {
+            view.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_NORMAL);
+            this.style.width = 56;
+            this.style.height = 56;
+        }
         return view;
     }
 
@@ -24,31 +34,16 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         this.nativeViewProtected.hide();
     }
 
-    [fabSizeProperty.getDefault](): string {
-        return 'normal';
-    }
-    [fabSizeProperty.setNative](value: string) {
-        switch (value) {
-            case 'auto':
-                this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_AUTO);
-                break;
-            case 'mini':
-                this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_MINI);
-                break;
-            default:
-                this.nativeViewProtected.setSize(com.google.android.material.floatingactionbutton.FloatingActionButton.SIZE_NORMAL);
-                break;
-        }
-    }
-
     [tintColorProperty.getDefault](): Color {
         return undefined;
     }
     [tintColorProperty.setNative](value: Color) {
-        if (value === undefined) {
-            this.nativeViewProtected.setSupportImageTintList(null);
+        if (value == null) {
+            this.nativeViewProtected.setSupportImageTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
+            this.nativeViewProtected.setSupportImageTintMode(android.graphics.PorterDuff.Mode.OVERLAY);
         } else {
             this.nativeViewProtected.setSupportImageTintList(android.content.res.ColorStateList.valueOf(value.android));
+            this.nativeViewProtected.setSupportImageTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
         }
     }
 
@@ -65,10 +60,10 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         }
     }
 
-    [srcProperty.getDefault](): any {
+    [iconProperty.getDefault](): any {
         return undefined;
     }
-    [srcProperty.setNative](value: any) {
+    [iconProperty.setNative](value: any) {
         this._createImageSourceFromSrc(value);
     }
 
@@ -84,9 +79,7 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         return undefined;
     }
     [backgroundColorProperty.setNative](value: Color) {
-        if (value === undefined) {
-            this.nativeViewProtected.setBackgroundTintList(null);
-        } else {
+        if (value != null) {
             this.nativeViewProtected.setBackgroundTintList(android.content.res.ColorStateList.valueOf(value.android));
         }
     }

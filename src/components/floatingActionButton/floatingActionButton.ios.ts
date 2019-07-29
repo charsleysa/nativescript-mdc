@@ -4,7 +4,7 @@ import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
 
 import { elevationProperty, tintColorProperty } from '../core/cssproperties';
 import { themer } from '../core/core';
-import { FloatingActionButtonBase, imageSourceProperty, srcProperty } from './floatingActionButton-common';
+import { FloatingActionButtonBase, imageSourceProperty, iconProperty } from './floatingActionButton-common';
 
 export class FloatingActionButton extends FloatingActionButtonBase {
     nativeViewProtected: MDCFloatingButton;
@@ -17,6 +17,13 @@ export class FloatingActionButton extends FloatingActionButtonBase {
     public createNativeView() {
         const view = MDCFloatingButton.floatingButtonWithShape(this.fabSize === 'mini' ? MDCFloatingButtonShape.Mini : MDCFloatingButtonShape.Default);
         view.applySecondaryThemeWithScheme(themer.appScheme);
+        if (this.fabSize === 'mini') {
+            this.style.width = 40;
+            this.style.height = 40;
+        } else {
+            this.style.width = 56;
+            this.style.height = 56;
+        }
         return view;
     }
 
@@ -46,7 +53,7 @@ export class FloatingActionButton extends FloatingActionButtonBase {
         this._setNativeImage(value ? value.ios : null);
     }
 
-    [srcProperty.setNative](value: any) {
+    [iconProperty.setNative](value: any) {
         this._createImageSourceFromSrc(value);
     }
 

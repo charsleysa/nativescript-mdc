@@ -12,12 +12,6 @@
     <style name="AppThemeFlatMaterialButton">
         <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.UnelevatedButton</item>
     </style>
-    <style name="AppWidgetFloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="maxImageSize">@dimen/design_fab_size_normal</item>
-    </style>
-    <style name="AppThemeFloatingActionButton">
-        <item name="floatingActionButtonStyle">@style/AppWidgetFloatingActionButton</item>
-    </style>
 
     <style name="AppThemeFilledMaterialTextField">
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>

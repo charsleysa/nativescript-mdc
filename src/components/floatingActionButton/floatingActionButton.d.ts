@@ -16,7 +16,7 @@ export declare class FloatingActionButton extends FloatingActionButtonBase {
 
     imageSource: ImageSource;
 
-    src: string | ImageSource;
+    icon: string | ImageSource;
 
     isLoading: boolean;
 }
