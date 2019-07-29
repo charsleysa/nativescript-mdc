@@ -43,7 +43,7 @@ export const state = {
     }
 };
 
-function createNativeArray(...args) {
+function createNativeArray(...args: number[]): native.Array<number> {
     const result = Array.create('int', args.length);
     args.forEach((a, i) => (result[i] = a));
     return result;
@@ -281,23 +281,24 @@ function createForegroundShape(radius) {
     const shapeDrawable = new android.graphics.drawable.ShapeDrawable(shape);
     return shapeDrawable;
 }
-export function createRippleDrawable(view: android.view.View, rippleColor: number, radius = 0) {
+export function createRippleDrawable(rippleColor: number, radius = 0) {
     const rippleShape = createForegroundShape(radius);
     let rippleDrawable: android.graphics.drawable.StateListDrawable | android.graphics.drawable.RippleDrawable;
     if (isPostLollipopMR1()) {
-        //noinspection NewApi
         rippleDrawable = new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(rippleColor), null, rippleShape);
     } else {
         rippleDrawable = new android.graphics.drawable.StateListDrawable();
-        // const foregroundShape = this.createForegroundShape(this._borderRadius);
         rippleShape.getPaint().setColor(rippleColor);
-        (rippleDrawable as android.graphics.drawable.StateListDrawable).addState([state.pressed], rippleShape);
-        // this.rippleDrawable = this.createCompatRippleDrawable(this.getCardRippleColor());
-        // view.setForeground(this.createCompatRippleDrawable(this.getRippleColor(this.style['rippleColor'])));
+        (rippleDrawable as android.graphics.drawable.StateListDrawable).addState(stateSets.PRESSED_STATE_SET, rippleShape);
     }
-    // some classes might need this
-    (rippleDrawable as any).rippleShape = rippleShape;
     return rippleDrawable;
+}
+
+export function getDrawableForState(stateListDrawable: android.graphics.drawable.StateListDrawable, state: number) {
+    const getStateDrawableIndex = android.graphics.drawable.StateListDrawable.class.getMethod('getStateDrawableIndex', [java.lang.Class.forName('[I')]);
+    const getStateDrawable = android.graphics.drawable.StateListDrawable.class.getMethod('getStateDrawable', [java.lang.Integer.class]);
+    const index = getStateDrawableIndex.invoke(stateListDrawable, [state]) as number;
+    return getStateDrawable.invoke(stateListDrawable, [index]) as android.graphics.drawable.Drawable;
 }
 
 export function handleClearFocus(view: android.view.View) {

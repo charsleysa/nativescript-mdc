@@ -32,7 +32,8 @@ export declare function getEnabledColorStateList(color: number, variant: string)
 export declare function getFocusedColorStateList(color: number, variant: string): globalAndroid.content.res.ColorStateList;
 export declare function createStateListAnimator(view: ViewBase, nativeView: android.view.View): void;
 export declare function getAttrColor(context: android.content.Context, name: string): number;
-export declare function createRippleDrawable(view: android.view.View, rippleColor: number, radius?: number): globalAndroid.graphics.drawable.StateListDrawable | globalAndroid.graphics.drawable.RippleDrawable;
+export declare function createRippleDrawable(rippleColor: number, radius?: number): globalAndroid.graphics.drawable.StateListDrawable | globalAndroid.graphics.drawable.RippleDrawable;
+export declare function getDrawableForState(stateListDrawable: android.graphics.drawable.StateListDrawable, state: number): globalAndroid.graphics.drawable.Drawable;
 export declare function handleClearFocus(view: android.view.View): void;
 export declare function setFocusable(view: android.view.View, focusable: boolean): void;
 export declare function getLayout(id: string): number;

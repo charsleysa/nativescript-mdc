@@ -1,7 +1,7 @@
 import { Color } from 'tns-core-modules/ui/page/page';
 import { ad, layout } from 'tns-core-modules/utils/utils';
 
-import { createRippleDrawable, getAttrColor, isPostLollipopMR1 } from '../core/android/utils';
+import { createRippleDrawable, getAttrColor, getDrawableForState, isPostLollipopMR1, state } from '../core/android/utils';
 import { rippleColorProperty } from '../core/cssproperties';
 import { getRippleColor } from '../core/core';
 import { RippleBase } from './ripple-common';
@@ -216,7 +216,7 @@ export class Ripple extends RippleBase {
 
     setRippleDrawable(view: android.view.View) {
         if (!this.rippleDrawable) {
-            this.rippleDrawable = createRippleDrawable(view, this.getRippleColor(), Number(this.style.backgroundInternal.borderTopRightRadius) || 0);
+            this.rippleDrawable = createRippleDrawable(this.getRippleColor(), Number(this.style.backgroundInternal.borderTopRightRadius) || 0);
             view.setForeground(this.rippleDrawable);
         }
     }
@@ -227,7 +227,8 @@ export class Ripple extends RippleBase {
         if (isPostLollipopMR1()) {
             (this.rippleDrawable as android.graphics.drawable.RippleDrawable).setColor(android.content.res.ColorStateList.valueOf(rippleColor));
         } else {
-            (this.rippleDrawable as any).rippleShape.getPaint().setColor(rippleColor);
+            const rippleShape = getDrawableForState(this.rippleDrawable as android.graphics.drawable.StateListDrawable, state.pressed) as android.graphics.drawable.ShapeDrawable;
+            rippleShape.getPaint().setColor(rippleColor);
         }
     }
 }

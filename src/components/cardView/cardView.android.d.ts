@@ -7,5 +7,6 @@ export declare class CardView extends CardViewBase {
     createNativeView(): com.google.android.material.card.MaterialCardView;
     getRippleColor(): any;
     setRippleDrawable(view: com.google.android.material.card.MaterialCardView): void;
+    updateRippleColor(): void;
     _redrawNativeBackground(value: Background): void;
 }
