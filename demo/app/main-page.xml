@@ -1,5 +1,10 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" class="page"
   xmlns:mdc="nativescript-mdc">
+    <mdc:BottomAppBar class="bottom-nav" style="background: red;">
+        <mdc:MainActionButton title="List" icon="res://ic_view_list" tap="{{ tapped }}" style="background-color: purple; tint-color: white;" />
+        <mdc:NavigationButton title="Menu" icon="res://ic_menu" tap="{{ tapped }}" style="tint-color: blue;" />
+        <mdc:ActionItem title="First" icon="res://ic_home" tap="{{ tapped }}" style="tint-color: green;" />
+    </mdc:BottomAppBar>
     <ScrollView>
         <StackLayout>
             <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
@@ -11,7 +16,7 @@
             <ListView items="{{ items }}">
                 <ListView.itemTemplate>
                     <StackLayout>
-                        <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="true">
+                        <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="false">
                             <StackLayout>
                                 <Label text="" class="text t-20 text-center c-black" textWrap="true"/>
                                 <mdc:Button variant="flat" text="button1"></mdc:Button>
@@ -36,6 +41,7 @@
                 <mdc:Button variant="text" text="text"></mdc:Button>
                 <mdc:Button variant="outlined" text="outlined"></mdc:Button>
                 <mdc:Button variant="flat" text="flat"></mdc:Button>
+                <mdc:FloatingActionButton fabSize="mini" icon="res://ic_view_list"></mdc:FloatingActionButton>
             </StackLayout>
             <mdc:CardView class="card" style="elevation: 5; border-radius: 5;" interactable="false">
                 <StackLayout>
@@ -54,9 +60,4 @@
             </StackLayout>
         </StackLayout>
     </ScrollView>
-    <mdc:BottomAppBar class="bottom-nav" style="background: red;">
-        <mdc:MainActionButton title="List" icon="res://ic_view_list" tap="{{ tapped }}" style="background-color: purple; tint-color: white;" />
-        <mdc:NavigationButton title="Menu" icon="res://ic_menu" tap="{{ tapped }}" style="tint-color: blue;" />
-        <mdc:ActionItem title="First" icon="res://ic_home" tap="{{ tapped }}" style="tint-color: green;" />
-    </mdc:BottomAppBar>
 </Page>

@@ -1,6 +1,6 @@
 import { Color } from 'tns-core-modules/color/color';
 import { Page } from 'tns-core-modules/ui/page/page';
-import { RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
+import { ad, RESOURCE_PREFIX } from 'tns-core-modules/utils/utils';
 import { fromFileOrResource } from 'tns-core-modules/image-source';
 import * as application from 'tns-core-modules/application';
 import { backgroundColorProperty } from 'tns-core-modules/ui/core/view';
@@ -10,8 +10,6 @@ import { AndroidActionItemSettings } from './bottomAppBar';
 import { ActionItemBase, BottomAppBarBase, MainActionButtonBase, isVisible, View, traceMissingIcon } from './bottomAppBar-common';
 
 export * from './bottomAppBar-common';
-
-import FloatingActionButton = com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 declare module 'tns-core-modules/ui/frame' {
     interface Frame {
@@ -91,7 +89,7 @@ export class MainActionButton extends MainActionButtonBase {
 
 export class BottomAppBar extends BottomAppBarBase {
     public nativeViewProtected: com.google.android.material.bottomappbar.BottomAppBar;
-    public floatingActionButton: FloatingActionButton;
+    public floatingActionButton: com.google.android.material.floatingactionbutton.FloatingActionButton;
 
     constructor() {
         super();
@@ -118,7 +116,8 @@ export class BottomAppBar extends BottomAppBarBase {
         bottomAppBar.setFabAlignmentMode(com.google.android.material.bottomappbar.BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
         bottomAppBar.setHideOnScroll(true);
 
-        this.floatingActionButton = new FloatingActionButton(this._context);
+        this.floatingActionButton = new com.google.android.material.floatingactionbutton.FloatingActionButton(this._context);
+        this.floatingActionButton.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         this.floatingActionButton.hide();
 
         return bottomAppBar;
@@ -203,12 +202,17 @@ export class BottomAppBar extends BottomAppBarBase {
             if (background && background.color) {
                 this.floatingActionButton.setSupportBackgroundTintList(android.content.res.ColorStateList.valueOf(background.color.android));
             }
+
             const tintColor = mainActionButton.style.tintColor;
             const iconDrawable = this.floatingActionButton.getDrawable();
-            if (tintColor && iconDrawable) {
-                iconDrawable.setColorFilter(tintColor.android, android.graphics.PorterDuff.Mode.SRC_IN);
-                this.floatingActionButton.setSupportImageTintList(android.content.res.ColorStateList.valueOf(tintColor.argb));
-                this.floatingActionButton.setSupportImageTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
+            if (iconDrawable) {
+                if (tintColor == null) {
+                    this.floatingActionButton.setSupportImageTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
+                    this.floatingActionButton.setSupportImageTintMode(android.graphics.PorterDuff.Mode.OVERLAY);
+                } else {
+                    this.floatingActionButton.setSupportImageTintList(android.content.res.ColorStateList.valueOf(tintColor.android));
+                    this.floatingActionButton.setSupportImageTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
+                }
             }
 
             const mainActionBtn = new WeakRef(mainActionButton);
@@ -250,8 +254,12 @@ export class BottomAppBar extends BottomAppBarBase {
 
             const tintColor = navButton.style.tintColor;
             const iconDrawable = this.nativeViewProtected.getNavigationIcon();
-            if (tintColor && iconDrawable) {
-                iconDrawable.setColorFilter(tintColor.android, android.graphics.PorterDuff.Mode.SRC_IN);
+            if (iconDrawable) {
+                if (tintColor == null) {
+                    iconDrawable.setColorFilter(android.graphics.Color.TRANSPARENT, android.graphics.PorterDuff.Mode.OVERLAY);
+                } else {
+                    iconDrawable.setColorFilter(tintColor.android, android.graphics.PorterDuff.Mode.SRC_IN);
+                }
             }
 
             const navBtn = new WeakRef(navButton);
@@ -297,8 +305,12 @@ export class BottomAppBar extends BottomAppBarBase {
             }
 
             const tintColor = item.style.tintColor;
-            if (tintColor) {
+            if (tintColor == null) {
+                menuItem.setIconTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT));
+                menuItem.setIconTintMode(android.graphics.PorterDuff.Mode.OVERLAY);
+            } else {
                 menuItem.setIconTintList(android.content.res.ColorStateList.valueOf(tintColor.android));
+                menuItem.setIconTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
             }
 
             const showAsAction = getShowAsAction(item);

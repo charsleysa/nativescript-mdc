@@ -27,7 +27,7 @@ dependencies {
         androidXAppCompatVersion = androidXAppCompat
     }
 
-    def androidXMaterialVersion = "1.0.0"
+    def androidXMaterialVersion = "1.1.0-alpha07"
     if (project.hasProperty("androidXMaterial")) {
         androidXMaterialVersion = androidXMaterial
     }

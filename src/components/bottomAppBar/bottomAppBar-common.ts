@@ -47,8 +47,6 @@ export class BottomAppBarBase extends View implements BottomAppBarDefinition {
     private _mainActionButton: MainActionButtonBase;
     private _navigationButton: NavigationButton;
 
-    public iosIconRenderingMode: 'automatic' | 'alwaysOriginal' | 'alwaysTemplate';
-
     get mainActionButton(): MainActionButtonBase {
         return this._mainActionButton;
     }
@@ -364,9 +362,6 @@ export function traceMissingIcon(icon: string) {
         traceCategories.Error,
         traceMessageType.error);
 }
-
-export const iosIconRenderingModeProperty = new Property<BottomAppBarBase, 'automatic' | 'alwaysOriginal' | 'alwaysTemplate'>({ name: 'iosIconRenderingMode', defaultValue: 'alwaysTemplate' });
-iosIconRenderingModeProperty.register(BottomAppBarBase);
 
 export const actionItemTextProperty = new Property<ActionItemBase, string>({ name: 'text', defaultValue: '', valueChanged: onItemChanged });
 actionItemTextProperty.register(ActionItemBase);

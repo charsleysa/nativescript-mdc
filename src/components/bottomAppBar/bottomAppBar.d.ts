@@ -36,15 +36,6 @@ export class BottomAppBar extends View {
     ios: any /* MDCBottomAppBarView */;
 
     /**
-     * Gets or set the UIImageRenderingMode of the action bar icons in iOS. Defaults to 'alwaysTemplate'
-     * Valid values are:
-     *  - automatic
-     *  - alwaysOriginal
-     *  - alwaysTemplate
-     */
-    iosIconRenderingMode: 'automatic' | 'alwaysOriginal' | 'alwaysTemplate';
-
-    /**
      * Updates the action bar.
      */
     update();
@@ -220,14 +211,7 @@ export interface IOSActionItemSettings {
 /**
  * Represents the navigation (a.k.a. 'back' or 'menu') button.
  */
-export class NavigationButton extends ActionItem {
-    //@private
-    /**
-     * @private
-     */
-    _navigationItem?: any
-    //@endprivate
-}
+export class NavigationButton extends ActionItem { }
 
 /**
  * Represents the main action (a.k.a. 'floating action') button.
@@ -273,8 +257,3 @@ export class MainActionButton extends ViewBase {
     _raiseTap(): void;
     //@endprivate
 }
-
-/** @internal */
-export function _setNavBarColor(navBar: any /* MDCBottomAppBarView */, color: any /* UIColor */);
-/** @internal */
-export function _setNavBarBackgroundColor(navBar: any /* MDCBottomAppBarView */, color: any /* UIColor */);

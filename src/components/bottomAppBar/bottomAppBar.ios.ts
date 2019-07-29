@@ -14,7 +14,6 @@ import {
     MainActionButtonBase,
     isVisible,
     View,
-    iosIconRenderingModeProperty,
     layout,
     traceMissingIcon
 } from './bottomAppBar-common';
@@ -120,18 +119,6 @@ export class BottomAppBar extends BottomAppBarBase {
         }
     }
 
-    private _getIconRenderingMode(): UIImageRenderingMode {
-        switch (this.iosIconRenderingMode) {
-            case 'alwaysOriginal':
-                return UIImageRenderingMode.AlwaysOriginal;
-            case 'alwaysTemplate':
-                return UIImageRenderingMode.AlwaysTemplate;
-            case 'automatic':
-            default:
-                return UIImageRenderingMode.Automatic;
-        }
-    }
-
     public update() {
         if (!this.nativeViewProtected) {
             return;
@@ -155,7 +142,7 @@ export class BottomAppBar extends BottomAppBarBase {
 
             if (this.mainActionButton.icon) {
                 const img = loadActionIconFromFileOrResource(this.mainActionButton.icon);
-                const image = img.imageWithRenderingMode(this._getIconRenderingMode());
+                const image = img.imageWithRenderingMode(UIImageRenderingMode.Automatic);
                 fab.setImageForState(image, UIControlState.Normal);
             }
 
@@ -170,8 +157,13 @@ export class BottomAppBar extends BottomAppBarBase {
                 fab.underlyingColorHint = background.color.ios;
                 fab.setBackgroundColorForState(background.color.ios, UIControlState.Normal);
             }
+
             const tintColor = this.mainActionButton.style.tintColor;
             if (tintColor) {
+                const image = fab.imageForState(UIControlState.Normal);
+                if (image) {
+                    fab.setImageForState(image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate), UIControlState.Normal);
+                }
                 fab.setTitleColorForState(tintColor.ios, UIControlState.Normal);
                 fab.setImageTintColorForState(tintColor.ios, UIControlState.Normal);
             }
@@ -228,7 +220,7 @@ export class BottomAppBar extends BottomAppBarBase {
             barButtonItem = UIBarButtonItem.alloc().initWithBarButtonSystemItemTargetAction(id, tapHandler, 'tap');
         } else if (item.icon) {
             const img = loadActionIconFromFileOrResource(item.icon);
-            const image = img.imageWithRenderingMode(this._getIconRenderingMode());
+            const image = img.imageWithRenderingMode(UIImageRenderingMode.Automatic);
             barButtonItem = UIBarButtonItem.alloc().initWithImageStyleTargetAction(image, UIBarButtonItemStyle.Plain, tapHandler, 'tap');
         } else {
             barButtonItem = UIBarButtonItem.alloc().initWithTitleStyleTargetAction(item.text + '', UIBarButtonItemStyle.Plain, tapHandler, 'tap');
@@ -236,6 +228,9 @@ export class BottomAppBar extends BottomAppBarBase {
 
         const tintColor = item.style.tintColor;
         if (tintColor) {
+            if (barButtonItem.image) {
+                barButtonItem.image = barButtonItem.image.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
             barButtonItem.tintColor = tintColor.ios;
         }
 
@@ -298,12 +293,5 @@ export class BottomAppBar extends BottomAppBarBase {
 
     _redrawNativeBackground(value: Background): void {
         return;
-    }
-
-    [iosIconRenderingModeProperty.getDefault](): 'automatic' | 'alwaysOriginal' | 'alwaysTemplate' {
-        return 'alwaysTemplate';
-    }
-    [iosIconRenderingModeProperty.setNative](value: 'automatic' | 'alwaysOriginal' | 'alwaysTemplate') {
-        this.update();
     }
 }

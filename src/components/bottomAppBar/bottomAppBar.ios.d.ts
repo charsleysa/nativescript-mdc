@@ -24,7 +24,6 @@ export declare class BottomAppBar extends BottomAppBarBase {
     constructor();
     createNativeView(): MDCBottomAppBarView;
     _addChildFromBuilder(name: string, value: any): void;
-    private _getIconRenderingMode;
     update(): void;
     private updateMainActionButton;
     private populateMenuItems;

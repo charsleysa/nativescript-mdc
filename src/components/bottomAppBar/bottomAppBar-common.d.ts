@@ -19,7 +19,6 @@ export declare class BottomAppBarBase extends View implements BottomAppBarDefini
     private _actionItems;
     private _mainActionButton;
     private _navigationButton;
-    iosIconRenderingMode: 'automatic' | 'alwaysOriginal' | 'alwaysTemplate';
     mainActionButton: MainActionButtonBase;
     navigationButton: NavigationButton;
     actionItems: ActionItems;
@@ -74,7 +73,6 @@ export declare class MainActionButtonBase extends ViewBase implements MainAction
 }
 export declare function isVisible(item: ActionItemDefinition | MainActionButtonBase): boolean;
 export declare function traceMissingIcon(icon: string): void;
-export declare const iosIconRenderingModeProperty: Property<BottomAppBarBase, "automatic" | "alwaysOriginal" | "alwaysTemplate">;
 export declare const actionItemTextProperty: Property<ActionItemBase, string>;
 export declare const actionItemIconProperty: Property<ActionItemBase, string>;
 export declare const actionItemVisibilityProperty: Property<ActionItemBase, string>;
