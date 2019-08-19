@@ -9,7 +9,6 @@ declare module 'tns-core-modules/ui/core/view/view' {
         _setupAsRootView(context: any): void;
         callLoaded(): void;
         callUnloaded(): void;
-        _removeFromFrameStack(): void;
     }
 }
 
@@ -39,52 +38,23 @@ export interface ShowBottomSheetOptions {
     };
 }
 
+export const _rootBottomSheetViews = new Array<ViewBase>();
+
 export abstract class ViewWithBottomSheetBase extends View {
     protected _closeBottomSheetCallback: Function;
-    protected abstract _hideNativeBottomSheet(parent, whenClosedCallback);
-    protected _bottomSheetContext: any;
-    _raiseShownBottomSheetEvent() {
+    private _bottomSheetContext: any;
+    private _bottomSheet: View;
+    public _bottomSheetParent: View;
+
+    protected _raiseShownBottomSheetEvent() {
         const args: ShownBottomSheetData = {
             eventName: shownInBottomSheetEvent,
             object: this,
             context: this._bottomSheetContext,
             closeCallback: this._closeBottomSheetCallback
         };
-
+        console.log('_raiseShownBottomSheetEvent', `${this}`);
         this.notify(args);
-    }
-    public _bottomSheetClosed(): void {
-        if (this instanceof Frame) {
-            this._removeFromFrameStack();
-        }
-        eachDescendant(this, (child: ViewWithBottomSheetBase) => {
-            child._bottomSheetClosed();
-            return true;
-        });
-    }
-    protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
-        this._bottomSheetContext = options.context;
-        const that = this;
-        this._closeBottomSheetCallback = function(...originalArgs) {
-            if (that._closeBottomSheetCallback) {
-                // const modalIndex = _rootModalViews.indexOf(that);
-                // _rootModalViews.splice(modalIndex);
-                // that._modalParent = null;
-                that._bottomSheetContext = null;
-                that._closeBottomSheetCallback = null;
-                that._bottomSheetClosed();
-                // parent._modal = null;
-
-                const whenClosedCallback = () => {
-                    if (typeof options.closeCallback === 'function') {
-                        options.closeCallback.apply(undefined, originalArgs);
-                    }
-                };
-
-                that._hideNativeBottomSheet(parent, whenClosedCallback);
-            }
-        };
-        options.context.closeCallback = this._closeBottomSheetCallback;
     }
     protected _raiseShowingBottomSheetEvent() {
         const args: ShownBottomSheetData = {
@@ -95,6 +65,44 @@ export abstract class ViewWithBottomSheetBase extends View {
         };
         this.notify(args);
     }
+
+    public _bottomSheetClosed(): void {
+        eachDescendant(this, (child: ViewWithBottomSheetBase) => {
+            child._bottomSheetClosed();
+            return true;
+        });
+    }
+
+    protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
+        _rootBottomSheetViews.push(this);
+
+        (parent as ViewWithBottomSheetBase)._bottomSheet = this;
+        this._bottomSheetParent = parent;
+        this._bottomSheetContext = options.context;
+        const that = this;
+        this._closeBottomSheetCallback = function(...originalArgs) {
+            if (that._closeBottomSheetCallback) {
+                const modalIndex = _rootBottomSheetViews.indexOf(that);
+                _rootBottomSheetViews.splice(modalIndex);
+                that._bottomSheetParent = null;
+                that._bottomSheetContext = null;
+                that._closeBottomSheetCallback = null;
+                that._bottomSheetClosed();
+                (parent as ViewWithBottomSheetBase)._bottomSheet = null;
+
+                const whenClosedCallback = () => {
+                    if (typeof options.closeCallback === 'function') {
+                        options.closeCallback.apply(undefined, originalArgs);
+                    }
+                };
+
+                that._hideNativeBottomSheet(parent, whenClosedCallback);
+            }
+        };
+    }
+
+    protected abstract _hideNativeBottomSheet(parent, whenClosedCallback);
+
     public closeBottomSheet(...args: any[]): void {
         let closeCallback = this._closeBottomSheetCallback;
         if (closeCallback) {

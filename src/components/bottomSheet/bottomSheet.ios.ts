@@ -1,151 +1,15 @@
 import { fromObject } from 'tns-core-modules/data/observable/observable';
-import { ios, traceCategories, traceError, traceMessageType, traceWrite, View, ViewBase } from 'tns-core-modules/ui/core/view';
+import { ios as iosView, traceCategories, traceError, traceMessageType, traceWrite, View, ViewBase } from 'tns-core-modules/ui/core/view';
 import { layout } from 'tns-core-modules/utils/utils';
 
-import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
+import { ShowBottomSheetOptions, ViewWithBottomSheetBase, shownInBottomSheetEvent, showingInBottomSheetEvent } from './bottomSheet-common';
 import { applyMixins } from '../core/core';
 
-class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottomSheetControllerDelegate {
-    public static ObjCProtocols = [MDCBottomSheetControllerDelegate];
-
-    private _owner: WeakRef<ViewWithBottomSheet>;
-
-    public static initWithOwner(owner: WeakRef<ViewWithBottomSheet>): MDCBottomSheetControllerDelegateImpl {
-        const impl = <MDCBottomSheetControllerDelegateImpl>MDCBottomSheetControllerDelegateImpl.new();
-        impl._owner = owner;
-        return impl;
-    }
-    bottomSheetControllerDidDismissBottomSheet(controller: MDCBottomSheetController) {
-        const owner = this._owner.get();
-        if (owner) {
-            owner.closeBottomSheet();
-            if (owner && owner.isLoaded) {
-                owner.callUnloaded();
-            }
-        }
-    }
-}
-
-declare module 'tns-core-modules/ui/core/view/view' {
-    interface View {
-        _setLayoutFlags(left: number, top: number, right: number, bottom: number);
-    }
-}
-
-class BottomSheetUILayoutViewController extends UIViewController {
-    public owner: WeakRef<View>;
-
-    public static initWithOwner(owner: WeakRef<View>): BottomSheetUILayoutViewController {
-        const controller = <BottomSheetUILayoutViewController>BottomSheetUILayoutViewController.new();
-        controller.owner = owner;
-        return controller;
-    }
-
-    private initLayoutGuide(controller: UIViewController) {
-        const rootView = controller.view;
-        const layoutGuide = UILayoutGuide.alloc().init();
-        rootView.addLayoutGuide(layoutGuide);
-        NSLayoutConstraint.activateConstraints(<any>[
-            layoutGuide.topAnchor.constraintEqualToAnchor(controller.topLayoutGuide.bottomAnchor),
-            layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
-            layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
-            layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
-        ]);
-        return layoutGuide;
-    }
-
-    private layoutView(controller: UIViewController, owner: View): void {
-        let layoutGuide = controller.view.safeAreaLayoutGuide;
-        if (!layoutGuide) {
-            traceWrite(`safeAreaLayoutGuide during layout of ${owner}. Creating fallback constraints, but layout might be wrong.`, traceCategories.Layout, traceMessageType.error);
-
-            layoutGuide = this.initLayoutGuide(controller);
-        }
-        const safeArea = layoutGuide.layoutFrame;
-        let position = ios.getPositionFromFrame(safeArea);
-        const safeAreaSize = safeArea.size;
-
-        const hasChildViewControllers = controller.childViewControllers.count > 0;
-        if (hasChildViewControllers) {
-            const fullscreen = controller.view.frame;
-            position = ios.getPositionFromFrame(fullscreen);
-        }
-
-        const safeAreaWidth = layout.round(layout.toDevicePixels(safeAreaSize.width));
-        const safeAreaHeight = layout.round(layout.toDevicePixels(safeAreaSize.height));
-
-        const widthSpec = layout.makeMeasureSpec(safeAreaWidth, layout.EXACTLY);
-        const heightSpec = layout.makeMeasureSpec(safeAreaHeight, layout.UNSPECIFIED);
-
-        View.measureChild(null, owner, widthSpec, heightSpec);
-        View.layoutChild(null, owner, position.left, position.top, position.right, position.top + owner.getMeasuredHeight());
-
-        this.preferredContentSize = CGSizeMake(layout.toDeviceIndependentPixels(owner.getMeasuredWidth()), position.top + layout.toDeviceIndependentPixels(owner.getMeasuredHeight()));
-
-        this.layoutParent(owner.parent);
-    }
-
-    private layoutParent(view: ViewBase): void {
-        if (!view) {
-            return;
-        }
-
-        if (view instanceof View && view.nativeViewProtected) {
-            const frame = view.nativeViewProtected.frame;
-            const origin = frame.origin;
-            const size = frame.size;
-            const left = layout.toDevicePixels(origin.x);
-            const top = layout.toDevicePixels(origin.y);
-            const width = layout.toDevicePixels(size.width);
-            const height = layout.toDevicePixels(size.height);
-            view._setLayoutFlags(left, top, width + left, height + top);
-        }
-
-        this.layoutParent(view.parent);
-    }
-
-    public viewWillLayoutSubviews(): void {
-        super.viewWillLayoutSubviews();
-        const owner = this.owner.get();
-        if (owner) {
-            ios.updateConstraints(this, owner);
-        }
-    }
-
-    public viewDidLayoutSubviews(): void {
-        super.viewDidLayoutSubviews();
-        const owner = this.owner.get();
-        if (owner) {
-            this.layoutView(this, owner);
-        }
-    }
-
-    public viewWillAppear(animated: boolean): void {
-        super.viewWillAppear(animated);
-        const owner = this.owner.get();
-        if (!owner) {
-            return;
-        }
-
-        ios.updateAutoAdjustScrollInsets(this, owner);
-
-        if (!owner.parent) {
-            owner.callLoaded();
-        }
-    }
-
-    public viewDidDisappear(animated: boolean): void {
-        super.viewDidDisappear(animated);
-        const owner = this.owner.get();
-        if (owner && !owner.parent) {
-            owner.callUnloaded();
-        }
-    }
-}
-
 export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
+    private _bottomSheetControllerDelegate: ios.MDCBottomSheetControllerDelegateImpl;
+
     protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
-        const parentWithController = ios.getParentWithViewController(parent);
+        const parentWithController = iosView.getParentWithViewController(parent);
         if (!parentWithController) {
             traceWrite(`Could not find parent with viewController for ${parent} while showing bottom sheet view.`, traceCategories.ViewHierarchy, traceMessageType.error);
             return;
@@ -168,7 +32,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         let controller = this.viewController;
         if (!controller) {
             const nativeView = this.ios || this.nativeViewProtected;
-            controller = BottomSheetUILayoutViewController.initWithOwner(new WeakRef(this));
+            controller = ios.BottomSheetUILayoutViewController.initWithOwner(new WeakRef(this));
 
             if (nativeView instanceof UIView) {
                 controller.view.addSubview(nativeView);
@@ -184,7 +48,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         this._raiseShowingBottomSheetEvent();
         const bottomSheet = MDCBottomSheetController.alloc().initWithContentViewController(controller);
-        bottomSheet.delegate = MDCBottomSheetControllerDelegateImpl.initWithOwner(new WeakRef(this));
+        this._bottomSheetControllerDelegate = ios.MDCBottomSheetControllerDelegateImpl.initWithOwnerAndCallback(new WeakRef(this), this._closeBottomSheetCallback);
+        bottomSheet.delegate = this._bottomSheetControllerDelegate;
         bottomSheet.isScrimAccessibilityElement = true;
         bottomSheet.scrimAccessibilityLabel = 'close';
         bottomSheet.dismissOnBackgroundTap = options.dismissOnBackgroundTap !== false;
@@ -223,9 +88,15 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             return;
         }
 
+        // modal view has already been closed by UI, probably as a popover
+        if (!parent.viewController.presentedViewController) {
+            whenClosedCallback();
+
+            return;
+        }
+
         const parentController = parent.viewController;
         const animated = (<any>this.viewController).animated;
-        whenClosedCallback();
         parentController.dismissViewControllerAnimatedCompletion(animated, whenClosedCallback);
     }
 }
@@ -233,7 +104,150 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 export function overrideBottomSheet() {
     const NSView = require('tns-core-modules/ui/core/view').View;
     applyMixins(NSView, [ViewWithBottomSheetBase, ViewWithBottomSheet]);
+    NSView.shownInBottomSheetEvent = shownInBottomSheetEvent;
+    NSView.showingInBottomSheetEvent = showingInBottomSheetEvent;
 }
 export function install() {
     overrideBottomSheet();
+}
+
+declare module 'tns-core-modules/ui/core/view/view' {
+    interface View {
+        _setLayoutFlags(left: number, top: number, right: number, bottom: number);
+    }
+}
+
+export namespace ios {
+
+    export class BottomSheetUILayoutViewController extends UIViewController {
+        public owner: WeakRef<View>;
+
+        public static initWithOwner(owner: WeakRef<View>): BottomSheetUILayoutViewController {
+            const controller = <BottomSheetUILayoutViewController>BottomSheetUILayoutViewController.new();
+            controller.owner = owner;
+            return controller;
+        }
+
+        private initLayoutGuide(controller: UIViewController) {
+            const rootView = controller.view;
+            const layoutGuide = UILayoutGuide.alloc().init();
+            rootView.addLayoutGuide(layoutGuide);
+            NSLayoutConstraint.activateConstraints(<any>[
+                layoutGuide.topAnchor.constraintEqualToAnchor(controller.topLayoutGuide.bottomAnchor),
+                layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
+                layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
+                layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
+            ]);
+            return layoutGuide;
+        }
+
+        private layoutView(controller: UIViewController, owner: View): void {
+            let layoutGuide = controller.view.safeAreaLayoutGuide;
+            if (!layoutGuide) {
+                traceWrite(`safeAreaLayoutGuide during layout of ${owner}. Creating fallback constraints, but layout might be wrong.`, traceCategories.Layout, traceMessageType.error);
+
+                layoutGuide = this.initLayoutGuide(controller);
+            }
+            const safeArea = layoutGuide.layoutFrame;
+            let position = iosView.getPositionFromFrame(safeArea);
+            const safeAreaSize = safeArea.size;
+
+            const hasChildViewControllers = controller.childViewControllers.count > 0;
+            if (hasChildViewControllers) {
+                const fullscreen = controller.view.frame;
+                position = iosView.getPositionFromFrame(fullscreen);
+            }
+
+            const safeAreaWidth = layout.round(layout.toDevicePixels(safeAreaSize.width));
+            const safeAreaHeight = layout.round(layout.toDevicePixels(safeAreaSize.height));
+
+            const widthSpec = layout.makeMeasureSpec(safeAreaWidth, layout.EXACTLY);
+            const heightSpec = layout.makeMeasureSpec(safeAreaHeight, layout.UNSPECIFIED);
+
+            View.measureChild(null, owner, widthSpec, heightSpec);
+            View.layoutChild(null, owner, position.left, position.top, position.right, position.top + owner.getMeasuredHeight());
+
+            this.preferredContentSize = CGSizeMake(layout.toDeviceIndependentPixels(owner.getMeasuredWidth()), position.top + layout.toDeviceIndependentPixels(owner.getMeasuredHeight()));
+
+            this.layoutParent(owner.parent);
+        }
+
+        private layoutParent(view: ViewBase): void {
+            if (!view) {
+                return;
+            }
+
+            if (view instanceof View && view.nativeViewProtected) {
+                const frame = view.nativeViewProtected.frame;
+                const origin = frame.origin;
+                const size = frame.size;
+                const left = layout.toDevicePixels(origin.x);
+                const top = layout.toDevicePixels(origin.y);
+                const width = layout.toDevicePixels(size.width);
+                const height = layout.toDevicePixels(size.height);
+                view._setLayoutFlags(left, top, width + left, height + top);
+            }
+
+            this.layoutParent(view.parent);
+        }
+
+        // public viewWillLayoutSubviews(): void {
+        //     super.viewWillLayoutSubviews();
+        //     const owner = this.owner.get();
+        //     if (owner) {
+        //         ios.updateConstraints(this, owner);
+        //     }
+        // }
+
+        public viewDidLayoutSubviews(): void {
+            super.viewDidLayoutSubviews();
+            const owner = this.owner.get();
+            if (owner) {
+                this.layoutView(this, owner);
+            }
+        }
+
+        public viewWillAppear(animated: boolean): void {
+            super.viewWillAppear(animated);
+            const owner = this.owner.get();
+            if (!owner) {
+                return;
+            }
+
+            iosView.updateAutoAdjustScrollInsets(this, owner);
+
+            if (!owner.parent) {
+                owner.callLoaded();
+            }
+        }
+
+        public viewDidDisappear(animated: boolean): void {
+            super.viewDidDisappear(animated);
+            const owner = this.owner.get();
+            if (owner && !owner.parent) {
+                owner.callUnloaded();
+            }
+        }
+    }
+
+    export class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottomSheetControllerDelegate {
+        public static ObjCProtocols = [MDCBottomSheetControllerDelegate];
+
+        private owner: WeakRef<ViewWithBottomSheet>;
+        private closedCallback: Function;
+
+        public static initWithOwnerAndCallback(owner: WeakRef<ViewWithBottomSheet>, whenClosedCallback: Function): MDCBottomSheetControllerDelegateImpl {
+            const instance = <MDCBottomSheetControllerDelegateImpl>super.new();
+            instance.owner = owner;
+            instance.closedCallback = whenClosedCallback;
+
+            return instance;
+        }
+        bottomSheetControllerDidDismissBottomSheet(controller: MDCBottomSheetController) {
+            const owner = this.owner.get();
+            if (owner && typeof this.closedCallback === 'function') {
+                this.closedCallback();
+            }
+        }
+    }
 }

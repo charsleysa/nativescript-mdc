@@ -1,5 +1,5 @@
-<StackLayout backgroundColor="red" xmlns:mdc="nativescript-mdc" shownInBottomSheet="onShownInBottomSheet">
+<StackLayout xmlns="http://www.nativescript.org/tns.xsd" xmlns:mdc="nativescript-mdc" loaded="onLoaded" backgroundColor="red">
     <Label text="bottomSheet" class="text t-20 text-center c-black" textWrap="true"/>
-    <mdc:Button variant="flat" text="test1" tap="onTap"></mdc:Button>
-    <mdc:Button variant="flat" text="test2" tap="onTap"></mdc:Button>
+    <mdc:Button id="btn1" variant="flat" text="test1" tap="onTap"></mdc:Button>
+    <mdc:Button id="btn2" variant="flat" text="test2" tap="onTap"></mdc:Button>
 </StackLayout>

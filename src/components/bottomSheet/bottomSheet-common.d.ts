@@ -7,7 +7,6 @@ declare module 'tns-core-modules/ui/core/view/view' {
         _setupAsRootView(context: any): void;
         callLoaded(): void;
         callUnloaded(): void;
-        _removeFromFrameStack(): void;
     }
 }
 export interface ShownBottomSheetData extends EventData {
@@ -24,14 +23,17 @@ export interface ShowBottomSheetOptions {
         trackingScrollView?: string;
     };
 }
+export declare const _rootBottomSheetViews: ViewBase[];
 export declare abstract class ViewWithBottomSheetBase extends View {
     protected _closeBottomSheetCallback: Function;
-    protected abstract _hideNativeBottomSheet(parent: any, whenClosedCallback: any): any;
-    protected _bottomSheetContext: any;
-    _raiseShownBottomSheetEvent(): void;
+    private _bottomSheetContext;
+    private _bottomSheet;
+    _bottomSheetParent: View;
+    protected _raiseShownBottomSheetEvent(): void;
+    protected _raiseShowingBottomSheetEvent(): void;
     _bottomSheetClosed(): void;
     protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions): void;
-    protected _raiseShowingBottomSheetEvent(): void;
+    protected abstract _hideNativeBottomSheet(parent: any, whenClosedCallback: any): any;
     closeBottomSheet(...args: any[]): void;
     showBottomSheet(view: ViewBase, options: ShowBottomSheetOptions): ViewBase;
     showBottomSheet(moduleName: string, options: ShowBottomSheetOptions): ViewBase;

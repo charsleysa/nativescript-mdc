@@ -1,35 +1,16 @@
 import { View } from 'tns-core-modules/ui/core/view';
-import { fromObject } from 'tns-core-modules/data/observable/observable';
 
-import { ShowBottomSheetOptions, ViewWithBottomSheetBase } from './bottomSheet-common';
+import { ShowBottomSheetOptions, ViewWithBottomSheetBase, shownInBottomSheetEvent, showingInBottomSheetEvent } from './bottomSheet-common';
 import { applyMixins } from '../core/core';
 
 interface BottomSheetDataOptions {
-    owner: View;
-    options: ShowBottomSheetOptions;
+    owner: ViewWithBottomSheet;
+    cancelable: boolean;
     shownCallback: () => void;
     dismissCallback: () => void;
 }
 const DOMID = '_domId';
 const bottomSheetMap = new Map<number, BottomSheetDataOptions>();
-
-function saveBottomSheet(options: BottomSheetDataOptions) {
-    bottomSheetMap.set(options.owner._domId, options);
-}
-
-function removeBottomSheet(domId: number) {
-    bottomSheetMap.delete(domId);
-}
-
-function getBottomSheetOptions(domId: number): BottomSheetDataOptions {
-    return bottomSheetMap.get(domId);
-}
-
-declare module 'tns-core-modules/ui/core/view' {
-    interface View {
-        _bottomSheetFragment: com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-    }
-}
 
 let BottomSheetDialogFragment: BottomSheetDialogFragment;
 
@@ -42,7 +23,7 @@ function initializeBottomSheetDialogFragment() {
     }
 
     class BottomSheetDialogFragmentImpl extends com.google.android.material.bottomsheet.BottomSheetDialogFragment {
-        public owner: View;
+        public owner: ViewWithBottomSheet;
         private _shownCallback: () => void;
         private _dismissCallback: () => void;
 
@@ -60,12 +41,11 @@ function initializeBottomSheetDialogFragment() {
             this.owner._bottomSheetFragment = this;
 
             const dialog = super.onCreateDialog(savedInstanceState) as com.google.android.material.bottomsheet.BottomSheetDialog;
-            if (options.options) {
-                const creationOptions = options.options;
-                if (creationOptions.dismissOnBackgroundTap !== undefined) {
-                    dialog.setCanceledOnTouchOutside(creationOptions.dismissOnBackgroundTap);
-                }
-            }
+
+            this.owner.horizontalAlignment = 'stretch';
+            this.owner.verticalAlignment = 'stretch';
+
+            dialog.setCanceledOnTouchOutside(options.cancelable);
 
             return dialog;
         }
@@ -106,24 +86,37 @@ function initializeBottomSheetDialogFragment() {
         public onDestroy(): void {
             super.onDestroy();
             const owner = this.owner;
-            owner._isAddedToNativeVisualTree = false;
-            owner._tearDownUI(true);
+
+            if (owner) {
+                // Android calls onDestroy before onDismiss.
+                // Make sure we unload first and then call _tearDownUI.
+                if (owner.isLoaded) {
+                    owner.callUnloaded();
+                }
+
+                owner._isAddedToNativeVisualTree = false;
+                owner._tearDownUI(true);
+            }
         }
     }
 
     BottomSheetDialogFragment = BottomSheetDialogFragmentImpl;
 }
 
-export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
-    protected _hideNativeBottomSheet(parent: View, whenClosedCallback: () => void) {
-        const manager = this._bottomSheetFragment.getFragmentManager();
-        if (manager) {
-            this._bottomSheetFragment.dismissAllowingStateLoss();
-        }
+function saveBottomSheet(options: BottomSheetDataOptions) {
+    bottomSheetMap.set(options.owner._domId, options);
+}
 
-        this._bottomSheetFragment = null;
-        whenClosedCallback();
-    }
+function removeBottomSheet(domId: number) {
+    bottomSheetMap.delete(domId);
+}
+
+function getBottomSheetOptions(domId: number): BottomSheetDataOptions {
+    return bottomSheetMap.get(domId);
+}
+
+export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
+    public _bottomSheetFragment: com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
     protected _showNativeBottomSheet(parent: View, options: ShowBottomSheetOptions) {
         super._showNativeBottomSheet(parent, options);
@@ -137,11 +130,8 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         const bottomSheetOptions: BottomSheetDataOptions = {
             owner: this,
-            options: options,
-            shownCallback: () => {
-                this.bindingContext = fromObject(options.context);
-                this._raiseShownBottomSheetEvent();
-            },
+            cancelable: options.dismissOnBackgroundTap !== false,
+            shownCallback: () => this._raiseShownBottomSheetEvent(),
             dismissCallback: () => this.closeBottomSheet()
         };
 
@@ -152,12 +142,23 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         this._bottomSheetFragment.show((<any>parent)._getRootFragmentManager(), this._domId.toString());
     }
+
+    protected _hideNativeBottomSheet(parent: View, whenClosedCallback: () => void) {
+        const manager = this._bottomSheetFragment.getFragmentManager();
+        if (manager) {
+            this._bottomSheetFragment.dismissAllowingStateLoss();
+        }
+
+        this._bottomSheetFragment = null;
+        whenClosedCallback();
+    }
 }
 
 export function overrideBottomSheet() {
     const NSView = require('tns-core-modules/ui/core/view').View;
-    console.log('about to override bottom sheet');
     applyMixins(NSView, [ViewWithBottomSheetBase, ViewWithBottomSheet]);
+    NSView.shownInBottomSheetEvent = shownInBottomSheetEvent;
+    NSView.showingInBottomSheetEvent = showingInBottomSheetEvent;
 }
 export function install() {
     // overridePage();

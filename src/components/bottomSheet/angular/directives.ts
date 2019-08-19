@@ -2,8 +2,8 @@ import {
     ComponentFactoryResolver,
     ComponentRef,
     Injectable,
+    Injector,
     NgModuleRef,
-    ReflectiveInjector,
     Type,
     ViewContainerRef
 } from '@angular/core';
@@ -83,10 +83,6 @@ export class MDCBottomSheetService {
             frame = (parentView.page && parentView.page.frame) || topmost();
         }
 
-        if (!(parentView instanceof View)) {
-            throw new Error(`No suitable parent view available for displaying bottom sheet.`);
-        }
-
         this.location._beginModalNavigation(frame);
 
         return new Promise((resolve, reject) => {
@@ -124,11 +120,11 @@ export class MDCBottomSheetService {
         });
 
         const modalParams = new MDCBottomSheetParams(options.context, closeCallback);
-        const providers = ReflectiveInjector.resolve([
-            { provide: MDCBottomSheetParams, useValue: modalParams },
-        ]);
 
-        const childInjector = ReflectiveInjector.fromResolvedProviders(providers, options.containerRef.parentInjector);
+        const childInjector = Injector.create({
+            providers: [{ provide: MDCBottomSheetParams, useValue: modalParams }],
+            parent: options.containerRef.injector
+        });
         const detachedFactory = options.resolver.resolveComponentFactory(DetachedLoader);
         detachedLoaderRef = options.containerRef.createComponent(detachedFactory, -1, childInjector, null);
         detachedLoaderRef.instance.loadComponent(options.type).then((compRef) => {

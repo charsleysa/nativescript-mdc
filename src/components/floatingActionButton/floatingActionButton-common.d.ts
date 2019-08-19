@@ -11,7 +11,7 @@ export declare abstract class FloatingActionButtonBase extends View {
     isLoading: boolean;
     _createImageSourceFromSrc(value: string | ImageSource | ImageAsset): void;
 }
-export declare const fabSizeProperty: Property<FloatingActionButtonBase, "normal" | "mini">;
+export declare const fabSizeProperty: Property<FloatingActionButtonBase, "mini" | "normal">;
 export declare const imageSourceProperty: Property<FloatingActionButtonBase, ImageSource>;
 export declare const iconProperty: Property<FloatingActionButtonBase, any>;
 export declare const isLoadingProperty: Property<FloatingActionButtonBase, boolean>;
