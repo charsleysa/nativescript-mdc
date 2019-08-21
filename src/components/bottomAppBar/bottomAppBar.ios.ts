@@ -136,7 +136,7 @@ export class BottomAppBar extends BottomAppBarBase {
         if (this.mainActionButton && isVisible(this.mainActionButton)) {
             const tapHandler = TapItemHandlerImpl.initWithOwner(new WeakRef(this.mainActionButton));
             // associate handler with menuItem or it will get collected by JSC.
-            (<any>fab).handler = tapHandler;
+            (<any>this.mainActionButton).handler = tapHandler;
 
             fab.addTargetActionForControlEvents(tapHandler, 'tap', UIControlEvents.TouchUpInside);
 
@@ -170,8 +170,8 @@ export class BottomAppBar extends BottomAppBarBase {
 
             this.nativeViewProtected.setFloatingButtonHiddenAnimated(false, true);
         } else {
-            if ((<any>fab).handler) {
-                fab.removeTargetActionForControlEvents((<any>fab).handler, 'tap', UIControlEvents.TouchUpInside);
+            if (this.mainActionButton && (<any>this.mainActionButton).handler) {
+                fab.removeTargetActionForControlEvents((<any>this.mainActionButton).handler, 'tap', UIControlEvents.TouchUpInside);
             }
 
             this.nativeViewProtected.setFloatingButtonHiddenAnimated(true, true);
