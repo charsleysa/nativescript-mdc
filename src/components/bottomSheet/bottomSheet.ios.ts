@@ -89,7 +89,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
         }
 
         // modal view has already been closed by UI, probably as a popover
-        if (!parent.viewController.presentedViewController) {
+        if (parent.viewController.presentedViewController == null || parent.viewController.presentedViewController.beingDismissed) {
             whenClosedCallback();
 
             return;
@@ -97,7 +97,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         const parentController = parent.viewController;
         const animated = (<any>this.viewController).animated;
-        parentController.dismissViewControllerAnimatedCompletion(animated, whenClosedCallback);
+        parentController.dismissViewControllerAnimatedCompletion(false, whenClosedCallback);
     }
 }
 

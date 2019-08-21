@@ -53,7 +53,6 @@ export abstract class ViewWithBottomSheetBase extends View {
             context: this._bottomSheetContext,
             closeCallback: this._closeBottomSheetCallback
         };
-        console.log('_raiseShownBottomSheetEvent', `${this}`);
         this.notify(args);
     }
     protected _raiseShowingBottomSheetEvent() {
