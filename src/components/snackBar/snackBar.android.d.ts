@@ -1,7 +1,7 @@
 import { SnackBarBase, SnackBarOptions } from './snackBar-common';
 export { DismissReasons, SnackBarAction } from './snackBar-common';
 export declare class SnackBar extends SnackBarBase {
-    private static SNACKBAR_TEXT_ID;
+    private static readonly SNACKBAR_TEXT_ID;
     private _snackbar;
     private _snackbarCallback;
     constructor(options?: SnackBarOptions);

@@ -29,7 +29,9 @@ function _getReason(value: number) {
 
 export class SnackBar extends SnackBarBase {
     // Use this to get the textview instance inside the snackbar
-    private static SNACKBAR_TEXT_ID = (com.google.android.material as any).R.id.snackbar_text;
+    private static get SNACKBAR_TEXT_ID() {
+        return (com.google.android.material as any).R.id.snackbar_text;
+    }
     private _snackbar: com.google.android.material.snackbar.Snackbar;
     private _snackbarCallback: any;
     constructor(options?: SnackBarOptions) {
