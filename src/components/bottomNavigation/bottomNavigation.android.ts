@@ -12,19 +12,32 @@ import {
     titleVisibilityProperty
 } from './bottomNavigation-common';
 
-import BitmapDrawable = android.graphics.drawable.BitmapDrawable;
-import BottomNavigationView = com.google.android.material.bottomnavigation.BottomNavigationView;
-import MenuBuilder = androidx.appcompat.view.menu.MenuBuilder;
-import LabelVisibilityMode = com.google.android.material.bottomnavigation.LabelVisibilityMode;
+let BottomNavigationView: typeof com.google.android.material.bottomnavigation.BottomNavigationView;
+let LabelVisibilityMode: typeof com.google.android.material.bottomnavigation.LabelVisibilityMode;
+
+function initBottomNavigationView() {
+    if (!BottomNavigationView) {
+        BottomNavigationView = com.google.android.material.bottomnavigation.BottomNavigationView;
+    }
+}
+
+function initLabelVisibilityMode() {
+    if (!LabelVisibilityMode) {
+        LabelVisibilityMode = com.google.android.material.bottomnavigation.LabelVisibilityMode;
+    }
+}
 
 export class BottomNavigation extends BottomNavigationBase {
-    nativeViewProtected: BottomNavigationView;
+    nativeViewProtected: com.google.android.material.bottomnavigation.BottomNavigationView;
 
     get android(): any {
         return this.nativeViewProtected;
     }
 
     createNativeView(): Object {
+        initBottomNavigationView();
+        initLabelVisibilityMode();
+
         const view = new BottomNavigationView(this._context);
         const owner = new WeakRef(this);
 
@@ -64,19 +77,19 @@ export class BottomNavigation extends BottomNavigationBase {
 
             const iconDrawable = new android.graphics.drawable.StateListDrawable();
             if (tab.selectedIcon != null) {
-                const iconSelectedDrawable = new BitmapDrawable(fromResource(tab.selectedIcon).android);
+                const iconSelectedDrawable = new android.graphics.drawable.BitmapDrawable(fromResource(tab.selectedIcon).android);
                 const state = Array.create('int', 1);
                 state[0] = this.getResourceId('android:attr/state_checked');
                 iconDrawable.addState(state, iconSelectedDrawable);
             }
-            const iconDefaultDrawable = new BitmapDrawable(fromResource(tab.icon).android);
+            const iconDefaultDrawable = new android.graphics.drawable.BitmapDrawable(fromResource(tab.icon).android);
             iconDrawable.addState(Array.create('int', 0), iconDefaultDrawable);
 
             tabBarItem.setIcon(iconDrawable);
         }
         // Disable the bottom navigation callback when setting the item (match iOS behavior)
         const menuBuilder = menu as any; /** MenuBuilder */
-        const cb = this.getField(MenuBuilder.class, menuBuilder, 'mCallback');
+        const cb = this.getField(androidx.appcompat.view.menu.MenuBuilder.class, menuBuilder, 'mCallback');
         menuBuilder.setCallback(null);
         this.nativeViewProtected.setSelectedItemId(this.selectedTabIndex);
         menuBuilder.setCallback(cb);

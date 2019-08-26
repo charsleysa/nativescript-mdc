@@ -5,13 +5,11 @@ declare module 'tns-core-modules/ui/page' {
         updateActionBar(): any;
     }
 }
-import AppBarLayout = com.google.android.material.appbar.AppBarLayout;
-import CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout;
 export declare class MDCPage extends MDCPageBase {
-    appBarLayout: AppBarLayout;
-    nativeViewProtected: CoordinatorLayout;
-    contentLayout: CoordinatorLayout;
-    createNativeView(): CoordinatorLayout;
+    appBarLayout: com.google.android.material.appbar.AppBarLayout;
+    nativeViewProtected: androidx.coordinatorlayout.widget.CoordinatorLayout;
+    contentLayout: androidx.coordinatorlayout.widget.CoordinatorLayout;
+    createNativeView(): androidx.coordinatorlayout.widget.CoordinatorLayout;
     onLoaded(): void;
     _addViewToNativeVisualTree(child: View, atIndex?: number): boolean;
     _removeViewFromNativeVisualTree(child: View): void;

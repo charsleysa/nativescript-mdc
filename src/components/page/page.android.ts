@@ -19,15 +19,30 @@ declare module 'tns-core-modules/ui/page' {
     }
 }
 
-import AppBarLayout = com.google.android.material.appbar.AppBarLayout;
-import CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout;
+let AppBarLayout: typeof com.google.android.material.appbar.AppBarLayout;
+let CoordinatorLayout: typeof androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+function initAppBarLayout() {
+    if (!AppBarLayout) {
+        AppBarLayout = com.google.android.material.appbar.AppBarLayout;
+    }
+}
+
+function initCoordinatorLayout() {
+    if (!CoordinatorLayout) {
+        CoordinatorLayout = androidx.coordinatorlayout.widget.CoordinatorLayout;
+    }
+}
 
 export class MDCPage extends MDCPageBase {
-    appBarLayout: AppBarLayout;
-    nativeViewProtected: CoordinatorLayout;
-    contentLayout: CoordinatorLayout;
+    appBarLayout: com.google.android.material.appbar.AppBarLayout;
+    nativeViewProtected: androidx.coordinatorlayout.widget.CoordinatorLayout;
+    contentLayout: androidx.coordinatorlayout.widget.CoordinatorLayout;
 
     public createNativeView() {
+        initAppBarLayout();
+        initCoordinatorLayout();
+
         const layout = new CoordinatorLayout(this._context);
 
         this.appBarLayout = new AppBarLayout(this._context);
@@ -59,9 +74,7 @@ export class MDCPage extends MDCPageBase {
 
             if (child instanceof ActionBar) {
                 const params = new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.MATCH_PARENT, AppBarLayout.LayoutParams.WRAP_CONTENT);
-                // const  params =  (child.nativeViewProtected as androidx.appcompat.widget.Toolbar).getLayoutParams() as  (com.google.android.material.appbar.AppBarLayout.LayoutParams);
                 params.setScrollFlags(0);
-                // params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
                 this.appBarLayout.addView(child.nativeViewProtected, params);
             } else if (child instanceof BottomAppBar) {
                 const params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
