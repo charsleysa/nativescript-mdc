@@ -19,9 +19,6 @@ export interface ShowBottomSheetOptions {
     context?: any;
     dismissOnBackgroundTap?: boolean;
     closeCallback?: Function;
-    ios?: {
-        trackingScrollView?: string;
-    };
 }
 export declare const _rootBottomSheetViews: ViewBase[];
 export declare abstract class ViewWithBottomSheetBase extends View {

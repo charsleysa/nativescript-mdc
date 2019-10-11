@@ -33,9 +33,6 @@ export interface ShowBottomSheetOptions {
     context?: any; // Any context you want to pass to the view shown in bottom sheet. This same context will be available in the arguments of the shownInBottomSheet event handler.
     dismissOnBackgroundTap?: boolean; // An optional parameter specifying whether to dismiss the sheet when clicking on background.
     closeCallback?: Function; //  A function that will be called when the view is closed. Any arguments provided when calling shownInBottomSheet.closeCallback will be available here.
-    ios?: {
-        trackingScrollView?: string; // optional id of the scroll view to track
-    };
 }
 
 export const _rootBottomSheetViews = new Array<ViewBase>();

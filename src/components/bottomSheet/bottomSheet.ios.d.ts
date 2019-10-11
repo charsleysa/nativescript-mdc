@@ -15,13 +15,18 @@ declare module 'tns-core-modules/ui/core/view/view' {
 export declare namespace ios {
     class BottomSheetUILayoutViewController extends UIViewController {
         owner: WeakRef<View>;
+        view: UIScrollView;
         static initWithOwner(owner: WeakRef<View>): BottomSheetUILayoutViewController;
+        private getSafeAreaInsets;
         private initLayoutGuide;
         private layoutView;
         private layoutParent;
+        loadView(): void;
+        viewDidLoad(): void;
         viewDidLayoutSubviews(): void;
         viewWillAppear(animated: boolean): void;
         viewDidDisappear(animated: boolean): void;
+        viewSafeAreaInsetsDidChange(): void;
     }
     class MDCBottomSheetControllerDelegateImpl extends NSObject implements MDCBottomSheetControllerDelegate {
         static ObjCProtocols: {

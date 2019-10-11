@@ -41,32 +41,28 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
             this.viewController = controller;
         }
 
-        controller.modalPresentationStyle = UIModalPresentationStyle.FormSheet;
+        controller.modalPresentationStyle = UIModalPresentationStyle.Custom;
 
         this.horizontalAlignment = 'stretch';
         this.verticalAlignment = 'stretch';
 
         this._raiseShowingBottomSheetEvent();
         const bottomSheet = MDCBottomSheetController.alloc().initWithContentViewController(controller);
+        bottomSheet.trackingScrollView = controller.view;
         this._bottomSheetControllerDelegate = ios.MDCBottomSheetControllerDelegateImpl.initWithOwnerAndCallback(new WeakRef(this), this._closeBottomSheetCallback);
         bottomSheet.delegate = this._bottomSheetControllerDelegate;
         bottomSheet.isScrimAccessibilityElement = true;
         bottomSheet.scrimAccessibilityLabel = 'close';
         bottomSheet.dismissOnBackgroundTap = options.dismissOnBackgroundTap !== false;
+        bottomSheet.shouldFlashScrollIndicatorsOnAppearance = true;
 
-        if (options.ios && options.ios.trackingScrollView) {
-            const scrollView = this.getViewById(options.ios.trackingScrollView);
-            if (scrollView && scrollView.nativeViewProtected instanceof UIScrollView) {
-                bottomSheet.trackingScrollView = scrollView.nativeViewProtected;
-            }
-        }
         (<any>controller).animated = true;
         parentController.presentViewControllerAnimatedCompletion(bottomSheet, true, null);
         if (!this.backgroundColor) {
             this.backgroundColor = 'white';
-            bottomSheet.view.backgroundColor = UIColor.whiteColor;
+            controller.view.backgroundColor = UIColor.whiteColor;
         } else {
-            bottomSheet.view.backgroundColor = this.style.backgroundColor.ios;
+            controller.view.backgroundColor = this.style.backgroundColor.ios;
         }
         const transitionCoordinator = bottomSheet.transitionCoordinator;
         if (transitionCoordinator) {
@@ -97,7 +93,7 @@ export class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 
         const parentController = parent.viewController;
         const animated = (<any>this.viewController).animated;
-        parentController.dismissViewControllerAnimatedCompletion(false, whenClosedCallback);
+        parentController.dismissViewControllerAnimatedCompletion(animated, whenClosedCallback);
     }
 }
 
@@ -121,6 +117,7 @@ export namespace ios {
 
     export class BottomSheetUILayoutViewController extends UIViewController {
         public owner: WeakRef<View>;
+        public view: UIScrollView;
 
         public static initWithOwner(owner: WeakRef<View>): BottomSheetUILayoutViewController {
             const controller = <BottomSheetUILayoutViewController>BottomSheetUILayoutViewController.new();
@@ -128,46 +125,64 @@ export namespace ios {
             return controller;
         }
 
-        private initLayoutGuide(controller: UIViewController) {
-            const rootView = controller.view;
+        private getSafeAreaInsets() {
+            const safeAreaInsets = this.view.safeAreaInsets;
+            const insets = { left: 0, top: 0, right: 0, bottom: 0 };
+            if (safeAreaInsets) {
+                insets.left = layout.round(layout.toDevicePixels(safeAreaInsets.left));
+                insets.top = layout.round(layout.toDevicePixels(safeAreaInsets.top));
+                insets.right = layout.round(layout.toDevicePixels(safeAreaInsets.right));
+                insets.bottom = layout.round(layout.toDevicePixels(safeAreaInsets.bottom));
+            }
+            return insets;
+        }
+
+        private initLayoutGuide() {
+            const rootView = this.view;
             const layoutGuide = UILayoutGuide.alloc().init();
             rootView.addLayoutGuide(layoutGuide);
             NSLayoutConstraint.activateConstraints(<any>[
-                layoutGuide.topAnchor.constraintEqualToAnchor(controller.topLayoutGuide.bottomAnchor),
-                layoutGuide.bottomAnchor.constraintEqualToAnchor(controller.bottomLayoutGuide.topAnchor),
+                layoutGuide.topAnchor.constraintEqualToAnchor(this.topLayoutGuide.bottomAnchor),
+                layoutGuide.bottomAnchor.constraintEqualToAnchor(this.bottomLayoutGuide.topAnchor),
                 layoutGuide.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
                 layoutGuide.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor)
             ]);
             return layoutGuide;
         }
 
-        private layoutView(controller: UIViewController, owner: View): void {
-            let layoutGuide = controller.view.safeAreaLayoutGuide;
+        private layoutView(owner: View): void {
+            let layoutGuide = this.view.safeAreaLayoutGuide;
             if (!layoutGuide) {
                 traceWrite(`safeAreaLayoutGuide during layout of ${owner}. Creating fallback constraints, but layout might be wrong.`, traceCategories.Layout, traceMessageType.error);
 
-                layoutGuide = this.initLayoutGuide(controller);
+                layoutGuide = this.initLayoutGuide();
             }
             const safeArea = layoutGuide.layoutFrame;
             let position = iosView.getPositionFromFrame(safeArea);
+
             const safeAreaSize = safeArea.size;
-
-            const hasChildViewControllers = controller.childViewControllers.count > 0;
-            if (hasChildViewControllers) {
-                const fullscreen = controller.view.frame;
-                position = iosView.getPositionFromFrame(fullscreen);
-            }
-
             const safeAreaWidth = layout.round(layout.toDevicePixels(safeAreaSize.width));
             const safeAreaHeight = layout.round(layout.toDevicePixels(safeAreaSize.height));
 
             const widthSpec = layout.makeMeasureSpec(safeAreaWidth, layout.EXACTLY);
-            const heightSpec = layout.makeMeasureSpec(safeAreaHeight, layout.UNSPECIFIED);
+            const heightSpec = layout.makeMeasureSpec(0, layout.UNSPECIFIED);
+
+            const insets = this.getSafeAreaInsets();
 
             View.measureChild(null, owner, widthSpec, heightSpec);
-            View.layoutChild(null, owner, position.left, position.top, position.right, position.top + owner.getMeasuredHeight());
+            View.layoutChild(null, owner, position.left, 0, position.right, insets.top + owner.getMeasuredHeight());
 
-            this.preferredContentSize = CGSizeMake(layout.toDeviceIndependentPixels(owner.getMeasuredWidth()), position.top + layout.toDeviceIndependentPixels(owner.getMeasuredHeight()));
+            const extraInsetTop = owner.getMeasuredHeight() > safeAreaHeight ? insets.top : 0;
+
+            this.view.contentSize = CGSizeMake(
+                layout.toDeviceIndependentPixels(owner.getMeasuredWidth()),
+                layout.toDeviceIndependentPixels(insets.top + extraInsetTop + owner.getMeasuredHeight())
+            );
+
+            this.preferredContentSize = CGSizeMake(
+                layout.toDeviceIndependentPixels(owner.getMeasuredWidth()),
+                layout.toDeviceIndependentPixels(Math.min(owner.getMeasuredHeight(), safeAreaHeight))
+            );
 
             this.layoutParent(owner.parent);
         }
@@ -191,19 +206,21 @@ export namespace ios {
             this.layoutParent(view.parent);
         }
 
-        // public viewWillLayoutSubviews(): void {
-        //     super.viewWillLayoutSubviews();
-        //     const owner = this.owner.get();
-        //     if (owner) {
-        //         ios.updateConstraints(this, owner);
-        //     }
-        // }
+        public loadView(): void {
+            this.view = UIScrollView.new();
+        }
+
+        public viewDidLoad(): void {
+            super.viewDidLoad();
+            this.view.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+            this.view.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
+        }
 
         public viewDidLayoutSubviews(): void {
             super.viewDidLayoutSubviews();
             const owner = this.owner.get();
             if (owner) {
-                this.layoutView(this, owner);
+                this.layoutView(owner);
             }
         }
 
@@ -227,6 +244,14 @@ export namespace ios {
             if (owner && !owner.parent) {
                 owner.callUnloaded();
             }
+        }
+
+        public viewSafeAreaInsetsDidChange(): void {
+            super.viewSafeAreaInsetsDidChange();
+            const insets = this.getSafeAreaInsets();
+            const contentInset = this.view.contentInset;
+            contentInset.top = -insets.top;
+            this.view.contentInset = contentInset;
         }
     }
 
