@@ -250,7 +250,7 @@ export namespace ios {
             super.viewSafeAreaInsetsDidChange();
             const insets = this.getSafeAreaInsets();
             const contentInset = this.view.contentInset;
-            contentInset.top = -insets.top;
+            contentInset.top = -layout.toDeviceIndependentPixels(insets.top);
             this.view.contentInset = contentInset;
         }
     }
