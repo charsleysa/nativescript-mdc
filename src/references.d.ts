@@ -5,7 +5,7 @@
 import { Color } from "tns-core-modules/color/color";
 import { Page } from "tns-core-modules/ui/page/page";
 
-declare module 'tns-core-modules/ui/dialogs' {
+declare module '@nativescript/core/ui/dialogs' {
     function isDialogOptions(arg): boolean;
     function getTextFieldColor(): Color;
     function getLabelColor(): Color;

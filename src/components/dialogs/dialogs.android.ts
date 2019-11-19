@@ -30,7 +30,7 @@ import { ad } from 'tns-core-modules/utils/utils';
 import { TextField } from '../textField/textField';
 import { LoginOptions, MDCAlertControllerOptions, PromptOptions } from './dialogs';
 
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _setupAsRootView(context: any): void;
         callLoaded(): void;

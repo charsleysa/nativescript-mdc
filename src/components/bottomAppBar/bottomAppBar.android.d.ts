@@ -3,7 +3,7 @@ import { Background } from 'tns-core-modules/ui/styling/background';
 import { AndroidActionItemSettings } from './bottomAppBar';
 import { ActionItemBase, BottomAppBarBase, MainActionButtonBase, View } from './bottomAppBar-common';
 export * from './bottomAppBar-common';
-declare module 'tns-core-modules/ui/frame' {
+declare module '@nativescript/core/ui/frame' {
     interface Frame {
         _getNavBarVisible(page: Page): boolean;
     }

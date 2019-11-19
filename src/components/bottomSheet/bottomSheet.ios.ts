@@ -107,7 +107,7 @@ export function install() {
     overrideBottomSheet();
 }
 
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _setLayoutFlags(left: number, top: number, right: number, bottom: number);
     }

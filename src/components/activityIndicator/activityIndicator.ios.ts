@@ -4,7 +4,7 @@ import { screen } from 'tns-core-modules/platform/platform';
 import { themer } from '../core/core';
 import { ActivityIndicatorBase, busyProperty } from './activityIndicator-common';
 
-declare module 'tns-core-modules/ui/core/view' {
+declare module '@nativescript/core/ui/core/view' {
     interface View {
         _onSizeChanged();
     }

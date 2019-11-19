@@ -16,7 +16,7 @@ import {
 } from './bottomNavigation-common';
 
 
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _setNativeViewFrame(nativeView: UIView, frame: CGRect): void;
     }

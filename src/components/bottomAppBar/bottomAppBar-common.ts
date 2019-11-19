@@ -25,13 +25,13 @@ import {
     AndroidActionItemSettings
 } from './bottomAppBar';
 
-declare module 'tns-core-modules/data/observable' {
+declare module '@nativescript/core/data/observable' {
     interface Observable {
         _emit(eventNames: string): void;
     }
 }
 
-declare module 'tns-core-modules/ui/core/view-base/view-base' {
+declare module '@nativescript/core/ui/core/view-base/view-base' {
     interface ViewBase {
         _defaultPaddingTop: number;
         _defaultPaddingRight: number;

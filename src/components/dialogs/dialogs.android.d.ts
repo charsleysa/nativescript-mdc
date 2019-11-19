@@ -1,5 +1,5 @@
 import { LoginResult, PromptResult } from 'tns-core-modules/ui/dialogs';
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _setupAsRootView(context: any): void;
         callLoaded(): void;

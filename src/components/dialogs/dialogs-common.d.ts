@@ -3,7 +3,7 @@ import { ImageSource } from 'tns-core-modules/image-source/image-source';
 import { TextAlignment } from 'tns-core-modules/ui/text-base/text-base';
 import { Font } from 'tns-core-modules/ui/styling/font';
 import { Color } from 'tns-core-modules/color';
-declare module 'tns-core-modules/ui/core/view' {
+declare module '@nativescript/core/ui/core/view' {
     interface View {
         _setupAsRootView(context: any): void;
         callLoaded(): void;

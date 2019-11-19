@@ -21,7 +21,7 @@ export function getRippleColor(color: string | Color): any;
 export function getColorWithDefaultAlpha(color: string | Color, alpha: number): Color;
 
 
-// declare module 'tns-core-modules/ui/core/view' {
+// declare module '@nativescript/core/ui/core/view' {
 //     interface View {
 //         elevation: Length
 //         elevationHighlighted: Length

@@ -1,6 +1,6 @@
 import { View } from 'tns-core-modules/ui/core/view';
 import { EventData, ViewBase } from 'tns-core-modules/ui/frame/frame';
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         showBottomSheet(view: ViewBase, options: ShowBottomSheetOptions): ViewBase;
         showBottomSheet(moduleName: string, options: ShowBottomSheetOptions): ViewBase;

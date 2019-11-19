@@ -1,6 +1,6 @@
 import { Background } from 'tns-core-modules/ui/styling/background';
 import { TextFieldBase } from './textField-common';
-declare module 'tns-core-modules/ui/text-field/text-field' {
+declare module '@nativescript/core/ui/text-field/text-field' {
     interface TextField {
         _updateAttributedPlaceholder(): any;
     }

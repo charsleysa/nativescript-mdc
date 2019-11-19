@@ -18,7 +18,7 @@ export declare abstract class BottomNavigationBase extends View implements AddCh
     _addChildFromBuilder(name: string, value: any): void;
     protected abstract selectTabNative(index: number): void;
 }
-declare module 'tns-core-modules/ui/styling/style' {
+declare module '@nativescript/core/ui/styling/style' {
     interface Style {
         activeColor: Color;
         inactiveColor: Color;

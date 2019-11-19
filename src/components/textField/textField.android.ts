@@ -16,7 +16,7 @@ import { getFocusedColorStateList, getLayout, handleClearFocus, stateSets } from
 import { getColorWithDefaultAlpha } from '../core/core';
 import { TextFieldBase, errorColorProperty, errorProperty, floatingColorProperty, floatingProperty, helperProperty, maxLengthProperty } from './textField-common';
 
-declare module 'tns-core-modules/ui/text-field/text-field' {
+declare module '@nativescript/core/ui/text-field/text-field' {
     interface TextField {
         _redrawNativeBackground(value: android.graphics.drawable.Drawable | Background): void;
     }

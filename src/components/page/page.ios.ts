@@ -13,13 +13,13 @@ import { BottomAppBar } from '../bottomAppBar/bottomAppBar';
 
 import { MDCPageBase } from './page-common';
 
-declare module 'tns-core-modules/ui/action-bar' {
+declare module '@nativescript/core/ui/action-bar' {
     interface ActionBar {
         readonly _getActualSize: { width: number, height: number };
     }
 }
 
-declare module 'tns-core-modules/ui/page' {
+declare module '@nativescript/core/ui/page' {
     interface Page {
         hasActionBar: boolean;
     }

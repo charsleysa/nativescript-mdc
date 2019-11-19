@@ -7,7 +7,7 @@ export declare class ViewWithBottomSheet extends ViewWithBottomSheetBase {
 }
 export declare function overrideBottomSheet(): void;
 export declare function install(): void;
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _setLayoutFlags(left: number, top: number, right: number, bottom: number): any;
     }

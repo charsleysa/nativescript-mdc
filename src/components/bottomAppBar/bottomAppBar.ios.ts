@@ -20,7 +20,7 @@ import {
 
 export * from './bottomAppBar-common';
 
-declare module 'tns-core-modules/ui/core/view/view' {
+declare module '@nativescript/core/ui/core/view/view' {
     interface View {
         _isPresentationLayerUpdateSuspeneded(): boolean;
         _nativeBackgroundState: string;

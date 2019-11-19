@@ -1,6 +1,6 @@
 import { View } from 'tns-core-modules/ui/page/page';
 import { MDCPageBase } from './page-common';
-declare module 'tns-core-modules/ui/page' {
+declare module '@nativescript/core/ui/page' {
     interface Page {
         updateActionBar(): any;
     }

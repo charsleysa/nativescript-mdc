@@ -11,7 +11,7 @@ import { ActionItemBase, BottomAppBarBase, MainActionButtonBase, isVisible, View
 
 export * from './bottomAppBar-common';
 
-declare module 'tns-core-modules/ui/frame' {
+declare module '@nativescript/core/ui/frame' {
     interface Frame {
         _getNavBarVisible(page: Page): boolean;
     }
